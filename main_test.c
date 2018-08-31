@@ -19,11 +19,11 @@ void assert_float(char*, float, float);
 int main(int argc, const char* argv[]) {
     mat4 matrix;
 
-    matrix.cols[X].vec[X] = 0.1;
-    matrix.cols[X].vec[Y] = 0.2;
-    matrix.cols[X].vec[Z] = 0.3;
-    matrix.cols[X].vec[W] = 0.4;
-    matrix.cols[W].vec[W] = 0.16;
+    matrix.cols[COL1].vec[X] = 0.1;
+    matrix.cols[COL1].vec[Y] = 0.2;
+    matrix.cols[COL1].vec[Z] = 0.3;
+    matrix.cols[COL1].vec[W] = 0.4;
+    matrix.cols[COL4].vec[W] = 0.16;
 
     mat4* result = scalar_mult(&matrix, 2);
 

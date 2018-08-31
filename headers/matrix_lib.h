@@ -10,6 +10,11 @@
 #define Z 2
 #define W 3
 
+#define COL1 0
+#define COL2 1
+#define COL3 2
+#define COL4 3
+
 typedef struct {
     float vec[COL_SIZE];
 } vec4;
