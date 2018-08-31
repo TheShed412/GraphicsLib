@@ -18,19 +18,25 @@ void assert_float(char*, float, float);
 
 int main(int argc, const char* argv[]) {
     mat4 matrix;
-    matrix.col1.x = 0.1;
-    matrix.col1.y = 0.2;
-    matrix.col1.z = 0.3;
-    matrix.col1.w = 0.4;
-    matrix.col4.w = 0.16;
+    // matrix.col1.x = 0.1;
+    // matrix.col1.y = 0.2;
+    // matrix.col1.z = 0.3;
+    // matrix.col1.w = 0.4;
+    // matrix.col4.w = 0.16;
+
+    matrix.cols[0].vec[0] = 0.1;
+    matrix.cols[0].vec[1] = 0.2;
+    matrix.cols[0].vec[2] = 0.3;
+    matrix.cols[0].vec[3] = 0.4;
+    matrix.cols[3].vec[3] = 0.16;
 
     mat4* result = scalar_mult(&matrix, 2);
 
-    assert_float("scalar_mult", 0.2, result->col1.x);
-    assert_float("scalar_mult", 0.4, result->col1.y);
-    assert_float("scalar_mult", 0.6, result->col1.z);
-    assert_float("scalar_mult", 0.8, result->col1.w);
-    assert_float("scalar_mult", 0.32, result->col4.w);
+    assert_float("scalar_mult", 0.2, result->cols[0].vec[0]);
+    assert_float("scalar_mult", 0.4, result->cols[0].vec[1]);
+    assert_float("scalar_mult", 0.6, result->cols[0].vec[2]);
+    assert_float("scalar_mult", 0.8, result->cols[0].vec[3]);
+    assert_float("scalar_mult", 0.32, result->cols[3].vec[3]);
     free(result);
 
     return 0;
