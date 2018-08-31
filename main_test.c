@@ -24,11 +24,11 @@ int main(int argc, const char* argv[]) {
     // matrix.col1.w = 0.4;
     // matrix.col4.w = 0.16;
 
-    matrix.cols[0].vec[0] = 0.1;
-    matrix.cols[0].vec[1] = 0.2;
-    matrix.cols[0].vec[2] = 0.3;
-    matrix.cols[0].vec[3] = 0.4;
-    matrix.cols[3].vec[3] = 0.16;
+    matrix.cols[X].vec[X] = 0.1;
+    matrix.cols[X].vec[Y] = 0.2;
+    matrix.cols[X].vec[Z] = 0.3;
+    matrix.cols[X].vec[W] = 0.4;
+    matrix.cols[W].vec[W] = 0.16;
 
     mat4* result = scalar_mult(&matrix, 2);
 

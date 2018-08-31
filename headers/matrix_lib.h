@@ -5,6 +5,11 @@
 #define ROW_SIZE 4
 #define MAT_LENGTH 16
 
+#define X 0
+#define Y 1
+#define Z 2
+#define W 3
+
 typedef struct {
     float vec[COL_SIZE];
 } vec4;
