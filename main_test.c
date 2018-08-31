@@ -18,11 +18,6 @@ void assert_float(char*, float, float);
 
 int main(int argc, const char* argv[]) {
     mat4 matrix;
-    // matrix.col1.x = 0.1;
-    // matrix.col1.y = 0.2;
-    // matrix.col1.z = 0.3;
-    // matrix.col1.w = 0.4;
-    // matrix.col4.w = 0.16;
 
     matrix.cols[X].vec[X] = 0.1;
     matrix.cols[X].vec[Y] = 0.2;
