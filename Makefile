@@ -1,7 +1,8 @@
 OBJDIR=obj
+LIBDIR=lib
 
 $(OBJDIR)/%.o: %.c
 	gcc -g -c -o $@ $<
 
-matlibtest: $(OBJDIR)/matrix_lib.o
-	gcc -Wall -Werror -g -o matrix_lib matrix_lib.c
+maintest: $(OBJDIR)/main_test.o
+	gcc -Wall -Werror -g -o main_test $(LIBDIR)/matrix_lib.c main_test.c
