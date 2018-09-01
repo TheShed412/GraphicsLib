@@ -23,6 +23,10 @@ typedef struct {
     vec4 cols[ROW_SIZE];
 } mat4;
 
+mat4* mat4_mult(const mat4* left_op, const mat4* right_op);
+
 mat4* scalar_mult(const mat4* matrix, float scalar);
+
+float vec_mult(const vec4* left, const vec4* right);
 
 #endif

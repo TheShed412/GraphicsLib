@@ -34,6 +34,23 @@ int main(int argc, const char* argv[]) {
     assert_float("scalar_mult", 0.32, result->cols[3].vec[3]);
     free(result);
 
+    vec4 left;
+    vec4 right;
+
+    left.vec[X] = 1.0;
+    left.vec[Y] = 2.0;
+    left.vec[Z] = 1.0;
+    left.vec[W] = 1.0;
+
+    right.vec[X] = 2.0;
+    right.vec[Y] = 2.0;
+    right.vec[Z] = 2.0;
+    right.vec[W] = 2.0;
+
+    float vec_result = vec_mult(&left, &right);
+
+    assert_float("vec_mult", 10.0, vec_result);
+
     return 0;
 }
 
