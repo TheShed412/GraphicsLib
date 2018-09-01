@@ -64,6 +64,21 @@ int main(int argc, const char* argv[]) {
     assert_float("vec_from_row", result_vec->vec[Z], 3.0);
     assert_float("vec_from_row", result_vec->vec[W], 4.0);
 
+    mat4 matrix3;
+    set_mat_zeroes(&matrix3);
+
+    matrix3.cols[COL1].vec[X] = 2.0;
+    matrix3.cols[COL1].vec[Y] = 2.0;
+    matrix3.cols[COL1].vec[Z] = 2.0;
+    matrix3.cols[COL1].vec[W] = 2.0;
+
+    mat4* result_mat = mat4_mult(&matrix3, &matrix3);
+
+    assert_float("mat4_mult", 4.0, result->cols[COL1].vec[X]);
+    assert_float("mat4_mult", 4.0, result->cols[COL2].vec[X]);
+    assert_float("mat4_mult", 4.0, result->cols[COL3].vec[X]);
+    assert_float("mat4_mult", 4.0, result->cols[COL4].vec[X]);
+
     return 0;
 }
 

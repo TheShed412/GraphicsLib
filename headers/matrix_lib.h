@@ -31,4 +31,8 @@ float vec_mult(const vec4* left, const vec4* right);
 
 vec4* vec_from_row(const mat4* matrix, int row);
 
+void set_vec_zeros(vec4* dirty_vec);
+
+void set_mat_zeroes(mat4* dirty_mat);
+
 #endif

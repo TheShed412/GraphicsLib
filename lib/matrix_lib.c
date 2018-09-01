@@ -27,10 +27,18 @@ mat4* mat4_mult(const mat4* left_op, const mat4* right_op){
     mat4* result = (mat4*) malloc(sizeof(mat4));
     vec4 row_vec; // vec from the left_op
     vec4 col_vec; // vec from the right_op
+    set_vec_zeros(&row_vec);
+    set_vec_zeros(&col_vec);
 
     /* loop is iterating through the rows */
-    for(int i = 0; i < ROW_SIZE; i++) {
+    for(int row_i = 0; row_i < ROW_SIZE; row_i++) {
+        row_vec = (*vec_from_row(left_op, row_i));
 
+        for(int col_j = 0; col_j < COL_SIZE; col_j++) {
+            col_vec = right_op->cols[col_j];
+            float point = vec_mult(&row_vec, &col_vec);
+            result->cols[row_i].vec[col_j] = point;
+        }
     }
 
     return result;
@@ -46,4 +54,17 @@ mat4* scalar_mult(const mat4* matrix, float scalar){
     }
 
     return result;
+}
+
+void set_vec_zeros(vec4* dirty_vec) {
+    for (int i = 0; i < COL_SIZE; i ++) {
+        dirty_vec->vec[i] = 0.0;
+    }
+}
+
+void set_mat_zeroes(mat4* dirty_mat) {
+    
+    for (int i = 0; i < ROW_SIZE; i++){
+        set_vec_zeros(&dirty_mat->cols[i]);
+    }
 }
