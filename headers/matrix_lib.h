@@ -35,4 +35,6 @@ void set_vec_zeros(vec4* dirty_vec);
 
 void set_mat_zeroes(mat4* dirty_mat);
 
+mat4* make_mat4();
+
 #endif

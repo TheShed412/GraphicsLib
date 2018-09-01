@@ -68,3 +68,9 @@ void set_mat_zeroes(mat4* dirty_mat) {
         set_vec_zeros(&dirty_mat->cols[i]);
     }
 }
+
+mat4* make_mat4() {
+    mat4* result = (mat4*) malloc(sizeof(mat4));
+    set_mat_zeroes(result);
+    return result;
+}
