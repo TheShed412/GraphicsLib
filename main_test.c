@@ -99,6 +99,36 @@ int main(int argc, const char* argv[]) {
     assert_float("mat4_mult", 8.0, result_mat->cols[COL3].vec[W]);
     assert_float("mat4_mult", 8.0, result_mat->cols[COL4].vec[W]);
 
+    float float_arr[COL_SIZE][ROW_SIZE] = {{2, 2, 2, 2}, 
+                                           {0, 0, 0, 0},
+                                           {0, 0, 0, 0},
+                                           {2, 2, 2, 2}};
+    
+    mat4 arr_to_mat;
+    arr_to_mat4(float_arr, &arr_to_mat);
+
+    mat4* result_mat2 = mat4_mult(&arr_to_mat, &arr_to_mat);
+
+    assert_float("arr_to_mat4", 8.0, result_mat2->cols[COL1].vec[X]);
+    assert_float("arr_to_mat4", 8.0, result_mat2->cols[COL2].vec[X]);
+    assert_float("arr_to_mat4", 8.0, result_mat2->cols[COL3].vec[X]);
+    assert_float("arr_to_mat4", 8.0, result_mat2->cols[COL4].vec[X]);
+
+    assert_float("arr_to_mat4", 0.0, result_mat2->cols[COL1].vec[Y]);
+    assert_float("arr_to_mat4", 0.0, result_mat2->cols[COL2].vec[Y]);
+    assert_float("arr_to_mat4", 0.0, result_mat2->cols[COL3].vec[Y]);
+    assert_float("arr_to_mat4", 0.0, result_mat2->cols[COL4].vec[Y]);
+
+    assert_float("arr_to_mat4", 0.0, result_mat2->cols[COL1].vec[Z]);
+    assert_float("arr_to_mat4", 0.0, result_mat2->cols[COL2].vec[Z]);
+    assert_float("arr_to_mat4", 0.0, result_mat2->cols[COL3].vec[Z]);
+    assert_float("arr_to_mat4", 0.0, result_mat2->cols[COL4].vec[Z]);
+
+    assert_float("arr_to_mat4", 8.0, result_mat2->cols[COL1].vec[W]);
+    assert_float("arr_to_mat4", 8.0, result_mat2->cols[COL2].vec[W]);
+    assert_float("arr_to_mat4", 8.0, result_mat2->cols[COL3].vec[W]);
+    assert_float("arr_to_mat4", 8.0, result_mat2->cols[COL4].vec[W]);
+
     return 0;
 }
 

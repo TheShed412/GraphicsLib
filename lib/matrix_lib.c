@@ -74,3 +74,13 @@ mat4* make_mat4() {
     set_mat_zeroes(result);
     return result;
 }
+
+void arr_to_mat4(float float_arr[4][4], mat4* dest_mat) {
+
+    for(int col_i = 0; col_i < COL_SIZE; col_i++) {
+        for(int row = 0; row < ROW_SIZE; row++) {
+            dest_mat->cols[col_i].vec[row] = float_arr[row][col_i];
+        }
+    }
+
+}

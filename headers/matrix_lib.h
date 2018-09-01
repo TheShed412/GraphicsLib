@@ -37,4 +37,6 @@ void set_mat_zeroes(mat4* dirty_mat);
 
 mat4* make_mat4();
 
+void arr_to_mat4(float float_arr[4][4], mat4* dest_mat);
+
 #endif
