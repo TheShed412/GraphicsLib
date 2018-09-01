@@ -72,12 +72,32 @@ int main(int argc, const char* argv[]) {
     matrix3.cols[COL3].vec[X] = 2.0;
     matrix3.cols[COL4].vec[X] = 2.0;
 
+    matrix3.cols[COL1].vec[W] = 2.0;
+    matrix3.cols[COL2].vec[W] = 2.0;
+    matrix3.cols[COL3].vec[W] = 2.0;
+    matrix3.cols[COL4].vec[W] = 2.0;
+
     mat4* result_mat = mat4_mult(&matrix3, &matrix3);
 
-    assert_float("mat4_mult", 4.0, result_mat->cols[COL1].vec[X]);
-    assert_float("mat4_mult", 4.0, result_mat->cols[COL2].vec[X]);
-    assert_float("mat4_mult", 4.0, result_mat->cols[COL3].vec[X]);
-    assert_float("mat4_mult", 4.0, result_mat->cols[COL4].vec[X]);
+    assert_float("mat4_mult", 8.0, result_mat->cols[COL1].vec[X]);
+    assert_float("mat4_mult", 8.0, result_mat->cols[COL2].vec[X]);
+    assert_float("mat4_mult", 8.0, result_mat->cols[COL3].vec[X]);
+    assert_float("mat4_mult", 8.0, result_mat->cols[COL4].vec[X]);
+
+    assert_float("mat4_mult", 0.0, result_mat->cols[COL1].vec[Y]);
+    assert_float("mat4_mult", 0.0, result_mat->cols[COL2].vec[Y]);
+    assert_float("mat4_mult", 0.0, result_mat->cols[COL3].vec[Y]);
+    assert_float("mat4_mult", 0.0, result_mat->cols[COL4].vec[Y]);
+
+    assert_float("mat4_mult", 0.0, result_mat->cols[COL1].vec[Z]);
+    assert_float("mat4_mult", 0.0, result_mat->cols[COL2].vec[Z]);
+    assert_float("mat4_mult", 0.0, result_mat->cols[COL3].vec[Z]);
+    assert_float("mat4_mult", 0.0, result_mat->cols[COL4].vec[Z]);
+
+    assert_float("mat4_mult", 8.0, result_mat->cols[COL1].vec[W]);
+    assert_float("mat4_mult", 8.0, result_mat->cols[COL2].vec[W]);
+    assert_float("mat4_mult", 8.0, result_mat->cols[COL3].vec[W]);
+    assert_float("mat4_mult", 8.0, result_mat->cols[COL4].vec[W]);
 
     return 0;
 }
