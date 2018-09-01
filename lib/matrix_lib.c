@@ -12,13 +12,25 @@ float vec_mult(const vec4* left, const vec4* right){
     return result;
 }
 
+vec4* vec_from_row(const mat4* matrix, int row){
+    vec4* result = (vec4*) malloc(sizeof(vec4));
+
+    /* looping across the columns to get the rows */
+    for(int i = 0; i < COL_SIZE; i ++) {
+        result->vec[i] = matrix->cols[i].vec[row];
+    }
+
+    return result;
+}
+
 mat4* mat4_mult(const mat4* left_op, const mat4* right_op){
     mat4* result = (mat4*) malloc(sizeof(mat4));
+    vec4 row_vec; // vec from the left_op
+    vec4 col_vec; // vec from the right_op
 
+    /* loop is iterating through the rows */
     for(int i = 0; i < ROW_SIZE; i++) {
-        for(int j = 0; j < COL_SIZE; j++) {
 
-        }
     }
 
     return result;

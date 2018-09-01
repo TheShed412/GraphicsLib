@@ -51,6 +51,19 @@ int main(int argc, const char* argv[]) {
 
     assert_float("vec_mult", 10.0, vec_result);
 
+    mat4 matrix2;
+    matrix2.cols[COL1].vec[X] = 1.0;
+    matrix2.cols[COL2].vec[X] = 2.0;
+    matrix2.cols[COL3].vec[X] = 3.0;
+    matrix2.cols[COL4].vec[X] = 4.0;
+
+    vec4* result_vec = vec_from_row(&matrix2, X);
+
+    assert_float("vec_from_row", result_vec->vec[X], 1.0);
+    assert_float("vec_from_row", result_vec->vec[Y], 2.0);
+    assert_float("vec_from_row", result_vec->vec[Z], 3.0);
+    assert_float("vec_from_row", result_vec->vec[W], 4.0);
+
     return 0;
 }
 

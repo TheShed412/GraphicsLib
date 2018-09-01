@@ -29,4 +29,6 @@ mat4* scalar_mult(const mat4* matrix, float scalar);
 
 float vec_mult(const vec4* left, const vec4* right);
 
+vec4* vec_from_row(const mat4* matrix, int row);
+
 #endif
