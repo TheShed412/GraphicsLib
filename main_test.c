@@ -68,9 +68,9 @@ int main(int argc, const char* argv[]) {
     //set_mat_zeroes(&matrix3);
 
     matrix3.cols[COL1].vec[X] = 2.0;
-    matrix3.cols[COL1].vec[Y] = 2.0;
-    matrix3.cols[COL1].vec[Z] = 2.0;
-    matrix3.cols[COL1].vec[W] = 2.0;
+    matrix3.cols[COL2].vec[X] = 2.0;
+    matrix3.cols[COL3].vec[X] = 2.0;
+    matrix3.cols[COL4].vec[X] = 2.0;
 
     mat4* result_mat = mat4_mult(&matrix3, &matrix3);
 

@@ -37,7 +37,7 @@ mat4* mat4_mult(const mat4* left_op, const mat4* right_op){
         for(int col_j = 0; col_j < COL_SIZE; col_j++) {
             col_vec = right_op->cols[col_j];
             float point = vec_mult(&row_vec, &col_vec);
-            result->cols[row_i].vec[col_j] = point;
+            result->cols[col_j].vec[row_i] = point;
         }
     }
 
