@@ -99,7 +99,7 @@ int main(int argc, const char* argv[]) {
     assert_float("mat4_mult", 8.0, result_mat->cols[COL3].vec[W]);
     assert_float("mat4_mult", 8.0, result_mat->cols[COL4].vec[W]);
 
-    float float_arr[COL_SIZE][ROW_SIZE] = {{2, 2, 2, 2}, 
+    float float_arr[ROW_SIZE][COL_SIZE] = {{2, 2, 2, 2}, 
                                            {0, 0, 0, 0},
                                            {0, 0, 0, 0},
                                            {2, 2, 2, 2}};
