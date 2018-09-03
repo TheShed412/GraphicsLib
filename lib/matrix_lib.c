@@ -78,8 +78,8 @@ void set_mat_zeroes(mat4* dirty_mat) {
 }
 
 mat4* make_mat4() {
-    mat4* result = (mat4*) malloc(sizeof(mat4));
-    set_mat_zeroes(result);
+    mat4* result = (mat4*) calloc(1, sizeof(mat4));
+    //set_mat_zeroes(result);
     return result;
 }
 
