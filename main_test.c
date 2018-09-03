@@ -138,7 +138,19 @@ int main(int argc, const char* argv[]) {
     assert_float("arr_to_mat4", 8.0, result_mat2->cols[COL3].vec[W]);
     assert_float("arr_to_mat4", 8.0, result_mat2->cols[COL4].vec[W]);
 
-    deter3_from_array(float_arr2);
+    float** test_arr = deter3_from_array(float_arr2, Y);
+
+    float thing[3][3] = {{2, 2, 2}, 
+                        {0, 0, 0}, 
+                        {2, 2, 2}};
+
+    for(int i = 0; i < 3; i ++) {
+        for (int j = 0; j < 3; j ++) {
+            assert_float("deter3_from_array", thing[i][j], test_arr[i][j]);
+        }
+    }
+
+    determinant(result_mat2);
 
     return 0;
 }

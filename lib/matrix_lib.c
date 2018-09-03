@@ -95,21 +95,22 @@ void mat4_to_arr(const mat4* mat, float dest_arr[4][4]) {
 
 }
 
-float** deter3_from_array(const float mat4_arr[4][4]){
+float** deter3_from_array(const float mat4_arr[4][4], int skip_row){
     float* values = (float*) calloc(9, sizeof(float));
     float** deter3_arr = (float**) malloc(3 * sizeof(float*));
-
-    // values[0] = mat4_arr[0][0];
-    // values[1] = mat4_arr[0][1];
 
     for(int i = 0; i < 3; i++) {
         deter3_arr[i] = values + i*3;
     }
 
-    for(int i = 1; i < COL_SIZE; i++) {
-        for(int j = 1; j < ROW_SIZE; j++) {
-            float mat_val = mat4_arr[j][i];
-            deter3_arr[j-1][i-1] = mat_val;
+    int d_j;
+    for(int i = 1; i < ROW_SIZE; i++) {
+        d_j = 0;
+        for(int j = 0; j < COL_SIZE; j++) {
+            if (j != skip_row) {
+                deter3_arr[d_j][i-1] = mat4_arr[j][i];
+                d_j++;
+            }
         }
     }
 
@@ -127,7 +128,10 @@ float determinant(const mat4* matrix) {
     float matrix_array[4][4];
     mat4_to_arr(matrix, matrix_array);
 
-
+    float** deter1 = deter3_from_array(matrix_array, X);
+    float** deter2 = deter3_from_array(matrix_array, Y);
+    float** deter3 = deter3_from_array(matrix_array, Z);
+    float** deter4 = deter3_from_array(matrix_array, W);
 
     return 0.0;
 }
