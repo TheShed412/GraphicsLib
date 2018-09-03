@@ -39,4 +39,8 @@ mat4* make_mat4();
 
 void arr_to_mat4(float float_arr[4][4], mat4* dest_mat);
 
+float determinant(const mat4* matrix);
+
+void mat4_to_arr(const mat4* mat, float dest_arr[4][4]);
+
 #endif

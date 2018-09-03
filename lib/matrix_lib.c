@@ -84,3 +84,18 @@ void arr_to_mat4(float float_arr[4][4], mat4* dest_mat) {
     }
 
 }
+
+void mat4_to_arr(const mat4* mat, float dest_arr[4][4]) {
+
+    for(int col_i = 0; col_i < COL_SIZE; col_i++) {
+        for(int row = 0; row < ROW_SIZE; row++) {
+            dest_arr[row][col_i] = mat->cols[col_i].vec[row];
+        }
+    }
+
+}
+
+float determinant(const mat4* matrix) {
+
+    return 0.0;
+}

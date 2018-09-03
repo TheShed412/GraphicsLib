@@ -107,7 +107,16 @@ int main(int argc, const char* argv[]) {
     mat4 arr_to_mat;
     arr_to_mat4(float_arr, &arr_to_mat);
 
+    float float_arr2[ROW_SIZE][COL_SIZE];
+    mat4_to_arr(&arr_to_mat, float_arr2);
+
     mat4* result_mat2 = mat4_mult(&arr_to_mat, &arr_to_mat);
+
+    for (int i = 0; i < COL_SIZE; i++) {
+        for (int j = 0; j < ROW_SIZE; j++) {
+            assert_float("mat4_to_arr", float_arr[i][j], float_arr2[i][j]);
+        }
+    }
 
     assert_float("arr_to_mat4", 8.0, result_mat2->cols[COL1].vec[X]);
     assert_float("arr_to_mat4", 8.0, result_mat2->cols[COL2].vec[X]);
