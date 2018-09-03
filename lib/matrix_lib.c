@@ -2,6 +2,14 @@
 #include <stdlib.h>
 #include "../headers/matrix_lib.h"
 
+static void free_arr(float*** _arr, int size) {
+    float** arr = *_arr;
+    for(int i = 0; i < size; i++) {
+        free(arr[i]);
+    }
+    free(arr);
+}
+
 float vec_mult(const vec4* left, const vec4* right){
     float result = 0;
 
@@ -117,6 +125,26 @@ float** deter3_from_array(const float mat4_arr[4][4], int skip_row){
     return deter3_arr;
 }
 
+float determinant3x3(float** deter3) {
+
+    float _1_1 = deter3[0][0];
+    float _1_2 = deter3[0][1];
+    float _1_3 = deter3[0][2];
+
+    float _2_1 = deter3[1][0];
+    float _2_2 = deter3[1][1];
+    float _2_3 = deter3[1][2];
+
+    float _3_1 = deter3[2][0];
+    float _3_2 = deter3[2][1];
+    float _3_3 = deter3[2][2];
+
+    float positive = (_1_1*_2_2*_3_3) + (_1_2*_2_3*_3_1) + (_2_1*_3_2*_1_3);
+    float negative = (_1_3*_2_2*_3_1) + (_3_1*_1_2*_3_3) + (_2_3*_3_2*_1_1);
+
+    return positive - negative;
+}
+
 float determinant(const mat4* matrix) {
 
     /* values infront of the 3x3 determinants */
@@ -128,10 +156,22 @@ float determinant(const mat4* matrix) {
     float matrix_array[4][4];
     mat4_to_arr(matrix, matrix_array);
 
-    float** deter1 = deter3_from_array(matrix_array, X);
-    float** deter2 = deter3_from_array(matrix_array, Y);
-    float** deter3 = deter3_from_array(matrix_array, Z);
-    float** deter4 = deter3_from_array(matrix_array, W);
+    float** deter1_arr = deter3_from_array(matrix_array, X);
+    float** deter2_arr = deter3_from_array(matrix_array, Y);
+    float** deter3_arr = deter3_from_array(matrix_array, Z);
+    float** deter4_arr = deter3_from_array(matrix_array, W);
 
-    return 0.0;
+    float deter1 = determinant3x3(deter1_arr);
+    float deter2 = determinant3x3(deter2_arr);
+    float deter3 = determinant3x3(deter3_arr);
+    float deter4 = determinant3x3(deter4_arr);
+
+    float deter;
+    deter = (val1*deter1) - (val2*deter2) + (val3*deter3) - (val4*deter4);
+
+    free(deter1_arr);
+    free(deter2_arr);
+    free(deter3_arr);
+    free(deter4_arr);
+    return deter;
 }

@@ -45,4 +45,6 @@ void mat4_to_arr(const mat4* mat, float dest_arr[4][4]);
 
 float** deter3_from_array(const float mat4_arr[4][4], int skip_row);
 
+float determinant3x3(float** deter3);
+
 #endif
