@@ -149,8 +149,17 @@ int main(int argc, const char* argv[]) {
             assert_float("deter3_from_array", thing[i][j], test_arr[i][j]);
         }
     }
+    float deter_tst[ROW_SIZE][COL_SIZE] = {{1, 0, 0, 0}, 
+                                           {2, 3, 5, 0},
+                                           {0, 4, 0, 0},
+                                           {0, 4, 5, 3}};
 
-    determinant(result_mat2);
+    mat4 deter_mat_test;
+    arr_to_mat4(deter_tst, &deter_mat_test);
+
+    float deter_result = determinant(&deter_mat_test);
+
+    assert_float("determinant", -60, deter_result);
 
     return 0;
 }
