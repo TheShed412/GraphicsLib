@@ -138,6 +138,8 @@ int main(int argc, const char* argv[]) {
     assert_float("arr_to_mat4", 8.0, result_mat2->cols[COL3].vec[W]);
     assert_float("arr_to_mat4", 8.0, result_mat2->cols[COL4].vec[W]);
 
+    deter3_from_array(float_arr2);
+
     return 0;
 }
 
