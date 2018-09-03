@@ -103,11 +103,10 @@ void mat4_to_arr(const mat4* mat, float dest_arr[4][4]) {
 }
 
 float** deter3_from_array(const float mat4_arr[4][4], int skip_row){
-    float* values = (float*) calloc(9, sizeof(float));
+    
     float** deter3_arr = (float**) malloc(3 * sizeof(float*));
-
     for(int i = 0; i < 3; i++) {
-        deter3_arr[i] = values + i*3;
+        deter3_arr[i] = (float*) calloc(3, sizeof(float));
     }
 
     int d_j;
@@ -168,9 +167,9 @@ float determinant(const mat4* matrix) {
     float deter;
     deter = (val1*deter1) - (val2*deter2) + (val3*deter3) - (val4*deter4);
 
-    free(deter1_arr);
-    free(deter2_arr);
-    free(deter3_arr);
-    free(deter4_arr);
+    free_arr(&deter1_arr, 3);
+    free_arr(&deter2_arr, 3);
+    free_arr(&deter3_arr, 3);
+    free_arr(&deter4_arr, 3);
     return deter;
 }
