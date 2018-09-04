@@ -173,3 +173,41 @@ float determinant(const mat4* matrix) {
     free_arr(&deter4_arr, 3);
     return deter;
 }
+
+float** minor_matrix(const mat4* mat4_matrix, int row_skip, int col_skip) {
+    float** minor = (float**) malloc(3 * sizeof(float*));
+    for(int i = 0; i < 3; i++) {
+        minor[i] = (float*) calloc(3, sizeof(float));
+    }
+
+    float matrix[4][4];
+    mat4_to_arr(mat4_matrix, matrix);
+    int m_j;
+    int m_i = 0;
+    for(int i = 0; i < ROW_SIZE; i++) {
+        m_j = 0;
+        for(int j = 0; j < COL_SIZE; j++) {
+            if (j != row_skip && i != col_skip) {
+                minor[m_j][m_i] = matrix[j][i];
+                m_j++;
+            }
+        }
+        if (i != col_skip) {
+            m_i++;
+        }
+    }
+
+    return minor;
+}
+
+mat4* mat4_of_minors(const mat4* matrix) {
+    mat4* result = make_mat4();
+
+    for (int col_i = 0; col_i < COL_SIZE; col_i++){
+        for (int row_i = 0; row_i < ROW_SIZE; row_i++){
+
+        } 
+    }
+
+    return result;
+}

@@ -161,6 +161,39 @@ int main(int argc, const char* argv[]) {
 
     assert_float("determinant", -60, deter_result);
 
+    /* MINOR MATRIX TEST */
+    float before_minor_matrix_arr[4][4] = {{1, 1, 1, 1}, 
+                                           {2, 2, 2, 2},
+                                           {3, 3, 3, 3},
+                                           {4, 4, 4, 4}};
+    
+    float expected_minor_matrix[3][3] =  {{1, 1, 1}, 
+                                          {3, 3, 3}, 
+                                          {4, 4, 4}};
+
+    float expected_minor_matrix2[3][3] =  {{1, 1, 1}, 
+                                          {2, 2, 2}, 
+                                          {3, 3, 3}};
+
+
+    mat4 before_minor_matrix;
+    arr_to_mat4(before_minor_matrix_arr, &before_minor_matrix);
+
+    float** minor_matrix_actual = minor_matrix(&before_minor_matrix, COL2, COL2);
+    float** minor_matrix_actual2 = minor_matrix(&before_minor_matrix, COL4, COL4); 
+
+    for(int i = 0; i < 3; i ++) {
+        for (int j = 0; j < 3; j ++) {
+            assert_float("minor_matrix", expected_minor_matrix[i][j], minor_matrix_actual[i][j]);
+        }
+    }
+
+    for(int i = 0; i < 3; i ++) {
+        for (int j = 0; j < 3; j ++) {
+            assert_float("minor_matrix2", expected_minor_matrix2[i][j], minor_matrix_actual2[i][j]);
+        }
+    }
+
     return 0;
 }
 

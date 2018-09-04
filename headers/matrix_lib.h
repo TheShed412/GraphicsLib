@@ -47,4 +47,8 @@ float** deter3_from_array(const float mat4_arr[4][4], int skip_row);
 
 float determinant3x3(float** deter3);
 
+mat4* mat4_of_minors(const mat4* matrix);
+
+float** minor_matrix(const mat4* matrix, int row_skip, int col_skip);
+
 #endif
