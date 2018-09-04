@@ -51,4 +51,6 @@ mat4* mat4_of_minors(const mat4* matrix);
 
 float** minor_matrix(const mat4* matrix, int row_skip, int col_skip);
 
+mat4* cofactor(const mat4* matrix);
+
 #endif

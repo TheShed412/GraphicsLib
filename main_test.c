@@ -154,12 +154,21 @@ int main(int argc, const char* argv[]) {
                                            {0, 4, 0, 0},
                                            {0, 4, 5, 3}};
 
+    float deter_tst2[ROW_SIZE][COL_SIZE] = {{0, 0, 0, 0}, 
+                                           {2, 3, 5, 0},
+                                           {0, 4, 0, 0},
+                                           {0, 4, 5, 3}};
+
     mat4 deter_mat_test;
     arr_to_mat4(deter_tst, &deter_mat_test);
+    mat4 deter_mat_test2;
+    arr_to_mat4(deter_tst2, &deter_mat_test2);
 
     float deter_result = determinant(&deter_mat_test);
+    float deter_result2 = determinant(&deter_mat_test2);
 
     assert_float("determinant", -60, deter_result);
+    assert_float("determinant2", 0, deter_result2);
 
     /* MINOR MATRIX TEST */
     float before_minor_matrix_arr[4][4] = {{1, 1, 1, 1}, 
@@ -195,8 +204,26 @@ int main(int argc, const char* argv[]) {
     }
 
     /* mat4_of_minors TEST */
+    float cofactor_test_arr[4][4] =      {{-9, 1, -5, 7}, 
+                                           {-1, -9, -1, 1},
+                                           {0, 1, -2, -1},
+                                           {9, 1, 5, 3}};
 
-    mat4* mat4_of_minors_actual = mat4_of_minors(&before_minor_matrix);
+    float cofactor_test_exp[4][4] =      {{20, -28, 68, -164}, 
+                                           {-68, 180, 108, -36},
+                                           {-456, -40, 824, 8},
+                                           {-176, -8, 80, -168}};
+
+    mat4 cofactor_test_actual;
+    arr_to_mat4(cofactor_test_arr, &cofactor_test_actual);
+    mat4* mat4_of_minors_actual = cofactor(&cofactor_test_actual);
+    mat4_to_arr(mat4_of_minors_actual, cofactor_test_arr);
+
+    for(int i = 0; i < 3; i ++) {
+        for (int j = 0; j < 3; j ++) {
+            assert_float("cofactor", cofactor_test_exp[i][j], cofactor_test_arr[i][j]);
+        }
+    }
 
     return 0;
 }

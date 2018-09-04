@@ -215,3 +215,20 @@ mat4* mat4_of_minors(const mat4* matrix) {
 
     return result;
 }
+
+mat4* cofactor(const mat4* matrix) {
+    mat4* result = make_mat4();
+
+    result = mat4_of_minors(matrix);
+
+    int invert = 1;
+    for (int i = 0; i < COL_SIZE; i++){
+        for (int j = 0; j < ROW_SIZE; j++) {
+            result->cols[i].vec[j] *= invert;
+            invert *= -1;
+        }
+        invert *= -1;
+    }
+
+    return result;
+}
