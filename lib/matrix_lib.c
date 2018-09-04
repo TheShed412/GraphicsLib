@@ -202,11 +202,15 @@ float** minor_matrix(const mat4* mat4_matrix, int row_skip, int col_skip) {
 
 mat4* mat4_of_minors(const mat4* matrix) {
     mat4* result = make_mat4();
+    float** minor3;
+    float deter3;
 
     for (int col_i = 0; col_i < COL_SIZE; col_i++){
         for (int row_i = 0; row_i < ROW_SIZE; row_i++){
-
-        } 
+            minor3 = minor_matrix(matrix, row_i, col_i);
+            deter3 = determinant3x3(minor3);
+            result->cols[col_i].vec[row_i] = deter3;
+        }
     }
 
     return result;

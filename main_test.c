@@ -194,6 +194,10 @@ int main(int argc, const char* argv[]) {
         }
     }
 
+    /* mat4_of_minors TEST */
+
+    mat4* mat4_of_minors_actual = mat4_of_minors(&before_minor_matrix);
+
     return 0;
 }
 
