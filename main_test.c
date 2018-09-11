@@ -14,7 +14,7 @@
 #define KCYN  "\x1B[36m"
 #define KWHT  "\x1B[37m"
 
-void assert_float(char*, float, float);
+void assert_float(char*, GLfloat, GLfloat);
 
 int main(int argc, const char* argv[]) {
     mat4 matrix;
@@ -47,7 +47,7 @@ int main(int argc, const char* argv[]) {
     right.vec[Z] = 2.0;
     right.vec[W] = 2.0;
 
-    float vec_result = vec_mult(&left, &right);
+    GLfloat vec_result = vec_mult(&left, &right);
 
     assert_float("vec_mult", 10.0, vec_result);
 
@@ -99,7 +99,7 @@ int main(int argc, const char* argv[]) {
     assert_float("mat4_mult", 8.0, result_mat->cols[COL3].vec[W]);
     assert_float("mat4_mult", 8.0, result_mat->cols[COL4].vec[W]);
 
-    float float_arr[ROW_SIZE][COL_SIZE] = {{2, 2, 2, 2}, 
+    GLfloat float_arr[ROW_SIZE][COL_SIZE] = {{2, 2, 2, 2}, 
                                            {0, 0, 0, 0},
                                            {0, 0, 0, 0},
                                            {2, 2, 2, 2}};
@@ -107,7 +107,7 @@ int main(int argc, const char* argv[]) {
     mat4 arr_to_mat;
     arr_to_mat4(float_arr, &arr_to_mat);
 
-    float float_arr2[ROW_SIZE][COL_SIZE];
+    GLfloat float_arr2[ROW_SIZE][COL_SIZE];
     mat4_to_arr(&arr_to_mat, float_arr2);
 
     mat4* result_mat2 = mat4_mult(&arr_to_mat, &arr_to_mat);
@@ -138,9 +138,9 @@ int main(int argc, const char* argv[]) {
     assert_float("arr_to_mat4", 8.0, result_mat2->cols[COL3].vec[W]);
     assert_float("arr_to_mat4", 8.0, result_mat2->cols[COL4].vec[W]);
 
-    float** test_arr = deter3_from_array(float_arr2, Y);
+    GLfloat** test_arr = deter3_from_array(float_arr2, Y);
 
-    float thing[3][3] = {{2, 2, 2}, 
+    GLfloat thing[3][3] = {{2, 2, 2}, 
                         {0, 0, 0}, 
                         {2, 2, 2}};
 
@@ -149,17 +149,17 @@ int main(int argc, const char* argv[]) {
             assert_float("deter3_from_array", thing[i][j], test_arr[i][j]);
         }
     }
-    float deter_tst[ROW_SIZE][COL_SIZE] = {{1, 0, 0, 0}, 
+    GLfloat deter_tst[ROW_SIZE][COL_SIZE] = {{1, 0, 0, 0}, 
                                            {2, 3, 5, 0},
                                            {0, 4, 0, 0},
                                            {0, 4, 5, 3}};
 
-    float deter_tst2[ROW_SIZE][COL_SIZE] = {{0, 0, 0, 0}, 
+    GLfloat deter_tst2[ROW_SIZE][COL_SIZE] = {{0, 0, 0, 0}, 
                                            {2, 3, 5, 0},
                                            {0, 4, 0, 0},
                                            {0, 4, 5, 3}};
 
-    float deter_tst3[ROW_SIZE][COL_SIZE] = {{0, 9, 0, 0}, 
+    GLfloat deter_tst3[ROW_SIZE][COL_SIZE] = {{0, 9, 0, 0}, 
                                            {0, 3, 5, 0},
                                            {0, 4, 0, 0},
                                            {0, 4, 5, 3}};
@@ -171,29 +171,29 @@ int main(int argc, const char* argv[]) {
     mat4 deter_mat_test3;
     arr_to_mat4(deter_tst3, &deter_mat_test3);
 
-    float deter_result = determinant(&deter_mat_test);
-    float deter_result2 = determinant(&deter_mat_test2);
-    float deter_result3 = determinant(&deter_mat_test3);
+    GLfloat deter_result = determinant(&deter_mat_test);
+    GLfloat deter_result2 = determinant(&deter_mat_test2);
+    GLfloat deter_result3 = determinant(&deter_mat_test3);
 
     assert_float("determinant", -60, deter_result);
     assert_float("determinant2", 0, deter_result2);
     assert_float("determinant3", 0, deter_result3); 
 
     /* MINOR MATRIX TEST */
-    float before_minor_matrix_arr[4][4] = {{1, 1, 1, 1}, 
+    GLfloat before_minor_matrix_arr[4][4] = {{1, 1, 1, 1}, 
                                            {2, 2, 2, 2},
                                            {3, 3, 3, 3},
                                            {4, 4, 4, 4}};
     
-    float expected_minor_matrix[3][3] =  {{1, 1, 1}, 
+    GLfloat expected_minor_matrix[3][3] =  {{1, 1, 1}, 
                                           {3, 3, 3}, 
                                           {4, 4, 4}};
 
-    float expected_minor_matrix2[3][3] =  {{1, 1, 1}, 
+    GLfloat expected_minor_matrix2[3][3] =  {{1, 1, 1}, 
                                           {2, 2, 2}, 
                                           {3, 3, 3}};
 
-    float expected_minor_matrix3[3][3] =  {{2, 2, 2}, 
+    GLfloat expected_minor_matrix3[3][3] =  {{2, 2, 2}, 
                                           {3, 3, 3}, 
                                           {4, 4, 4}};
 
@@ -201,9 +201,9 @@ int main(int argc, const char* argv[]) {
     mat4 before_minor_matrix;
     arr_to_mat4(before_minor_matrix_arr, &before_minor_matrix);
 
-    float** minor_matrix_actual = minor_matrix(&before_minor_matrix, COL2, COL2);
-    float** minor_matrix_actual2 = minor_matrix(&before_minor_matrix, COL4, COL4);
-    float** minor_matrix_actual3 = minor_matrix(&before_minor_matrix, COL1, COL1); 
+    GLfloat** minor_matrix_actual = minor_matrix(&before_minor_matrix, COL2, COL2);
+    GLfloat** minor_matrix_actual2 = minor_matrix(&before_minor_matrix, COL4, COL4);
+    GLfloat** minor_matrix_actual3 = minor_matrix(&before_minor_matrix, COL1, COL1); 
 
     for(int i = 0; i < 3; i ++) {
         for (int j = 0; j < 3; j ++) {
@@ -224,12 +224,12 @@ int main(int argc, const char* argv[]) {
     }
 
     /* mat4_of_minors TEST */
-    float cofactor_test_arr[4][4] =      {{3, 1, 9, 2}, 
+    GLfloat cofactor_test_arr[4][4] =      {{3, 1, 9, 2}, 
                                            {4, 5, 6, 9},
                                            {3, 4, 3, 7},
                                            {7, 8, 6, 4}};
 
-    float cofactor_test_exp[4][4] =      {{90, -75, -11, 9}, 
+    GLfloat cofactor_test_exp[4][4] =      {{90, -75, -11, 9}, 
                                            {-330, 237, 91, -33},
                                            {402, -297, -115, 63},
                                            {-6, 24, 2, -12}};
@@ -245,13 +245,13 @@ int main(int argc, const char* argv[]) {
         }
     }
 
-    float deter_3x3[3][3] = {{5, 6, 9}, 
+    GLfloat deter_3x3[3][3] = {{5, 6, 9}, 
                             {4, 3, 7}, 
                             {8, 6, 4}};
 
-    float** deter_3x3_ptrs = (float**) malloc(3 * sizeof(float*));
+    GLfloat** deter_3x3_ptrs = (GLfloat**) malloc(3 * sizeof(GLfloat*));
     for(int i = 0; i < 3; i++) {
-        deter_3x3_ptrs[i] = (float*) calloc(3, sizeof(float));
+        deter_3x3_ptrs[i] = (GLfloat*) calloc(3, sizeof(GLfloat));
     }
 
     for(int i = 0; i < 3; i++) {
@@ -260,13 +260,13 @@ int main(int argc, const char* argv[]) {
         }
     }
 
-    float determinant = determinant3x3(deter_3x3_ptrs);
+    GLfloat determinant = determinant3x3(deter_3x3_ptrs);
     assert_float("determinant3x3", 90, determinant);
 
     return 0;
 }
 
-void assert_float(char* print_string, float expected, float actual) {
+void assert_float(char* print_string, GLfloat expected, GLfloat actual) {
     if (expected == actual){
         printf("%s%s%s: %s\n", KGRN, PASS_STR, KWHT, print_string);
     } else {

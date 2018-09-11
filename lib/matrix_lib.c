@@ -2,16 +2,16 @@
 #include <stdlib.h>
 #include "../headers/matrix_lib.h"
 
-static void free_arr(float*** _arr, int size) {
-    float** arr = *_arr;
+static void free_arr(GLfloat*** _arr, int size) {
+    GLfloat** arr = *_arr;
     for(int i = 0; i < size; i++) {
         free(arr[i]);
     }
     free(arr);
 }
 
-float vec_mult(const vec4* left, const vec4* right){
-    float result = 0;
+GLfloat vec_mult(const vec4* left, const vec4* right){
+    GLfloat result = 0;
 
     for(int i = 0; i < COL_SIZE; i++) {
         result += left->vec[i] * right->vec[i]; 
@@ -64,7 +64,7 @@ mat4* mat4_mult(const mat4* left_op, const mat4* right_op){
 
         for(int col_j = 0; col_j < COL_SIZE; col_j++) {
             col_vec = right_op->cols[col_j];
-            float point = vec_mult(&row_vec, &col_vec);
+            GLfloat point = vec_mult(&row_vec, &col_vec);
             result->cols[col_j].vec[row_i] = point;
         }
     }
@@ -72,7 +72,7 @@ mat4* mat4_mult(const mat4* left_op, const mat4* right_op){
     return result;
 }
 
-mat4* scalar_mult(const mat4* matrix, float scalar){
+mat4* scalar_mult(const mat4* matrix, GLfloat scalar){
     mat4* result = (mat4*) malloc(sizeof(mat4));
 
     for (int i = 0; i < COL_SIZE; i ++){
@@ -102,7 +102,7 @@ mat4* make_mat4() {
     return result;
 }
 
-void arr_to_mat4(float float_arr[4][4], mat4* dest_mat) {
+void arr_to_mat4(GLfloat float_arr[4][4], mat4* dest_mat) {
 
     for(int col_i = 0; col_i < COL_SIZE; col_i++) {
         for(int row = 0; row < ROW_SIZE; row++) {
@@ -112,7 +112,7 @@ void arr_to_mat4(float float_arr[4][4], mat4* dest_mat) {
 
 }
 
-void mat4_to_arr(const mat4* mat, float dest_arr[4][4]) {
+void mat4_to_arr(const mat4* mat, GLfloat dest_arr[4][4]) {
 
     for(int col_i = 0; col_i < COL_SIZE; col_i++) {
         for(int row = 0; row < ROW_SIZE; row++) {
@@ -122,11 +122,11 @@ void mat4_to_arr(const mat4* mat, float dest_arr[4][4]) {
 
 }
 
-float** deter3_from_array(const float mat4_arr[4][4], int skip_row){
+GLfloat** deter3_from_array(const GLfloat mat4_arr[4][4], int skip_row){
     
-    float** deter3_arr = (float**) malloc(3 * sizeof(float*));
+    GLfloat** deter3_arr = (GLfloat**) malloc(3 * sizeof(GLfloat*));
     for(int i = 0; i < 3; i++) {
-        deter3_arr[i] = (float*) calloc(3, sizeof(float));
+        deter3_arr[i] = (GLfloat*) calloc(3, sizeof(GLfloat));
     }
 
     int d_j;
@@ -144,48 +144,48 @@ float** deter3_from_array(const float mat4_arr[4][4], int skip_row){
 }
 
 /* something is fucky with this */
-float determinant3x3(float** deter3) {
+GLfloat determinant3x3(GLfloat** deter3) {
 
-    float a11 = deter3[0][0];
-    float a12 = deter3[0][1];
-    float a13 = deter3[0][2];
+    GLfloat a11 = deter3[0][0];
+    GLfloat a12 = deter3[0][1];
+    GLfloat a13 = deter3[0][2];
 
-    float a21 = deter3[1][0];
-    float a22 = deter3[1][1];
-    float a23 = deter3[1][2];
+    GLfloat a21 = deter3[1][0];
+    GLfloat a22 = deter3[1][1];
+    GLfloat a23 = deter3[1][2];
 
-    float a31 = deter3[2][0];
-    float a32 = deter3[2][1];
-    float a33 = deter3[2][2];
+    GLfloat a31 = deter3[2][0];
+    GLfloat a32 = deter3[2][1];
+    GLfloat a33 = deter3[2][2];
 
-    float positive = (a11*a22*a33) + (a12*a23*a31) + (a21*a32*a13);
-    float negative = (a13*a22*a31) + (a21*a12*a33) + (a23*a32*a11);
+    GLfloat positive = (a11*a22*a33) + (a12*a23*a31) + (a21*a32*a13);
+    GLfloat negative = (a13*a22*a31) + (a21*a12*a33) + (a23*a32*a11);
 
     return positive - negative;
 }
 
-float determinant(const mat4* matrix) {
+GLfloat determinant(const mat4* matrix) {
 
     /* values infront of the 3x3 determinants */
-    float val1 = matrix->cols[COL1].vec[X];
-    float val2 = matrix->cols[COL1].vec[Y];
-    float val3 = matrix->cols[COL1].vec[Z];
-    float val4 = matrix->cols[COL1].vec[W];
+    GLfloat val1 = matrix->cols[COL1].vec[X];
+    GLfloat val2 = matrix->cols[COL1].vec[Y];
+    GLfloat val3 = matrix->cols[COL1].vec[Z];
+    GLfloat val4 = matrix->cols[COL1].vec[W];
 
-    float matrix_array[4][4];
+    GLfloat matrix_array[4][4];
     mat4_to_arr(matrix, matrix_array);
 
-    float** deter1_arr = deter3_from_array(matrix_array, X);
-    float** deter2_arr = deter3_from_array(matrix_array, Y);
-    float** deter3_arr = deter3_from_array(matrix_array, Z);
-    float** deter4_arr = deter3_from_array(matrix_array, W);
+    GLfloat** deter1_arr = deter3_from_array(matrix_array, X);
+    GLfloat** deter2_arr = deter3_from_array(matrix_array, Y);
+    GLfloat** deter3_arr = deter3_from_array(matrix_array, Z);
+    GLfloat** deter4_arr = deter3_from_array(matrix_array, W);
 
-    float deter1 = determinant3x3(deter1_arr);
-    float deter2 = determinant3x3(deter2_arr);
-    float deter3 = determinant3x3(deter3_arr);
-    float deter4 = determinant3x3(deter4_arr);
+    GLfloat deter1 = determinant3x3(deter1_arr);
+    GLfloat deter2 = determinant3x3(deter2_arr);
+    GLfloat deter3 = determinant3x3(deter3_arr);
+    GLfloat deter4 = determinant3x3(deter4_arr);
 
-    float deter;
+    GLfloat deter;
     deter = (val1*deter1) - (val2*deter2) + (val3*deter3) - (val4*deter4);
 
     free_arr(&deter1_arr, 3);
@@ -195,10 +195,10 @@ float determinant(const mat4* matrix) {
     return deter;
 }
 
-float** minor_matrix(const mat4* mat4_matrix, int row_skip, int col_skip) {
-    float** minor = (float**) malloc(3 * sizeof(float*));
+GLfloat** minor_matrix(const mat4* mat4_matrix, int row_skip, int col_skip) {
+    GLfloat** minor = (GLfloat**) malloc(3 * sizeof(GLfloat*));
     for(int i = 0; i < 3; i++) {
-        minor[i] = (float*) calloc(3, sizeof(float));
+        minor[i] = (GLfloat*) calloc(3, sizeof(GLfloat));
     }
 
     int m_j;
@@ -221,8 +221,8 @@ float** minor_matrix(const mat4* mat4_matrix, int row_skip, int col_skip) {
 
 mat4* mat4_of_minors(const mat4* matrix) {
     mat4* result = make_mat4();
-    float** minor3;
-    float deter3;
+    GLfloat** minor3;
+    GLfloat deter3;
 
     for (int col_i = 0; col_i < COL_SIZE; col_i++){
         for (int row_i = 0; row_i < ROW_SIZE; row_i++){
