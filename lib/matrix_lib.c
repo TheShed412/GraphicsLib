@@ -123,22 +123,23 @@ float** deter3_from_array(const float mat4_arr[4][4], int skip_row){
     return deter3_arr;
 }
 
+/* something is fucky with this */
 float determinant3x3(float** deter3) {
 
-    float _1_1 = deter3[0][0];
-    float _1_2 = deter3[0][1];
-    float _1_3 = deter3[0][2];
+    float a11 = deter3[0][0];
+    float a12 = deter3[0][1];
+    float a13 = deter3[0][2];
 
-    float _2_1 = deter3[1][0];
-    float _2_2 = deter3[1][1];
-    float _2_3 = deter3[1][2];
+    float a21 = deter3[1][0];
+    float a22 = deter3[1][1];
+    float a23 = deter3[1][2];
 
-    float _3_1 = deter3[2][0];
-    float _3_2 = deter3[2][1];
-    float _3_3 = deter3[2][2];
+    float a31 = deter3[2][0];
+    float a32 = deter3[2][1];
+    float a33 = deter3[2][2];
 
-    float positive = (_1_1*_2_2*_3_3) + (_1_2*_2_3*_3_1) + (_2_1*_3_2*_1_3);
-    float negative = (_1_3*_2_2*_3_1) + (_3_1*_1_2*_3_3) + (_2_3*_3_2*_1_1);
+    float positive = (a11*a22*a33) + (a12*a23*a31) + (a21*a32*a13);
+    float negative = (a13*a22*a31) + (a21*a12*a33) + (a23*a32*a11);
 
     return positive - negative;
 }
@@ -180,15 +181,13 @@ float** minor_matrix(const mat4* mat4_matrix, int row_skip, int col_skip) {
         minor[i] = (float*) calloc(3, sizeof(float));
     }
 
-    float matrix[4][4];
-    mat4_to_arr(mat4_matrix, matrix);
     int m_j;
     int m_i = 0;
     for(int i = 0; i < ROW_SIZE; i++) {
         m_j = 0;
         for(int j = 0; j < COL_SIZE; j++) {
             if (j != row_skip && i != col_skip) {
-                minor[m_j][m_i] = matrix[j][i];
+                minor[m_j][m_i] = mat4_matrix->cols[i].vec[j];
                 m_j++;
             }
         }

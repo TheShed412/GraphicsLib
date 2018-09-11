@@ -159,16 +159,25 @@ int main(int argc, const char* argv[]) {
                                            {0, 4, 0, 0},
                                            {0, 4, 5, 3}};
 
+    float deter_tst3[ROW_SIZE][COL_SIZE] = {{0, 9, 0, 0}, 
+                                           {0, 3, 5, 0},
+                                           {0, 4, 0, 0},
+                                           {0, 4, 5, 3}};
+
     mat4 deter_mat_test;
     arr_to_mat4(deter_tst, &deter_mat_test);
     mat4 deter_mat_test2;
     arr_to_mat4(deter_tst2, &deter_mat_test2);
+    mat4 deter_mat_test3;
+    arr_to_mat4(deter_tst3, &deter_mat_test3);
 
     float deter_result = determinant(&deter_mat_test);
     float deter_result2 = determinant(&deter_mat_test2);
+    float deter_result3 = determinant(&deter_mat_test3);
 
     assert_float("determinant", -60, deter_result);
     assert_float("determinant2", 0, deter_result2);
+    assert_float("determinant3", 0, deter_result3); 
 
     /* MINOR MATRIX TEST */
     float before_minor_matrix_arr[4][4] = {{1, 1, 1, 1}, 
@@ -184,12 +193,17 @@ int main(int argc, const char* argv[]) {
                                           {2, 2, 2}, 
                                           {3, 3, 3}};
 
+    float expected_minor_matrix3[3][3] =  {{2, 2, 2}, 
+                                          {3, 3, 3}, 
+                                          {4, 4, 4}};
+
 
     mat4 before_minor_matrix;
     arr_to_mat4(before_minor_matrix_arr, &before_minor_matrix);
 
     float** minor_matrix_actual = minor_matrix(&before_minor_matrix, COL2, COL2);
-    float** minor_matrix_actual2 = minor_matrix(&before_minor_matrix, COL4, COL4); 
+    float** minor_matrix_actual2 = minor_matrix(&before_minor_matrix, COL4, COL4);
+    float** minor_matrix_actual3 = minor_matrix(&before_minor_matrix, COL1, COL1); 
 
     for(int i = 0; i < 3; i ++) {
         for (int j = 0; j < 3; j ++) {
@@ -203,16 +217,22 @@ int main(int argc, const char* argv[]) {
         }
     }
 
-    /* mat4_of_minors TEST */
-    float cofactor_test_arr[4][4] =      {{-9, 1, -5, 7}, 
-                                           {-1, -9, -1, 1},
-                                           {0, 1, -2, -1},
-                                           {9, 1, 5, 3}};
+    for(int i = 0; i < 3; i ++) {
+        for (int j = 0; j < 3; j ++) {
+            assert_float("minor_matrix3", expected_minor_matrix3[i][j], minor_matrix_actual3[i][j]);
+        }
+    }
 
-    float cofactor_test_exp[4][4] =      {{20, -28, 68, -164}, 
-                                           {-68, 180, 108, -36},
-                                           {-456, -40, 824, 8},
-                                           {-176, -8, 80, -168}};
+    /* mat4_of_minors TEST */
+    float cofactor_test_arr[4][4] =      {{3, 1, 9, 2}, 
+                                           {4, 5, 6, 9},
+                                           {3, 4, 3, 7},
+                                           {7, 8, 6, 4}};
+
+    float cofactor_test_exp[4][4] =      {{90, -75, -11, 9}, 
+                                           {-330, 237, 91, -33},
+                                           {402, -297, -115, 63},
+                                           {-6, 24, 2, -12}};
 
     mat4 cofactor_test_actual;
     arr_to_mat4(cofactor_test_arr, &cofactor_test_actual);
@@ -224,6 +244,24 @@ int main(int argc, const char* argv[]) {
             assert_float("cofactor", cofactor_test_exp[i][j], cofactor_test_arr[i][j]);
         }
     }
+
+    float deter_3x3[3][3] = {{5, 6, 9}, 
+                            {4, 3, 7}, 
+                            {8, 6, 4}};
+
+    float** deter_3x3_ptrs = (float**) malloc(3 * sizeof(float*));
+    for(int i = 0; i < 3; i++) {
+        deter_3x3_ptrs[i] = (float*) calloc(3, sizeof(float));
+    }
+
+    for(int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            deter_3x3_ptrs[i][j] = deter_3x3[i][j];
+        }
+    }
+
+    float determinant = determinant3x3(deter_3x3_ptrs);
+    assert_float("determinant3x3", 90, determinant);
 
     return 0;
 }
