@@ -20,6 +20,26 @@ float vec_mult(const vec4* left, const vec4* right){
     return result;
 }
 
+vec4* vec_add(const vec4* left, const vec4* right){
+    vec4* result = (vec4*)calloc(1, sizeof(vec4));
+
+    for(int i = 0; i < COL_SIZE; i++) {
+        result->vec[i] = left->vec[i] + right->vec[i]; 
+    }
+
+    return result;
+}
+
+vec4* vec_sub(const vec4* left, const vec4* right){
+    vec4* result = (vec4*)calloc(1, sizeof(vec4));
+
+    for(int i = 0; i < COL_SIZE; i++) {
+        result->vec[i] = left->vec[i] - right->vec[i]; 
+    }
+
+    return result;
+}
+
 vec4* vec_from_row(const mat4* matrix, int row){
     vec4* result = (vec4*) malloc(sizeof(vec4));
 
