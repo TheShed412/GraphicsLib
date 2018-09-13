@@ -286,6 +286,30 @@ int main(int argc, const char* argv[]) {
             }
         }
 
+        GLfloat inverse_test_arr[4][4] =   {{1, 1, 2, 1}, 
+                                            {4, 2, 2, 2},
+                                            {3, 3, 5, 3},
+                                            {4, 9, 4, 4}};
+        
+        GLfloat identity_arr[4][4] =       {{1, 0, 0, 0}, 
+                                            {0, 1, 0, 0},
+                                            {0, 0, 1, 0},
+                                            {0, 0, 0, 1}};
+        mat4 inverse_test;
+        arr_to_mat4(inverse_test_arr, &inverse_test);
+        mat4 identity;
+        arr_to_mat4(identity_arr, &identity);
+
+        mat4* inverse_actual = inverse_mat4(&inverse_test);
+
+        mat4* should_be_identity = mat4_mult(&inverse_test, inverse_actual);
+
+        for (int i=0; i < 4; i++) {
+            for (int j=0; j < 4; j++) {
+                assert_float("invert", identity.cols[i].vec[j], should_be_identity->cols[i].vec[j]);
+            }
+        }
+
     return 0;
 }
 
