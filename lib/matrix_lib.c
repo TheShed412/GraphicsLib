@@ -236,9 +236,7 @@ mat4* mat4_of_minors(const mat4* matrix) {
 }
 
 mat4* cofactor(const mat4* matrix) {
-    mat4* result = make_mat4();
-
-    result = mat4_of_minors(matrix);
+    mat4* result = mat4_of_minors(matrix);
 
     int invert = 1;
     for (int i = 0; i < COL_SIZE; i++){
