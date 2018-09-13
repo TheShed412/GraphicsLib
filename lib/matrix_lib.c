@@ -261,3 +261,9 @@ mat4* transpose_mat4(const mat4* matrix) {
 
     return result;
 }
+
+mat4* inverse_mat4(const mat4* matrix) {
+    mat4* result = make_mat4();
+
+    return result;
+}
