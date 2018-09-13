@@ -263,7 +263,14 @@ mat4* transpose_mat4(const mat4* matrix) {
 }
 
 mat4* inverse_mat4(const mat4* matrix) {
-    mat4* result = make_mat4();
 
-    return result;
+    mat4* cofactor_mat4 = cofactor(matrix);
+    mat4* transpose = transpose_mat4(cofactor_mat4);
+    GLfloat deter = determinant(matrix);
+    mat4* inverse = scalar_mult(transpose, (1/deter));
+
+    free(cofactor_mat4);
+    free(transpose);
+
+    return inverse;
 }
