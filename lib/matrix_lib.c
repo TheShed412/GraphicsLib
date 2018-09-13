@@ -249,3 +249,15 @@ mat4* cofactor(const mat4* matrix) {
 
     return result;
 }
+
+mat4* transpose_mat4(const mat4* matrix) {
+    mat4* result = make_mat4();
+
+    for (int i = 0; i < ROW_SIZE; i++) {
+        for (int j = 0; j < COL_SIZE; j++) {
+            result->cols[i].vec[j] = matrix->cols[j].vec[i];
+        }
+    }
+
+    return result;
+}

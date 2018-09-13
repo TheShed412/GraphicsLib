@@ -263,6 +263,29 @@ int main(int argc, const char* argv[]) {
     GLfloat determinant = determinant3x3(deter_3x3_ptrs);
     assert_float("determinant3x3", 90, determinant);
 
+        GLfloat transpose_test_arr[4][4] =      {{1, 1, 1, 1}, 
+                                                 {2, 2, 2, 2},
+                                                 {3, 3, 3, 3},
+                                                 {4, 4, 4, 4}};
+        
+        GLfloat transpose_expected_arr[4][4] =      {{1, 2, 3, 4}, 
+                                                     {1, 2, 3, 4},
+                                                     {1, 2, 3, 4},
+                                                     {1, 2, 3, 4}};
+
+        mat4 transpose_test;
+        arr_to_mat4(transpose_test_arr, &transpose_test);
+        mat4 transpose_expected;
+        arr_to_mat4(transpose_expected_arr, &transpose_expected);
+
+        mat4* actual_transpose = transpose_mat4(&transpose_test);
+
+        for (int i=0; i < 4; i++) {
+            for (int j=0; j < 4; j++) {
+                assert_float("transpose", transpose_expected.cols[i].vec[j], actual_transpose->cols[i].vec[j]);
+            }
+        }
+
     return 0;
 }
 
