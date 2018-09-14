@@ -1,4 +1,5 @@
 matrix_lib
 main_test
+lab1
 *.o
 /.vscode
