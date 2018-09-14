@@ -265,9 +265,12 @@ mat4* transpose_mat4(const mat4* matrix) {
 mat4* inverse_mat4(const mat4* matrix) {
 
     //check for 0 determinant to avoid 1/0
+    GLfloat deter = determinant(matrix);
+    if (deter == 0) {
+        return NULL;
+    }
     mat4* cofactor_mat4 = cofactor(matrix);
     mat4* transpose = transpose_mat4(cofactor_mat4);
-    GLfloat deter = determinant(matrix);
     mat4* inverse = scalar_mult(transpose, (1/deter));
 
     free(cofactor_mat4);
