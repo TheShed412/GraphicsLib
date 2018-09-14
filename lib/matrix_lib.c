@@ -20,6 +20,17 @@ GLfloat vec_mult(const vec4* left, const vec4* right){
     return result;
 }
 
+vec4* vec_cross(const vec4* left, const vec4* right){
+    vec4* result = (vec4*)calloc(1, sizeof(vec4));
+    
+    result->vec[X] = (left->vec[Y]*right->vec[Z]) - (left->vec[Z]*right->vec[Y]);
+    result->vec[Y] = (left->vec[Z]*right->vec[X]) - (left->vec[X]*right->vec[Z]);
+    result->vec[Z] = (left->vec[X]*right->vec[Y]) - (left->vec[Y]*right->vec[X]);
+    result->vec[W] = 0;
+
+    return result;
+}
+
 vec4* vec_add(const vec4* left, const vec4* right){
     vec4* result = (vec4*)calloc(1, sizeof(vec4));
 
@@ -287,4 +298,16 @@ mat4* inverse_mat4(const mat4* matrix) {
     free(transpose);
 
     return inverse;
+}
+
+mat4* mat_add(const mat4* left, const mat4* right) {
+    mat4* result = make_mat4();
+
+    for (int i=0; i < COL_SIZE; i++) {
+        for (int j=0; j < ROW_SIZE; j++) {
+            result->cols[i].vec[j] = left->cols[i].vec[j] + right->cols[i].vec[j];
+        }
+    }
+
+    return result;
 }

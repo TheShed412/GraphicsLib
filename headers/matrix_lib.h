@@ -63,4 +63,12 @@ mat4* inverse_mat4(const mat4* matrix);
 
 vec4* scalar_mult_vec4(const vec4* vector, GLfloat scalar);
 
+vec4* vec_add(const vec4* left, const vec4* right);
+
+vec4* vec_sub(const vec4* left, const vec4* right);
+
+vec4* vec_cross(const vec4* left, const vec4* right);
+
+mat4* mat_add(const mat4* left, const mat4* right);
+
 #endif
