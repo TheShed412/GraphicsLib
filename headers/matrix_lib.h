@@ -73,4 +73,6 @@ mat4* mat_add(const mat4* left, const mat4* right);
 
 mat4* mat_sub(const mat4* left, const mat4* right);
 
+vec4* mat_mult_vec(const mat4* matrix, const vec4* vector);
+
 #endif

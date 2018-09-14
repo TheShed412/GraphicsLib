@@ -323,3 +323,17 @@ mat4* mat_sub(const mat4* left, const mat4* right) {
 
     return result;
 }
+
+vec4* mat_mult_vec(const mat4* matrix, const vec4* vector) {
+    vec4* result = (vec4*) malloc(sizeof(vec4));
+
+    for (int i=0; i < ROW_SIZE; i++) {
+        GLfloat row_result = 0;
+        for (int j=0; j < COL_SIZE; j++) {
+            row_result += matrix->cols[j].vec[i] * vector->vec[j];
+        }
+        result->vec[i] = row_result;
+    }
+
+    return result;
+}

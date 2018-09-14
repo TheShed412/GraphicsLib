@@ -44,5 +44,7 @@ int main(int argc, const char* argv[]) {
 
     mat4* mat_transpose_result = transpose_mat4(&m1);
 
+    vec4* mat_mult_vec_result = mat_mult_vec(&m1, &v1);
+
     return 0;
 }
