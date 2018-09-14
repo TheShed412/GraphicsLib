@@ -311,3 +311,15 @@ mat4* mat_add(const mat4* left, const mat4* right) {
 
     return result;
 }
+
+mat4* mat_sub(const mat4* left, const mat4* right) {
+    mat4* result = make_mat4();
+
+    for (int i=0; i < COL_SIZE; i++) {
+        for (int j=0; j < ROW_SIZE; j++) {
+            result->cols[i].vec[j] = left->cols[i].vec[j] - right->cols[i].vec[j];
+        }
+    }
+
+    return result;
+}

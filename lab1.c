@@ -36,5 +36,13 @@ int main(int argc, const char* argv[]) {
 
     mat4* mat_add_result = mat_add(&m1, &m2);
 
+    mat4* mat_sub_result = mat_sub(&m1, &m2);
+
+    mat4* mat_mult_result = mat4_mult(&m1, &m2);
+
+    mat4* mat_inverse_reslut = inverse_mat4(&m1);
+
+    mat4* mat_transpose_result = transpose_mat4(&m1);
+
     return 0;
 }
