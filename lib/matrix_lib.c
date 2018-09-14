@@ -75,6 +75,10 @@ mat4* mat4_mult(const mat4* left_op, const mat4* right_op){
 vec4* scalar_mult_vec4(const vec4* vector, GLfloat scalar) {
     vec4* result = (vec4*) malloc(sizeof(vec4));
 
+    for (int i=0; i < COL_SIZE; i++) {
+        result->vec[i] = vector->vec[i] * scalar;
+    }
+
     return result;
 }
 
