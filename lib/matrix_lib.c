@@ -72,6 +72,12 @@ mat4* mat4_mult(const mat4* left_op, const mat4* right_op){
     return result;
 }
 
+vec4* scalar_mult_vec4(const vec4* vector, GLfloat scalar) {
+    vec4* result = (vec4*) malloc(sizeof(vec4));
+
+    return result;
+}
+
 mat4* scalar_mult(const mat4* matrix, GLfloat scalar){
     mat4* result = (mat4*) malloc(sizeof(mat4));
 

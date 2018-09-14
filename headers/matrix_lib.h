@@ -61,4 +61,6 @@ mat4* transpose_mat4(const mat4* matrix);
 
 mat4* inverse_mat4(const mat4* matrix);
 
+vec4* scalar_mult_vec4(const vec4* vector, GLfloat scalar);
+
 #endif
