@@ -2,7 +2,25 @@
 #include <stdlib.h>
 #include "headers/matrix_lib.h"
 
+void print_vec4(const vec4* vector) {
+    GLfloat v_x = vector->vec[X];
+    GLfloat v_y = vector->vec[Y];
+    GLfloat v_z = vector->vec[Z];
+    GLfloat v_w = vector->vec[W];
+    printf("| %.1f |\n", v_x);
+    printf("| %.1f |\n", v_y);
+    printf("| %.1f |\n", v_z);
+    printf("| %.1f |\n", v_w);
+}
 
+void print_mat4(const mat4* matrix) {
+    for (int i=0; i < COL_SIZE; i ++) {
+        for (int j=0; j < ROW_SIZE; j++) {
+            printf("%.1f\t", matrix->cols[j].vec[i]);
+        }
+        printf("\n");
+    }
+}
 
 int main(int argc, const char* argv[]) {
 
@@ -45,6 +63,31 @@ int main(int argc, const char* argv[]) {
     mat4* mat_transpose_result = transpose_mat4(&m1);
 
     vec4* mat_mult_vec_result = mat_mult_vec(&m1, &v1);
+
+    printf("Scalar times vector:\n");
+    print_vec4(vec_scalar_mult_result);
+    printf("\n\n Vector Addition:\n");
+    print_vec4(vec_add_result);
+    printf("\n\n Vector Subtraction:\n");
+    print_vec4(vec_sub_result);
+    printf("\n\n Vector Dot Product:\n");
+    printf("%.1f\n", vec_mult_result);
+    printf("\n\n Vector Cross Product:\n");
+    print_vec4(vec_cross_result);
+    printf("\n\n Matrix Scalar Multiplication:\n");
+    print_mat4(mat_scalar_mult);
+    printf("\n\n Matrix Addition:\n");
+    print_mat4(mat_add_result);
+    printf("\n\n Matrix Subtraction:\n");
+    print_mat4(mat_sub_result);
+    printf("\n\n Matrix Multiplication:\n");
+    print_mat4(mat_mult_result);
+    printf("\n\n Matrix Inverse:\n");
+    print_mat4(mat_inverse_reslut);
+    printf("\n\n Matrix Transpose:\n");
+    print_mat4(mat_transpose_result);
+    printf("\n\n Matrix Vector Multiplication:\n");
+    print_vec4(mat_mult_vec_result);
 
     return 0;
 }
