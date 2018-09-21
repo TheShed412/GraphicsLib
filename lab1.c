@@ -22,6 +22,15 @@ void print_mat4(const mat4* matrix) {
     }
 }
 
+void print_inverse_mat4(const mat4* matrix) {
+    for (int i=0; i < COL_SIZE; i ++) {
+        for (int j=0; j < ROW_SIZE; j++) {
+            printf("%.3f\t", matrix->cols[j].vec[i]);
+        }
+        printf("\n");
+    }
+}
+
 int main(int argc, const char* argv[]) {
 
     vec4 v1 = {1, 2, 3, 4};
@@ -83,7 +92,7 @@ int main(int argc, const char* argv[]) {
     printf("\n\n Matrix Multiplication:\n");
     print_mat4(mat_mult_result);
     printf("\n\n Matrix Inverse:\n");
-    print_mat4(mat_inverse_reslut);
+    print_inverse_mat4(mat_inverse_reslut);
     printf("\n\n Matrix Transpose:\n");
     print_mat4(mat_transpose_result);
     printf("\n\n Matrix Vector Multiplication:\n");
