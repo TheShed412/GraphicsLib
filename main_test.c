@@ -21,6 +21,10 @@ int main(int argc, const char* argv[]) {
     
     vec4 vector = {1, 1, 1, 1};
     vec4* result = translation(&vector, 1.0, 3.0, 1.0);
+    vec4 expected_trans = {2.0, 4.0, 2.0, 1.0};
+    for (int i=0; i<4; i++) {
+        assert_float("translation", expected_trans.vec[i], result->vec[i]);
+    }
 
     return 0;
 }
