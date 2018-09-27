@@ -2,23 +2,11 @@
 #include <stdlib.h>
 #include "../headers/transformations.h"
 
-mat4 IDENTITY_MATRIX = {{1, 0, 0, 0},
-                        {0, 1, 0, 0},
-                        {0, 0, 1, 0},
-                        {0, 0, 0, 1}};
+mat4 IDENTITY_MATRIX = {1, 0, 0, 0,
+                        0, 1, 0, 0,
+                        0, 0, 1, 0,
+                        0, 0, 0, 1};
 
-mat4* translation(const vec4* vector, GLfloat x, GLfloat y, GLfloat z) {
-    
-    mat4* trans_mat = copy_id();
-    trans_mat->cols[COL4].vec[X] = x;
-    trans_mat->cols[COL4].vec[Y] = y;
-    trans_mat->cols[COL4].vec[Z] = z;
-
-    vec4* result_vec = mat_mult_vec(trans_mat, vector);
-
-    free(trans_mat);
-    return result_vec;
-}
 
 static mat4* copy_id(){
     mat4* ret_matrix = (mat4*)calloc(1, sizeof(mat4));
@@ -29,4 +17,17 @@ static mat4* copy_id(){
     }
 
     return ret_matrix;
+}
+
+vec4* translation(const vec4* vector, GLfloat x, GLfloat y, GLfloat z) {
+    
+    mat4* trans_mat = copy_id();
+    trans_mat->cols[COL4].vec[X] = x;
+    trans_mat->cols[COL4].vec[Y] = y;
+    trans_mat->cols[COL4].vec[Z] = z;
+
+    vec4* result_vec = mat_mult_vec(trans_mat, vector);
+
+    free(trans_mat);
+    return result_vec;
 }

@@ -19,7 +19,8 @@ void assert_float(char*, GLfloat, GLfloat);
 
 int main(int argc, const char* argv[]) {
     
-    
+    vec4 vector = {1, 1, 1, 1};
+    vec4* result = translation(&vector, 1.0, 3.0, 1.0);
 
     return 0;
 }
