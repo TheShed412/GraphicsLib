@@ -3,6 +3,6 @@
 
 #include "matrix_lib.h"
 
-mat4* translation(const mat4* matrix, int x, int y, int z);
+mat4* translation(const vec4* vector, GLfloat x, GLfloat y, GLfloat z);
 
 #endif

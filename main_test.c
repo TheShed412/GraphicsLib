@@ -18,6 +18,22 @@
 void assert_float(char*, GLfloat, GLfloat);
 
 int main(int argc, const char* argv[]) {
+    
+    
+
+    return 0;
+}
+
+void assert_float(char* print_string, GLfloat expected, GLfloat actual) {
+    if (expected == actual){
+        printf("%s%s%s: %s\n", KGRN, PASS_STR, KWHT, print_string);
+    } else {
+        printf("%s%s%s: %s --- expected: %f != actual: %f\n", 
+        KRED, FAIL_STR, KWHT, print_string, expected, actual);
+    }
+}
+
+void matrix_lib_tests() {
     mat4 matrix;
 
     matrix.cols[COL1].vec[X] = 0.1;
@@ -310,15 +326,4 @@ int main(int argc, const char* argv[]) {
                 assert_float("invert", identity.cols[i].vec[j], should_be_identity->cols[i].vec[j]);
             }
         }
-
-    return 0;
-}
-
-void assert_float(char* print_string, GLfloat expected, GLfloat actual) {
-    if (expected == actual){
-        printf("%s%s%s: %s\n", KGRN, PASS_STR, KWHT, print_string);
-    } else {
-        printf("%s%s%s: %s --- expected: %f != actual: %f\n", 
-        KRED, FAIL_STR, KWHT, print_string, expected, actual);
-    }
 }
