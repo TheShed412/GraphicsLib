@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "headers/matrix_lib.h"
+#include "headers/transformations.h"
 
 #define FAIL_STR ">_< Oooo daddy made a fucky wuck!"
 #define PASS_STR "UwU Good Daddy passed his test!"
