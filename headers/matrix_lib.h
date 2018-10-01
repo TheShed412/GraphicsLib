@@ -76,3 +76,7 @@ mat4* mat_sub(const mat4* left, const mat4* right);
 vec4* mat_mult_vec(const mat4* matrix, const vec4* vector);
 
 #endif
+
+#ifndef M_PI
+#define M_PI 3.141593
+#endif
