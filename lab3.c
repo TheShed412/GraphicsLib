@@ -9,7 +9,9 @@
 #include "headers/initShader.h"
 #include "headers/matrix_lib.h"
 
+/* numTriangles = 360/degreePerVertex */
 /* for the circle, vertices are 3 x numTriangles */
+/* for the cone, vertices are 6 x numTriangles */
 #define NUM_VERTICES 216
 
 vec4* genRandomTriangleColors(int num_vertices);
