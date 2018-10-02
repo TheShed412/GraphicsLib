@@ -8,6 +8,7 @@
 
 #include "headers/initShader.h"
 #include "headers/matrix_lib.h"
+#include "headers/transformations.h"
 
 /* numTriangles = 360/degreePerVertex */
 /* for the circle, vertices are 3 x numTriangles */

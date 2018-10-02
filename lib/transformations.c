@@ -31,3 +31,67 @@ vec4* translation(const vec4* vector, GLfloat x, GLfloat y, GLfloat z) {
     free(trans_mat);
     return result_vec;
 }
+
+static mat4* x_rotate(GLfloat theta) {
+    mat4* rot_mat = copy_id();
+
+    GLfloat cos_theta = cos(theta);
+    GLfloat sin_theta = sin(theta);
+
+    rot_mat->cols[COL2].vec[Y] = cos_theta;
+    rot_mat->cols[COL3].vec[Y] = sin_theta * -1;
+    rot_mat->cols[COL2].vec[Z] = sin_theta;
+    rot_mat->cols[COL3].vec[Z] = cos_theta;
+
+    return rot_mat;
+}
+
+static mat4* y_rotate(GLfloat theta) {
+    mat4* rot_mat = copy_id();
+
+    GLfloat cos_theta = cos(theta);
+    GLfloat sin_theta = sin(theta);
+
+    rot_mat->cols[COL1].vec[X] = cos_theta;
+    rot_mat->cols[COL1].vec[Z] = sin_theta * -1;
+    rot_mat->cols[COL3].vec[X] = sin_theta;
+    rot_mat->cols[COL3].vec[Z] = cos_theta;
+
+    return rot_mat;
+}
+
+static mat4* z_rotate(GLfloat theta) {
+    mat4* rot_mat = copy_id();
+
+    GLfloat cos_theta = cos(theta);
+    GLfloat sin_theta = sin(theta);
+
+    rot_mat->cols[COL1].vec[X] = cos_theta;
+    rot_mat->cols[COL2].vec[X] = sin_theta * -1;
+    rot_mat->cols[COL2].vec[Y] = sin_theta;
+    rot_mat->cols[COL2].vec[Y] = cos_theta;
+
+    return rot_mat;
+}
+
+vec4* rotation(const vec4* vector, GLfloat theta, int axis) {
+    mat4* rot_mat;
+    vec4* ret_vec;
+
+    switch(axis) {
+        case X:
+            rot_mat = x_rotate(theta);
+            ret_vec = mat_mult_vec(rot_mat, vector);
+            break;
+        case Y:
+            rot_mat = y_rotate(theta);
+            ret_vec = mat_mult_vec(rot_mat, vector);
+            break;
+        case Z:
+            rot_mat = z_rotate(theta);
+            ret_vec = mat_mult_vec(rot_mat, vector);
+            break;
+    }
+
+    return ret_vec;
+}
