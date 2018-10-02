@@ -16,7 +16,7 @@
 #define NUM_VERTICES 216
 
 vec4* genRandomTriangleColors(int num_vertices);
-vec4* bottom(int num_vertices);
+vec4* bottom(int num_vertices, GLfloat twist, int axis);
 void init(void);
 void display(void);
 void keyboard(unsigned char key, int mousex, int mousey);
@@ -25,7 +25,7 @@ int main(int argc, char **argv)
 {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
-    glutInitWindowSize(512, 512);
+    glutInitWindowSize(1024, 1024);
     glutInitWindowPosition(100,100);
     glutCreateWindow("Cone");
     glewInit();
@@ -67,12 +67,11 @@ vec4* genRandomTriangleColors(int num_vertices)
 /**
  * From the circle.c file with a couple small changes
 */
-vec4* bottom(int num_vertices)
+vec4* bottom(int num_vertices, GLfloat twist, int axis)
 {
     float theta, theta_r, theta10_r;
     int index = 0;
     vec4 *vertices = (vec4 *) malloc (sizeof(vec4) * num_vertices);
-    GLfloat twist = 1.0;
     for(theta = 0; theta <= 355; theta += 5)
     {
         theta_r = theta * M_PI / 180.0;
@@ -82,9 +81,9 @@ vec4* bottom(int num_vertices)
         vec4 second = (vec4){cos(theta_r), sin(theta_r), 0.0, 1.0};
         vec4 third = (vec4){cos(theta10_r), sin(theta10_r), 0.0, 1.0};
 
-        vec4* _first = rotation(&first, twist, Z);
-        vec4* _second = rotation(&second, twist, Z);
-        vec4* _third = rotation(&third, twist, Z);
+        vec4* _first = rotation(&first, twist, axis);
+        vec4* _second = rotation(&second, twist, axis);
+        vec4* _third = rotation(&third, twist, axis);
 
         vertices[index] = *_first;
         vertices[index + 1] = *_second;
@@ -103,7 +102,7 @@ void init(void)
     GLuint program = initShader("shaders/vshader.glsl", "shaders/fshader.glsl");
     glUseProgram(program);
 
-    vec4 *circle_vertices = bottom(NUM_VERTICES);
+    vec4 *circle_vertices = bottom(NUM_VERTICES, 0.5, Z);
     vec4 *circle_colors = genRandomTriangleColors(NUM_VERTICES);
     
     GLuint vao;
