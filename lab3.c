@@ -9,7 +9,8 @@
 #include "headers/initShader.h"
 #include "headers/matrix_lib.h"
 
-#define NUM_VERTICES 108
+/* for the circle, vertices are 3 x numTriangles */
+#define NUM_VERTICES 216
 
 vec4* genRandomTriangleColors(int num_vertices);
 vec4* bottom(int num_vertices);
@@ -68,10 +69,10 @@ vec4* bottom(int num_vertices)
     float theta, theta_r, theta10_r;
     int index = 0;
     vec4 *vertices = (vec4 *) malloc (sizeof(vec4) * num_vertices);
-    for(theta = 0; theta <= 350; theta += 10)
+    for(theta = 0; theta <= 355; theta += 5)
     {
         theta_r = theta * M_PI / 180.0;
-        theta10_r = (theta + 10) * M_PI / 180.0;
+        theta10_r = (theta + 5) * M_PI / 180.0;
 
         vertices[index] = (vec4){0.0, 0.0, 0.0, 1.0};
         vertices[index + 1] = (vec4){cos(theta_r), sin(theta_r), 0.0, 1.0};
