@@ -13,7 +13,7 @@
 /* numTriangles = 360/degreePerVertex */
 /* for the circle, vertices are 3 x numTriangles */
 /* for the cone, vertices are 6 x numTriangles */
-#define NUM_VERTICES 216
+#define NUM_VERTICES 432
 
 vec4* genRandomTriangleColors(int num_vertices);
 vec4* bottom(int num_vertices, GLfloat twist, int axis);
@@ -83,18 +83,33 @@ vec4* bottom(int num_vertices, GLfloat twist, int axis)
         vec4 second = (vec4){cos(theta_r), sin(theta_r), 0.0, 1.0};
         vec4 third = (vec4){cos(theta10_r), sin(theta10_r), 0.0, 1.0};
 
+        vec4 first_base = (vec4){0.0, 0.0, 0.0, 1.0};
+        vec4 second_base = (vec4){cos(theta_r), sin(theta_r), 0.0, 1.0};
+        vec4 third_base = (vec4){cos(theta10_r), sin(theta10_r), 0.0, 1.0};
+
         vec4* rot_first = rotation(&first, twist, axis);
         vec4* rot_second = rotation(&second, twist, axis);
         vec4* rot_third = rotation(&third, twist, axis);
+
+        vec4* rot_first_base = rotation(&first_base, twist, axis);
+        vec4* rot_second_base = rotation(&second_base, twist, axis);
+        vec4* rot_third_base = rotation(&third_base, twist, axis);
 
         vec4* tran_rot_first = translation(rot_first, x_trans, 0.0, 0.0);
         vec4* tran_rot_second = translation(rot_second, x_trans, 0.0, 0.0);
         vec4* tran_rot_third = translation(rot_third, x_trans, 0.0, 0.0);
 
+        vec4* tran_rot_first_base = translation(rot_first_base, x_trans, 0.0, 0.0);
+        vec4* tran_rot_second_base = translation(rot_second_base, x_trans, 0.0, 0.0);
+        vec4* tran_rot_third_base = translation(rot_third_base, x_trans, 0.0, 0.0);
+
         vertices[index] = *tran_rot_first;
         vertices[index + 1] = *tran_rot_second;
         vertices[index + 2] = *tran_rot_third;
-	    index += 3;
+        vertices[index + 3] = *tran_rot_third_base;
+        vertices[index + 4] = *tran_rot_second_base;
+        vertices[index + 5] = *tran_rot_first_base;
+	    index += 6;
 
         // vec4 first = (vec4){0.0, 0.0, og_z, 1.0};
         // vec4 second = (vec4){cos(theta_r), sin(theta_r), og_z, 1.0};
