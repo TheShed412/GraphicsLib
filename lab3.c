@@ -76,19 +76,41 @@ vec4* bottom(int num_vertices, GLfloat twist, int axis)
     {
         theta_r = theta * M_PI / 180.0;
         theta10_r = (theta + 5) * M_PI / 180.0;
+        GLfloat og_z = -1.25;
+        GLfloat x_trans = -0.4;
 
-        vec4 first = (vec4){0.0, 0.0, 0.0, 1.0};
+        vec4 first = (vec4){0.0, 0.0, og_z, 1.0};
         vec4 second = (vec4){cos(theta_r), sin(theta_r), 0.0, 1.0};
         vec4 third = (vec4){cos(theta10_r), sin(theta10_r), 0.0, 1.0};
 
-        vec4* _first = rotation(&first, twist, axis);
-        vec4* _second = rotation(&second, twist, axis);
-        vec4* _third = rotation(&third, twist, axis);
+        vec4* rot_first = rotation(&first, twist, axis);
+        vec4* rot_second = rotation(&second, twist, axis);
+        vec4* rot_third = rotation(&third, twist, axis);
 
-        vertices[index] = *_first;
-        vertices[index + 1] = *_second;
-        vertices[index + 2] = *_third;
+        vec4* tran_rot_first = translation(rot_first, x_trans, 0.0, 0.0);
+        vec4* tran_rot_second = translation(rot_second, x_trans, 0.0, 0.0);
+        vec4* tran_rot_third = translation(rot_third, x_trans, 0.0, 0.0);
+
+        vertices[index] = *tran_rot_first;
+        vertices[index + 1] = *tran_rot_second;
+        vertices[index + 2] = *tran_rot_third;
 	    index += 3;
+
+        // vec4 first = (vec4){0.0, 0.0, og_z, 1.0};
+        // vec4 second = (vec4){cos(theta_r), sin(theta_r), og_z, 1.0};
+        // vec4 third = (vec4){cos(theta10_r), sin(theta10_r), og_z, 1.0};
+
+        // vec4 fourth = (vec4){0.0, 0.0, -10.0, 1.0};
+        // vec4 fifth = (vec4){cos(theta_r), sin(theta_r), og_z, 1.0};
+        // vec4 sixth = (vec4){cos(theta10_r), sin(theta10_r), og_z, 1.0};
+
+        // vertices[index] = *(rotation(&first, twist, axis));
+        // vertices[index + 1] = *(rotation(&second, twist, axis));
+        // vertices[index + 2] = *(rotation(&third, twist, axis));
+        // vertices[index + 3] = *(rotation(&fourth, twist, axis));
+        // vertices[index + 4] = *(rotation(&fifth, twist, axis));
+        // vertices[index + 5] = *(rotation(&sixth, twist, axis));
+	    // index += 6;
     }
 
     return vertices;
@@ -102,7 +124,7 @@ void init(void)
     GLuint program = initShader("shaders/vshader.glsl", "shaders/fshader.glsl");
     glUseProgram(program);
 
-    vec4 *circle_vertices = bottom(NUM_VERTICES, 0.5, Z);
+    vec4 *circle_vertices = bottom(NUM_VERTICES, -2.0, Y);
     vec4 *circle_colors = genRandomTriangleColors(NUM_VERTICES);
     
     GLuint vao;
