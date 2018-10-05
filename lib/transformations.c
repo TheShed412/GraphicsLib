@@ -95,3 +95,21 @@ vec4* rotation(const vec4* vector, GLfloat theta, int axis) {
 
     return ret_vec;
 }
+
+mat4* get_rotation_matrix(GLfloat theta, int axis) {
+    mat4* rot_mat;
+
+        switch(axis) {
+        case X:
+            rot_mat = x_rotate(theta);
+            break;
+        case Y:
+            rot_mat = y_rotate(theta);
+            break;
+        case Z:
+            rot_mat = z_rotate(theta);
+            break;
+    }
+
+    return rot_mat;
+}
