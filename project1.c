@@ -13,7 +13,7 @@
 /* numTriangles = 360/degreePerVertex */
 /* for the circle, vertices are 3 x numTriangles */
 /* for the cone, vertices are 6 x numTriangles */
-#define NUM_VERTICES 216
+#define NUM_VERTICES 432
 #define TIMER 1
 
 GLuint ctm_location;
@@ -28,6 +28,9 @@ void init(void);
 void display(void);
 void keyboard(unsigned char key, int mousex, int mousey);
 void idle(int);
+int tor_band(vec4* vertices, float theta, GLfloat twist, int axis, int index);
+void translate_vertices(vec4* vertices, GLfloat x, GLfloat y, GLfloat z);
+void rotate_vertices(vec4* vertices, GLfloat twist, int axis);
 
 int main(int argc, char **argv) 
 {
@@ -35,7 +38,7 @@ int main(int argc, char **argv)
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
     glutInitWindowSize(1024, 1024);
     glutInitWindowPosition(100,100);
-    glutCreateWindow("Cone Spinning");
+    glutCreateWindow("Peoject 1");
     glewInit();
     init();
     glutDisplayFunc(display);
@@ -78,14 +81,44 @@ vec4* genRandomTriangleColors(int num_vertices)
 */
 vec4* bottom(int num_vertices, GLfloat twist, int axis)
 {
+    GLfloat x_trans = 0.0;
+    GLfloat y_trans = 0.5;
     float theta, theta_r, theta10_r;
     int index = 0;
     vec4 *vertices = (vec4 *) malloc (sizeof(vec4) * num_vertices);
     for(theta = 0; theta <= 350; theta += 10)
     {
+        index = tor_band(vertices, theta, twist, axis, index);
+    }
+
+    rotate_vertices(vertices, twist, axis);
+    translate_vertices(vertices, x_trans, y_trans, 0);
+
+    return vertices;
+}
+
+void rotate_vertices(vec4* vertices, GLfloat twist, int axis) {
+    vec4 temp;
+    for (int i=0; i < NUM_VERTICES; i++) {
+        temp = vertices[i];
+        vertices[i] = *rotation(&temp, twist, axis);
+    }
+}
+
+void translate_vertices(vec4* vertices, GLfloat x, GLfloat y, GLfloat z) {
+    vec4 temp;
+    for (int i=0; i < NUM_VERTICES; i++) {
+        temp = vertices[i];
+        vertices[i] = *translation(&temp, x, y, z);
+    }
+}
+
+int tor_band(vec4* vertices, float theta, GLfloat twist, int axis, int index) {
+    float theta_r, theta10_r;
+
         theta_r = theta * M_PI / 180.0;
         theta10_r = (theta + 10) * M_PI / 180.0;
-        GLfloat og_z = -1.25;
+        GLfloat og_z = -0.5;
         GLfloat x_trans = 0.0;
         GLfloat y_trans = 0.5;
 
@@ -99,37 +132,16 @@ vec4* bottom(int num_vertices, GLfloat twist, int axis)
         vec4 second_base = (vec4){cos(theta_r), sin(theta_r), og_z, 1.0};
         vec4 third_base = (vec4){cos(theta10_r), sin(theta10_r), og_z, 1.0};
 
-        /* rotating slope vectors  */
-        vec4* rot_first = rotation(&first, twist, axis);
-        vec4* rot_second = rotation(&second, twist, axis);
-        vec4* rot_third = rotation(&third, twist, axis);
-
-        /* rotating base vectors */
-        vec4* rot_first_base = rotation(&first_base, twist, axis);
-        vec4* rot_second_base = rotation(&second_base, twist, axis);
-        vec4* rot_third_base = rotation(&third_base, twist, axis);
-
-        /* moving slopes along x axis to keep cone in view */
-        vec4* tran_rot_first = translation(rot_first, x_trans, y_trans, 0.0);
-        vec4* tran_rot_second = translation(rot_second, x_trans, y_trans, 0.0);
-        vec4* tran_rot_third = translation(rot_third, x_trans, y_trans, 0.0);
-
-        /* moving base along x axis to keep it in view */
-        vec4* tran_rot_first_base = translation(rot_first_base, x_trans, y_trans, 0.0);
-        vec4* tran_rot_second_base = translation(rot_second_base, x_trans, y_trans, 0.0);
-        vec4* tran_rot_third_base = translation(rot_third_base, x_trans, y_trans, 0.0);
-
         /* add all vertecies */
-        vertices[index + 0] = *tran_rot_third;
-        vertices[index + 1] = *tran_rot_second;
-        vertices[index + 2] = *tran_rot_first;
-        vertices[index + 5] = *tran_rot_third_base;
-        vertices[index + 4] = *tran_rot_second_base;
-        vertices[index + 3] = *tran_rot_first_base;
+        vertices[index + 0] = third;
+        vertices[index + 1] = second;
+        vertices[index + 2] = first;
+        vertices[index + 5] = third_base;
+        vertices[index + 4] = second_base;
+        vertices[index + 3] = first_base;
 	    index += 6;
-    }
 
-    return vertices;
+        return index;
 }
 
 /**
