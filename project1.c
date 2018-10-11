@@ -14,6 +14,7 @@
 /* for the circle, vertices are 3 x numTriangles */
 /* for the cone, vertices are 6 x numTriangles */
 #define NUM_VERTICES 216
+#define TIMER 1
 
 GLuint ctm_location;
 mat4 ctm =             {1, 0, 0, 0,
@@ -26,7 +27,7 @@ vec4* bottom(int num_vertices, GLfloat twist, int axis);
 void init(void);
 void display(void);
 void keyboard(unsigned char key, int mousex, int mousey);
-void idle(void);
+void idle(int);
 
 int main(int argc, char **argv) 
 {
@@ -39,7 +40,7 @@ int main(int argc, char **argv)
     init();
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
-    glutIdleFunc(idle);
+    glutTimerFunc(TIMER, idle, 0);
     glutMainLoop();
 
     return 0;
@@ -187,8 +188,9 @@ void display(void)
 
 GLfloat spin = 0.0;
 
-void idle(void) 
+void idle(int value) 
 {
+    glutTimerFunc(TIMER, idle, 0);
     mat4* rotation_matrix = get_rotation_matrix(spin, Y);
     ctm = *rotation_matrix;
     spin += 0.01;
