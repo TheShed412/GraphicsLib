@@ -10,4 +10,6 @@ vec4* rotation(const vec4* vector, GLfloat theta, int axis);
 
 mat4* get_rotation_matrix(GLfloat theta, int axis);
 
+vec4* scale(const vec4* vector, GLfloat x, GLfloat y, GLfloat z);
+
 #endif

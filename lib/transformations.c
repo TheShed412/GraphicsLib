@@ -32,6 +32,17 @@ vec4* translation(const vec4* vector, GLfloat x, GLfloat y, GLfloat z) {
     return result_vec;
 }
 
+vec4* scale(const vec4* vector, GLfloat x, GLfloat y, GLfloat z) {
+    mat4* trans_mat = copy_id();
+    trans_mat->cols[COL1].vec[X] = x;
+    trans_mat->cols[COL2].vec[Y] = y;
+    trans_mat->cols[COL3].vec[Z] = z;
+
+    vec4* result_vec = mat_mult_vec(trans_mat, vector);
+    free(trans_mat);
+    return result_vec;
+}
+
 static mat4* x_rotate(GLfloat theta) {
     mat4* rot_mat = copy_id();
 
