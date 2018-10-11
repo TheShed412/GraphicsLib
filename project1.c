@@ -90,14 +90,14 @@ vec4* bottom(int num_vertices, GLfloat twist, int axis)
         GLfloat y_trans = 0.5;
 
         /* the vectors for the slopes of the cone */
-        vec4 first = (vec4){0.0, 0.0, og_z, 1.0};
-        vec4 second = (vec4){cos(theta_r), sin(theta_r), 0.0, 1.0};
-        vec4 third = (vec4){cos(theta10_r), sin(theta10_r), 0.0, 1.0};
+        vec4 first = (vec4){cos(theta_r), sin(theta_r), og_z, 1};
+        vec4 second = (vec4){cos(theta_r), sin(theta_r), 0, 1};
+        vec4 third = (vec4){cos(theta10_r), sin(theta10_r), 0, 1};
 
         /* the vectors for the base of the cone */
-        vec4 first_base = (vec4){0.0, 0.0, 0.0, 1.0};
-        vec4 second_base = (vec4){cos(theta_r), sin(theta_r), 0.0, 1.0};
-        vec4 third_base = (vec4){cos(theta10_r), sin(theta10_r), 0.0, 1.0};
+        vec4 first_base = (vec4){cos(theta10_r), sin(theta10_r), 0, 1.0};
+        vec4 second_base = (vec4){cos(theta_r), sin(theta_r), og_z, 1.0};
+        vec4 third_base = (vec4){cos(theta10_r), sin(theta10_r), og_z, 1.0};
 
         /* rotating slope vectors  */
         vec4* rot_first = rotation(&first, twist, axis);
