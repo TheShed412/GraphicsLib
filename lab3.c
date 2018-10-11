@@ -78,7 +78,7 @@ vec4* bottom(int num_vertices, GLfloat twist, int axis)
         theta10_r = (theta + 10) * M_PI / 180.0;
         GLfloat og_z = -1.25;
         GLfloat x_trans = 0.0;
-        GLfloat y_trans = 0.5;
+        GLfloat y_trans = -0.5;
 
         /* the vectors for the slopes of the cone */
         vec4 first = (vec4){0.0, 0.0, og_z, 1.0};
@@ -154,7 +154,7 @@ void init(void)
     GLuint program = initShader("shaders/vshader.glsl", "shaders/fshader.glsl");
     glUseProgram(program);
 
-    vec4 *circle_vertices = bottom(NUM_VERTICES, 5, X);
+    vec4 *circle_vertices = bottom(NUM_VERTICES, -5, X);
     vec4 *circle_colors = genRandomTriangleColors(NUM_VERTICES);
     
     GLuint vao;
