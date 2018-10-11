@@ -19,3 +19,6 @@ lab4: $(OBJDIR)/lab4.o
 
 lab5: $(OBJDIR)/lab5.o
 	gcc -g -o lab5 $(LIBDIR)/matrix_lib.c $(LIBDIR)/initShader.c $(LIBDIR)/transformations.c lab5.c $(LIBFLAGS)
+
+proj1: $(OBJDIR)/project1.o
+	gcc -g -o project1 $(LIBDIR)/matrix_lib.c $(LIBDIR)/initShader.c $(LIBDIR)/transformations.c project1.c $(LIBFLAGS)
