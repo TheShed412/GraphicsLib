@@ -13,7 +13,7 @@
 /* numTriangles = 360/degreePerVertex */
 /* for the circle, vertices are 3 x numTriangles */
 /* for the cone, vertices are 6 x numTriangles */
-#define NUM_VERTICES 864
+#define NUM_VERTICES 5000
 #define TIMER 1
 
 GLuint ctm_location;
@@ -28,7 +28,7 @@ void init(void);
 void display(void);
 void keyboard(unsigned char key, int mousex, int mousey);
 void idle(int);
-int tor_band(vec4* vertices, GLfloat twist, int axis, GLfloat start, GLfloat width, int index);
+int tor_band(vec4* vertices, GLfloat twist, int axis, GLfloat end, GLfloat start, int index, float taper);
 void translate_vertices(vec4* vertices, GLfloat x, GLfloat y, GLfloat z);
 void rotate_vertices(vec4* vertices, GLfloat twist, int axis);
 void scale_vertices(vec4* vertices, GLfloat x, GLfloat y, GLfloat z);
@@ -88,12 +88,12 @@ vec4* bottom(int num_vertices, GLfloat twist, int axis)
     float theta, theta_r, theta10_r;
     int index = 0;
     vec4 *vertices = (vec4 *) malloc (sizeof(vec4) * num_vertices);
-    GLfloat dist = 0.25;
+    GLfloat dist = 0.5;
     GLfloat start, end;
     for (int i=1; i <= num_bands; i ++) {
         end = dist * i;
         start = end - dist;
-        index = tor_band(vertices, twist, axis, end, start, index);
+        index = tor_band(vertices, twist, axis, end, start, index, 0.01);
     }
 
 
@@ -128,23 +128,24 @@ void scale_vertices(vec4* vertices, GLfloat x, GLfloat y, GLfloat z) {
     }
 }
 
-int tor_band(vec4* vertices, GLfloat twist, int axis, GLfloat end, GLfloat start, int index) {
-    float theta_r, theta10_r, theta;
+int tor_band(vec4* vertices, GLfloat twist, int axis, GLfloat end, GLfloat start, int index, float taper) {
+    float theta_r, theta10_r, theta, z_diff;
     for(theta = 0; theta <= 350; theta += 10) {
         theta_r = theta * M_PI / 180.0;
         theta10_r = (theta + 10) * M_PI / 180.0;
         GLfloat x_trans = 0.0;
         GLfloat y_trans = 0.5;
 
+
         /* the vectors for the slopes of the cone */
-        vec4 first = (vec4){cos(theta_r), sin(theta_r), start, 1};
-        vec4 second = (vec4){cos(theta_r), sin(theta_r), end, 1};
-        vec4 third = (vec4){cos(theta10_r), sin(theta10_r), end, 1};
+        vec4 first = (vec4){cos(theta_r), sin(theta_r), start-z_diff, 1};
+        vec4 second = (vec4){cos(theta_r), sin(theta_r), end+z_diff, 1};
+        vec4 third = (vec4){cos(theta10_r), sin(theta10_r), end+z_diff, 1};
 
         /* the vectors for the base of the cone */
-        vec4 first_base = (vec4){cos(theta10_r), sin(theta10_r), end, 1.0};
-        vec4 second_base = (vec4){cos(theta_r), sin(theta_r), start, 1.0};
-        vec4 third_base = (vec4){cos(theta10_r), sin(theta10_r), start, 1.0};
+        vec4 first_base = (vec4){cos(theta10_r), sin(theta10_r), end+z_diff, 1.0};
+        vec4 second_base = (vec4){cos(theta_r), sin(theta_r), start-z_diff, 1.0};
+        vec4 third_base = (vec4){cos(theta10_r), sin(theta10_r), start-z_diff, 1.0};
 
         /* add all vertecies */
         vertices[index + 0] = third;
@@ -154,6 +155,12 @@ int tor_band(vec4* vertices, GLfloat twist, int axis, GLfloat end, GLfloat start
         vertices[index + 4] = second_base;
         vertices[index + 3] = first_base;
 	    index += 6;
+        if (theta < 180) {
+            z_diff -= taper;
+        } else {
+            z_diff += taper;
+        }
+        
     }
 
         return index;
@@ -167,7 +174,7 @@ void init(void)
     GLuint program = initShader("shaders/vshader_lab4.glsl", "shaders/fshader_lab4.glsl");
     glUseProgram(program);
 
-    vec4 *circle_vertices = bottom(NUM_VERTICES, 5, X);
+    vec4 *circle_vertices = bottom(NUM_VERTICES, 0, X);
     vec4 *circle_colors = genRandomTriangleColors(NUM_VERTICES);
     
     GLuint vao;
