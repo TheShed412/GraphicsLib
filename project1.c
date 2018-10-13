@@ -85,15 +85,15 @@ vec4* bottom(int num_vertices, GLfloat twist, int axis)
 {   
     GLfloat radius = 3.5;
     int num_bands = NUM_VERTICES/216;
-    GLfloat theta, theta_r, theta10_r;
-    theta = 5;
+    GLfloat delta_theta = 5;
+
+    GLfloat theta, theta_r;
     int index = 0;
     vec4 *vertices = (vec4 *) malloc (sizeof(vec4) * num_vertices);
-    theta_r = theta * M_PI / 180.0;
+    theta_r = delta_theta * M_PI / 180.0;
     GLfloat dist = radius * tan(theta_r);
     GLfloat start, end;
-    GLfloat theta_rad;
-    for (theta = 0; theta <= 355; theta+=5) {
+    for (theta = 0; theta <= 360-delta_theta; theta+=delta_theta) {
         theta_r = theta * M_PI / 180.0;
         end = dist;
         start = end - dist;
