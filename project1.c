@@ -13,7 +13,7 @@
 /* numTriangles = 360/degreePerVertex */
 /* for the circle, vertices are 3 x numTriangles */
 /* for the cone, vertices are 6 x numTriangles */
-#define NUM_VERTICES 5000
+#define NUM_VERTICES 15552
 #define TIMER 1
 
 GLuint ctm_location;
@@ -28,10 +28,11 @@ void init(void);
 void display(void);
 void keyboard(unsigned char key, int mousex, int mousey);
 void idle(int);
-int tor_band(vec4* vertices, GLfloat twist, int axis, GLfloat end, GLfloat start, int index, float taper);
+vec4* tor_band(GLfloat end, GLfloat start);
 void translate_vertices(vec4* vertices, GLfloat x, GLfloat y, GLfloat z);
 void rotate_vertices(vec4* vertices, GLfloat twist, int axis);
 void scale_vertices(vec4* vertices, GLfloat x, GLfloat y, GLfloat z);
+void rotate_n_vertices(vec4* vertices, GLfloat twist, int axis, int num_vertices);
 
 int main(int argc, char **argv) 
 {
@@ -81,25 +82,36 @@ vec4* genRandomTriangleColors(int num_vertices)
  * From the circle.c file with a couple small changes
 */
 vec4* bottom(int num_vertices, GLfloat twist, int axis)
-{
-    GLfloat x_trans = 0.0;
-    GLfloat y_trans = 0.5;
+{   
+    GLfloat radius = 3.5;
     int num_bands = NUM_VERTICES/216;
-    float theta, theta_r, theta10_r;
+    GLfloat theta, theta_r, theta10_r;
+    theta = 5;
     int index = 0;
     vec4 *vertices = (vec4 *) malloc (sizeof(vec4) * num_vertices);
-    GLfloat dist = 0.5;
+    theta_r = theta * M_PI / 180.0;
+    GLfloat dist = radius * tan(theta_r);
     GLfloat start, end;
-    for (int i=1; i <= num_bands; i ++) {
-        end = dist * i;
+    GLfloat theta_rad;
+    for (theta = 0; theta <= 355; theta+=5) {
+        theta_r = theta * M_PI / 180.0;
+        end = dist;
         start = end - dist;
-        index = tor_band(vertices, twist, axis, end, start, index, 0.01);
+        vec4* band = tor_band(end, start);
+        translate_vertices(band, -1*(radius-1.25), 0, 0);
+        rotate_n_vertices(band, theta_r, Y, 216);
+    
+        for(int i=0; i<216; i++) {
+            vertices[index + i] = band[i];
+        }
+        index += 216;
+        free(band);
     }
 
 
     GLfloat scale_factor = 0.20;
-    rotate_vertices(vertices, twist, axis);
-    translate_vertices(vertices, x_trans, y_trans, 0);
+    rotate_vertices(vertices, 0.5, axis);
+    //translate_vertices(vertices, x_trans, y_trans, 0);
     scale_vertices(vertices, scale_factor, scale_factor, scale_factor);
     return vertices;
 }
@@ -107,6 +119,14 @@ vec4* bottom(int num_vertices, GLfloat twist, int axis)
 void rotate_vertices(vec4* vertices, GLfloat twist, int axis) {
     vec4 temp;
     for (int i=0; i < NUM_VERTICES; i++) {
+        temp = vertices[i];
+        vertices[i] = *rotation(&temp, twist, axis);
+    }
+}
+
+void rotate_n_vertices(vec4* vertices, GLfloat twist, int axis, int num_vertices) {
+    vec4 temp;
+    for (int i=0; i < num_vertices; i++) {
         temp = vertices[i];
         vertices[i] = *rotation(&temp, twist, axis);
     }
@@ -128,42 +148,47 @@ void scale_vertices(vec4* vertices, GLfloat x, GLfloat y, GLfloat z) {
     }
 }
 
-int tor_band(vec4* vertices, GLfloat twist, int axis, GLfloat end, GLfloat start, int index, float taper) {
+void rotate_around_not_origin(vec4* vec_arr, int vec_arr_size, GLfloat theta, int axis) {
+    vec4 origin = {0, 0, 0, 0};
+    vec4 curr_vec;
+    for (int i=0; i<vec_arr_size; i++){
+        curr_vec = vec_arr[i];
+        vec4* diff_vec = vec_sub(&origin, &curr_vec);
+        vec4* ret_vec = vec_sub(&curr_vec, &origin);
+        vec4* at_origin = translation(&curr_vec, diff_vec->vec[X], diff_vec->vec[Y], diff_vec->vec[Z]);
+        vec4* rotated_at_origin = rotation(at_origin, theta, axis);
+        vec4* back_after_rot = translation(rotated_at_origin, ret_vec->vec[X], ret_vec->vec[Y], ret_vec->vec[Z]);
+        vec_arr[i] = *back_after_rot;
+    }
+}
+
+vec4* tor_band(GLfloat end, GLfloat start) {
     float theta_r, theta10_r, theta, z_diff;
+    z_diff = 0;
+    int index = 0;
+    vec4* temp_vec_arr = calloc(216, sizeof(vec4) * 216);
     for(theta = 0; theta <= 350; theta += 10) {
         theta_r = theta * M_PI / 180.0;
         theta10_r = (theta + 10) * M_PI / 180.0;
-        GLfloat x_trans = 0.0;
-        GLfloat y_trans = 0.5;
-
 
         /* the vectors for the slopes of the cone */
         vec4 first = (vec4){cos(theta_r), sin(theta_r), start-z_diff, 1};
         vec4 second = (vec4){cos(theta_r), sin(theta_r), end+z_diff, 1};
         vec4 third = (vec4){cos(theta10_r), sin(theta10_r), end+z_diff, 1};
+        temp_vec_arr[index + 0] = third;
+        temp_vec_arr[index + 1] = second;
+        temp_vec_arr[index + 2] = first;
 
         /* the vectors for the base of the cone */
         vec4 first_base = (vec4){cos(theta10_r), sin(theta10_r), end+z_diff, 1.0};
         vec4 second_base = (vec4){cos(theta_r), sin(theta_r), start-z_diff, 1.0};
         vec4 third_base = (vec4){cos(theta10_r), sin(theta10_r), start-z_diff, 1.0};
-
-        /* add all vertecies */
-        vertices[index + 0] = third;
-        vertices[index + 1] = second;
-        vertices[index + 2] = first;
-        vertices[index + 5] = third_base;
-        vertices[index + 4] = second_base;
-        vertices[index + 3] = first_base;
+        temp_vec_arr[index + 3] = first_base;
+        temp_vec_arr[index + 4] = second_base;
+        temp_vec_arr[index + 5] = third_base;
 	    index += 6;
-        if (theta < 180) {
-            z_diff -= taper;
-        } else {
-            z_diff += taper;
-        }
-        
     }
-
-        return index;
+    return temp_vec_arr;
 }
 
 /**
