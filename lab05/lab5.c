@@ -59,7 +59,7 @@ void init(void)
     int height = 512;
     GLubyte my_texels[width][height][4];
 
-    FILE *fp = fopen("textures/brick_lab5.data", "r");
+    FILE *fp = fopen("textures/brick_lab5.raw", "r");
     fread(my_texels, width * height * 3, 1, fp);
     fclose(fp);
 
