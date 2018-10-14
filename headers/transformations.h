@@ -12,4 +12,8 @@ mat4* get_rotation_matrix(GLfloat theta, int axis);
 
 vec4* scale(const vec4* vector, GLfloat x, GLfloat y, GLfloat z);
 
+mat4* get_scaling_matrix(const vec4* vector, GLfloat x, GLfloat y, GLfloat z);
+
+mat4* get_scaling_matrix_con(GLfloat scale_factor);
+
 #endif

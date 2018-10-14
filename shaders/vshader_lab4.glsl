@@ -5,9 +5,10 @@ attribute vec4 vColor;
 varying vec4 color;
 
 uniform mat4 ctm;
+uniform mat4 scale_ctm;
 
 void main()
 {
 	color = vColor;
-	gl_Position = ctm * vPosition;
+	gl_Position = ctm * scale_ctm * vPosition;
 }

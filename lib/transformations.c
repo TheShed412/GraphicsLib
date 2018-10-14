@@ -33,14 +33,32 @@ vec4* translation(const vec4* vector, GLfloat x, GLfloat y, GLfloat z) {
 }
 
 vec4* scale(const vec4* vector, GLfloat x, GLfloat y, GLfloat z) {
-    mat4* trans_mat = copy_id();
-    trans_mat->cols[COL1].vec[X] = x;
-    trans_mat->cols[COL2].vec[Y] = y;
-    trans_mat->cols[COL3].vec[Z] = z;
+    mat4* scale_mat = copy_id();
+    scale_mat->cols[COL1].vec[X] = x;
+    scale_mat->cols[COL2].vec[Y] = y;
+    scale_mat->cols[COL3].vec[Z] = z;
 
-    vec4* result_vec = mat_mult_vec(trans_mat, vector);
-    free(trans_mat);
+    vec4* result_vec = mat_mult_vec(scale_mat, vector);
+    free(scale_mat);
     return result_vec;
+}
+
+mat4* get_scaling_matrix_con(GLfloat scale_factor) {
+    mat4* scale_mat = copy_id();
+    scale_mat->cols[COL1].vec[X] = scale_factor;
+    scale_mat->cols[COL2].vec[Y] = scale_factor;
+    scale_mat->cols[COL3].vec[Z] = scale_factor;
+
+    return scale_mat;
+}
+
+mat4* get_scaling_matrix(const vec4* vector, GLfloat x, GLfloat y, GLfloat z) {
+    mat4* scale_mat = copy_id();
+    scale_mat->cols[COL1].vec[X] = x;
+    scale_mat->cols[COL2].vec[Y] = y;
+    scale_mat->cols[COL3].vec[Z] = z;
+
+    return scale_mat;
 }
 
 static mat4* x_rotate(GLfloat theta) {

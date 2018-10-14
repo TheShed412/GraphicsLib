@@ -22,6 +22,13 @@ mat4 ctm =             {1, 0, 0, 0,
                         0, 0, 1, 0,
                         0, 0, 0, 1};
 
+GLuint scale_ctm_location;
+mat4 scale_ctm =             {1, 0, 0, 0,
+                        0, 1, 0, 0,
+                        0, 0, 1, 0,
+                        0, 0, 0, 1};
+
+
 vec4* genRandomTriangleColors(int num_vertices);
 vec4* bottom(int num_vertices, GLfloat twist, int axis);
 void init(void);
@@ -33,6 +40,7 @@ void translate_vertices(vec4* vertices, GLfloat x, GLfloat y, GLfloat z);
 void rotate_vertices(vec4* vertices, GLfloat twist, int axis);
 void scale_vertices(vec4* vertices, GLfloat x, GLfloat y, GLfloat z);
 void rotate_n_vertices(vec4* vertices, GLfloat twist, int axis, int num_vertices);
+void mouse(int button, int state, int x, int y);
 
 int main(int argc, char **argv) 
 {
@@ -45,6 +53,7 @@ int main(int argc, char **argv)
     init();
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
+    glutMouseFunc(mouse);
     glutTimerFunc(TIMER, idle, 0);
     glutMainLoop();
 
@@ -208,6 +217,7 @@ void init(void)
     glVertexAttribPointer(vColor, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid *) (sizeof(vec4) * NUM_VERTICES));
 
     ctm_location = glGetUniformLocation(program, "ctm");
+    scale_ctm_location =  glGetUniformLocation(program, "scale_ctm");
 
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -225,6 +235,7 @@ void display(void)
     glPolygonMode(GL_BACK, GL_LINE);
 
     glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ctm);
+    glUniformMatrix4fv(scale_ctm_location, 1, GL_FALSE, (GLfloat *) &scale_ctm);
 
     glDrawArrays(GL_TRIANGLES, 0, NUM_VERTICES);
 
@@ -245,10 +256,40 @@ void idle(int value)
 /**
  * From the circle.c file
 */
+GLfloat scale_up = 1.02;
+GLfloat scale_dn = 1/1.02;
 void keyboard(unsigned char key, int mousex, int mousey)
 {
+    mat4* scale_mat = NULL;
+    switch(key) {
+        case 'w':
+            scale_mat = get_scaling_matrix_con(scale_up);
+        break;
+        case 's':
+            scale_mat = get_scaling_matrix_con(scale_dn);
+        break;
+        default:
+            scale_mat = get_scaling_matrix_con(1);
+    }
+    scale_ctm = *scale_mat;
     if(key == 'q')
     	exit(0);
 
+    glutPostRedisplay();
+}
+
+void mouse(int button, int state, int x, int y) {
+    mat4* scale_mat = NULL;
+    switch(button) {
+        case 3:
+            scale_mat = get_scaling_matrix_con(scale_up);
+        break;
+        case 4:
+            scale_mat = get_scaling_matrix_con(scale_dn);
+        break;
+        default:
+            scale_mat = get_scaling_matrix_con(1);
+    }
+    scale_ctm = *scale_mat;
     glutPostRedisplay();
 }
