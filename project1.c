@@ -148,20 +148,6 @@ void scale_vertices(vec4* vertices, GLfloat x, GLfloat y, GLfloat z) {
     }
 }
 
-void rotate_around_not_origin(vec4* vec_arr, int vec_arr_size, GLfloat theta, int axis) {
-    vec4 origin = {0, 0, 0, 0};
-    vec4 curr_vec;
-    for (int i=0; i<vec_arr_size; i++){
-        curr_vec = vec_arr[i];
-        vec4* diff_vec = vec_sub(&origin, &curr_vec);
-        vec4* ret_vec = vec_sub(&curr_vec, &origin);
-        vec4* at_origin = translation(&curr_vec, diff_vec->vec[X], diff_vec->vec[Y], diff_vec->vec[Z]);
-        vec4* rotated_at_origin = rotation(at_origin, theta, axis);
-        vec4* back_after_rot = translation(rotated_at_origin, ret_vec->vec[X], ret_vec->vec[Y], ret_vec->vec[Z]);
-        vec_arr[i] = *back_after_rot;
-    }
-}
-
 vec4* tor_band(GLfloat end, GLfloat start) {
     float theta_r, theta10_r, theta, z_diff;
     z_diff = 0;
