@@ -258,15 +258,20 @@ void idle(int value)
 */
 GLfloat scale_up = 1.02;
 GLfloat scale_dn = 1/1.02;
+mat4* scale_mat = NULL;
 void keyboard(unsigned char key, int mousex, int mousey)
 {
-    mat4* scale_mat = NULL;
+    if(scale_mat == NULL)
+        scale_mat = get_scaling_matrix_con(1);
+    mat4* temp;
     switch(key) {
         case 'w':
-            scale_mat = get_scaling_matrix_con(scale_up);
+            temp = get_scaling_matrix_con(scale_up);
+            scale_mat = mat4_mult(scale_mat, temp);
         break;
         case 's':
-            scale_mat = get_scaling_matrix_con(scale_dn);
+            temp = get_scaling_matrix_con(scale_dn);
+            scale_mat = mat4_mult(scale_mat, temp);
         break;
         default:
             scale_mat = get_scaling_matrix_con(1);
@@ -279,13 +284,18 @@ void keyboard(unsigned char key, int mousex, int mousey)
 }
 
 void mouse(int button, int state, int x, int y) {
-    mat4* scale_mat = NULL;
+    
+    if(scale_mat == NULL)
+        scale_mat = get_scaling_matrix_con(1);
+    mat4* temp;
     switch(button) {
         case 3:
-            scale_mat = get_scaling_matrix_con(scale_up);
+            temp = get_scaling_matrix_con(scale_up);
+            scale_mat = mat4_mult(scale_mat, temp);
         break;
         case 4:
-            scale_mat = get_scaling_matrix_con(scale_dn);
+            temp = get_scaling_matrix_con(scale_dn);
+            scale_mat = mat4_mult(scale_mat, temp);
         break;
         default:
             scale_mat = get_scaling_matrix_con(1);
