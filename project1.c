@@ -15,6 +15,8 @@
 /* for the cone, vertices are 6 x numTriangles */
 #define NUM_VERTICES 15552
 #define TIMER 1
+#define WIDTH 1024
+#define HEIGHT 1024
 
 GLuint ctm_location;
 mat4 ctm =             {1, 0, 0, 0,
@@ -46,7 +48,7 @@ int main(int argc, char **argv)
 {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
-    glutInitWindowSize(1024, 1024);
+    glutInitWindowSize(WIDTH, HEIGHT);
     glutInitWindowPosition(100,100);
     glutCreateWindow("Peoject 1");
     glewInit();
@@ -283,6 +285,12 @@ void keyboard(unsigned char key, int mousex, int mousey)
     glutPostRedisplay();
 }
 
+int curr_x = 0;
+int curr_y = 0;
+int prev_x = 0;
+int prev_y = 0;
+int ball_grabbed = 0;
+
 void mouse(int button, int state, int x, int y) {
     
     if(scale_mat == NULL)
@@ -297,9 +305,51 @@ void mouse(int button, int state, int x, int y) {
             temp = get_scaling_matrix_con(scale_dn);
             scale_mat = mat4_mult(scale_mat, temp);
         break;
+        case GLUT_LEFT_BUTTON:
+            if(state == GLUT_DOWN) {
+                ball_grabbed = 1;
+                curr_x = x;
+                curr_y = y;
+                prev_x = curr_x;
+                prev_y = curr_y;
+            } else {
+                ball_grabbed = 0;
+            }
+        break;
         default:
             scale_mat = get_scaling_matrix_con(1);
     }
     scale_ctm = *scale_mat;
     glutPostRedisplay();
+}
+
+void motion(int x, int y) {
+    if(ball_grabbed) {
+        curr_x = x;
+        curr_y = y;
+    }
+}
+
+vec4* get_ball_vec(int x, int y) {
+    vec4* ball_vec = calloc(1, sizeof(vec4));
+
+    GLfloat proj_x = (x/WIDTH*2) - 1;
+    GLfloat proj_y = -1*((y/HEIGHT*2) - 1);
+    GLfloat sqr_dist = proj_x*proj_x + proj_y*proj_y;
+    GLfloat proj_z;
+    if(sqr_dist >= 1.0) {
+        proj_z = sqrt(1 - sqr_dist);
+    } else {
+        proj_z = 0;
+        proj_x = ((proj_x > 1.0) ? 1.0 : proj_x);
+        proj_x = ((proj_x < -1.0) ? -1.0 : proj_x);
+        proj_y = ((proj_y > 1.0) ? 1.0 : proj_y);
+        proj_y = ((proj_y < -1.0) ? -1.0 : proj_y);
+    }
+
+    ball_vec->vec[X] = proj_x;
+    ball_vec->vec[Y] = proj_y;
+    ball_vec->vec[Z] = proj_z;
+
+    return ball_vec;
 }
