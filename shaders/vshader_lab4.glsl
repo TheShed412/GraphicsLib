@@ -10,5 +10,5 @@ uniform mat4 scale_ctm;
 void main()
 {
 	color = vColor;
-	gl_Position = ctm * scale_ctm * vPosition;
+	gl_Position = scale_ctm * ctm * vPosition;
 }

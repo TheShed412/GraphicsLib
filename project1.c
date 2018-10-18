@@ -253,6 +253,7 @@ int prev_x = 0;
 int prev_y = 0;
 int ball_grabbed = 0;
 GLfloat theta = 0.0;
+mat4* rot_mat = NULL;
 
 void idle(int value) 
 {   
@@ -269,8 +270,8 @@ void idle(int value)
         prev_y = curr_y;
     }
 
-    mat4* rotation_matrix = get_rotation_matrix(theta, Y);
-    ctm = *rotation_matrix;
+    rot_mat = get_rotation_matrix(theta, Y);
+    ctm = *rot_mat;
     // spin += 0.01;
     glutPostRedisplay();
 }
