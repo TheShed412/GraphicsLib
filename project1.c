@@ -43,6 +43,8 @@ void rotate_vertices(vec4* vertices, GLfloat twist, int axis);
 void scale_vertices(vec4* vertices, GLfloat x, GLfloat y, GLfloat z);
 void rotate_n_vertices(vec4* vertices, GLfloat twist, int axis, int num_vertices);
 void mouse(int button, int state, int x, int y);
+void motion(int x, int y);
+vec4* get_ball_vec(int x, int y);
 
 int main(int argc, char **argv) 
 {
@@ -57,6 +59,7 @@ int main(int argc, char **argv)
     glutKeyboardFunc(keyboard);
     glutMouseFunc(mouse);
     glutTimerFunc(TIMER, idle, 0);
+    glutMotionFunc(motion);
     glutMainLoop();
 
     return 0;
@@ -121,7 +124,7 @@ vec4* bottom(int num_vertices, GLfloat twist, int axis)
 
 
     GLfloat scale_factor = 0.20;
-    rotate_vertices(vertices, 0.5, axis);
+    //rotate_vertices(vertices, 0.5, axis);
     //translate_vertices(vertices, x_trans, y_trans, 0);
     scale_vertices(vertices, scale_factor, scale_factor, scale_factor);
     return vertices;
@@ -244,14 +247,31 @@ void display(void)
     glutSwapBuffers();
 }
 
-GLfloat spin = 0.0;
+int curr_x = 0;
+int curr_y = 0;
+int prev_x = 0;
+int prev_y = 0;
+int ball_grabbed = 0;
+GLfloat theta = 0.0;
 
 void idle(int value) 
-{
+{   
     glutTimerFunc(TIMER, idle, 0);
-    mat4* rotation_matrix = get_rotation_matrix(spin, Y);
+
+    // if the torus moved
+    if(curr_x != prev_x || curr_y != prev_y) {
+        // get the start and ending vectors
+        vec4* start_vec = get_ball_vec(prev_x, prev_y);
+        vec4* end_vec = get_ball_vec(curr_x, curr_y);
+        GLfloat dot_prod = vec_mult(start_vec, end_vec);
+        theta = acos((dot_prod > 1.0) ? 1.0 : dot_prod);
+        prev_x = curr_x;
+        prev_y = curr_y;
+    }
+
+    mat4* rotation_matrix = get_rotation_matrix(theta, Y);
     ctm = *rotation_matrix;
-    spin += 0.01;
+    // spin += 0.01;
     glutPostRedisplay();
 }
 
@@ -284,12 +304,6 @@ void keyboard(unsigned char key, int mousex, int mousey)
 
     glutPostRedisplay();
 }
-
-int curr_x = 0;
-int curr_y = 0;
-int prev_x = 0;
-int prev_y = 0;
-int ball_grabbed = 0;
 
 void mouse(int button, int state, int x, int y) {
     
@@ -333,11 +347,11 @@ void motion(int x, int y) {
 vec4* get_ball_vec(int x, int y) {
     vec4* ball_vec = calloc(1, sizeof(vec4));
 
-    GLfloat proj_x = (x/WIDTH*2) - 1;
-    GLfloat proj_y = -1*((y/HEIGHT*2) - 1);
+    GLfloat proj_x = (x/(WIDTH*1.0)) * 2.0 - 1.0;
+    GLfloat proj_y = -1*((y/(HEIGHT*1.0)) * 2.0 - 1.0);
     GLfloat sqr_dist = proj_x*proj_x + proj_y*proj_y;
     GLfloat proj_z;
-    if(sqr_dist >= 1.0) {
+    if(sqr_dist <= 1.0) {
         proj_z = sqrt(1 - sqr_dist);
     } else {
         proj_z = 0;
