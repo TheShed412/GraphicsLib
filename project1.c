@@ -265,14 +265,13 @@ void idle(int value)
         vec4* start_vec = get_ball_vec(prev_x, prev_y);
         vec4* end_vec = get_ball_vec(curr_x, curr_y);
         GLfloat dot_prod = vec_mult(start_vec, end_vec);
-        theta = acos((dot_prod > 1.0) ? 1.0 : dot_prod);
+        theta += acos((dot_prod > 1.0) ? 1.0 : dot_prod);
         prev_x = curr_x;
         prev_y = curr_y;
     }
 
     rot_mat = get_rotation_matrix(theta, Y);
     ctm = *rot_mat;
-    // spin += 0.01;
     glutPostRedisplay();
 }
 
