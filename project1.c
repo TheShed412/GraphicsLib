@@ -30,6 +30,8 @@ mat4 scale_ctm =             {1, 0, 0, 0,
                         0, 0, 1, 0,
                         0, 0, 0, 1};
 
+vec4 y_vec = {0, 1, 0, 0};
+
 
 vec4* genRandomTriangleColors(int num_vertices);
 vec4* bottom(int num_vertices, GLfloat twist, int axis);
@@ -124,7 +126,7 @@ vec4* bottom(int num_vertices, GLfloat twist, int axis)
 
 
     GLfloat scale_factor = 0.20;
-    //rotate_vertices(vertices, 0.5, axis);
+    rotate_vertices(vertices, 0.5, axis);
     //translate_vertices(vertices, x_trans, y_trans, 0);
     scale_vertices(vertices, scale_factor, scale_factor, scale_factor);
     return vertices;
@@ -258,6 +260,9 @@ mat4* rot_mat = NULL;
 void idle(int value) 
 {   
     glutTimerFunc(TIMER, idle, 0);
+    if (rot_mat == NULL) {
+        rot_mat = get_rotation_matrix(theta, Y);
+    }
 
     // if the torus moved
     if(curr_x != prev_x || curr_y != prev_y) {
@@ -266,11 +271,18 @@ void idle(int value)
         vec4* end_vec = get_ball_vec(curr_x, curr_y);
         GLfloat dot_prod = vec_mult(start_vec, end_vec);
         theta += acos((dot_prod > 1.0) ? 1.0 : dot_prod);
+        vec4* orth = vec_cross(start_vec, end_vec);
+        vec4* to_y_axis = vec_sub(&y_vec, orth);
+
         prev_x = curr_x;
         prev_y = curr_y;
+
+        rot_mat = get_rotation_matrix(theta, Y);
+        free(start_vec);
+        free(end_vec);
+        free(orth);
     }
 
-    rot_mat = get_rotation_matrix(theta, Y);
     ctm = *rot_mat;
     glutPostRedisplay();
 }
