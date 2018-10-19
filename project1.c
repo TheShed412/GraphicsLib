@@ -406,10 +406,6 @@ vec4* get_ball_vec(int x, int y) {
         proj_z = sqrt(1 - sqr_dist);
     } else {
         proj_z = 0;
-        proj_x = ((proj_x > 1.0) ? 1.0 : proj_x);
-        proj_x = ((proj_x < -1.0) ? -1.0 : proj_x);
-        proj_y = ((proj_y > 1.0) ? 1.0 : proj_y);
-        proj_y = ((proj_y < -1.0) ? -1.0 : proj_y);
     }
 
     ball_vec->vec[X] = proj_x;
