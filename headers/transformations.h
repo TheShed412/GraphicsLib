@@ -16,4 +16,6 @@ mat4* get_scaling_matrix(const vec4* vector, GLfloat x, GLfloat y, GLfloat z);
 
 mat4* get_scaling_matrix_con(GLfloat scale_factor);
 
+mat4* get_translation_matrix(GLfloat x, GLfloat y, GLfloat z);
+
 #endif

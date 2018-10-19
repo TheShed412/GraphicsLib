@@ -30,7 +30,7 @@ mat4 scale_ctm =             {1, 0, 0, 0,
                         0, 0, 1, 0,
                         0, 0, 0, 1};
 
-vec4 y_vec = {0, 1, 0, 0};
+vec4 origin = {0, 0, 0, 0};
 
 
 vec4* genRandomTriangleColors(int num_vertices);
@@ -47,6 +47,7 @@ void rotate_n_vertices(vec4* vertices, GLfloat twist, int axis, int num_vertices
 void mouse(int button, int state, int x, int y);
 void motion(int x, int y);
 vec4* get_ball_vec(int x, int y);
+mat4* arbitrary_rotate(GLfloat z_theta, const vec4* axis);
 
 int main(int argc, char **argv) 
 {
@@ -269,22 +270,68 @@ void idle(int value)
         // get the start and ending vectors
         vec4* start_vec = get_ball_vec(prev_x, prev_y);
         vec4* end_vec = get_ball_vec(curr_x, curr_y);
+        vec4* axis = vec_cross(end_vec, start_vec);
         GLfloat dot_prod = vec_mult(start_vec, end_vec);
         theta += acos((dot_prod > 1.0) ? 1.0 : dot_prod);
-        vec4* orth = vec_cross(start_vec, end_vec);
-        vec4* to_y_axis = vec_sub(&y_vec, orth);
 
         prev_x = curr_x;
         prev_y = curr_y;
-
-        rot_mat = get_rotation_matrix(theta, Y);
         free(start_vec);
         free(end_vec);
-        free(orth);
-    }
 
+        rot_mat = mat_add(rot_mat, arbitrary_rotate(theta, axis));
+    }
     ctm = *rot_mat;
     glutPostRedisplay();
+}
+
+mat4* arbitrary_rotate(GLfloat z_theta, const vec4* axis) {
+    mat4* final_mat = calloc(1, sizeof(mat4));
+
+    /* step 1: translate to origin */
+    vec4* to_origin = vec_sub(&origin, axis);
+    mat4* trans_to_origin = get_translation_matrix(to_origin->vec[X], to_origin->vec[Y], to_origin->vec[Z]);
+    mat4* trans_from_origin = get_translation_matrix(axis->vec[X], axis->vec[Y], axis->vec[Z]);
+    vec4* at_origin = mat_mult_vec(trans_to_origin, axis);
+
+    /* I might need to check which way to spin on the Y and X axes */
+    /* step 2: rotate around Y axis to the Z-Y plane */
+    GLfloat vx = at_origin->vec[X];
+    GLfloat vz = at_origin->vec[Z];
+    GLfloat vy = at_origin->vec[Y];
+    int flip_y = 1;
+    if((vx < 0 && vz < 0) || (vx > 0 && vz > 0)) {
+        flip_y = -1;
+    }
+    GLfloat y_theta = flip_y * atan(vx/vz);
+    mat4* rot_to_yz = get_rotation_matrix(y_theta, Y);
+    vec4* at_yz = mat_mult_vec(rot_to_yz, at_origin);
+
+    /* step 3: rotate around X-axis to the Z-axis */
+    int flip_x = 1;
+    if(vy < 0) {
+        flip_x = -1;
+    }
+    GLfloat z_adj = sqrt(vz*vz + vx*vx);
+    GLfloat x_theta = flip_x * atan(vy/z_adj);
+    mat4* rot_to_z = get_rotation_matrix(x_theta, X);
+    vec4* at_z = mat_mult_vec(rot_to_z, at_yz);
+
+    /* step 4: rotate around the Z-axis */
+    mat4* rot_around_z = get_rotation_matrix(2*z_theta, Z);
+
+    /* step 5: undo everything and multiply to make the mother of all matrices */
+    mat4* do_rotate_mat = mat4_mult(trans_to_origin, rot_to_yz);
+    do_rotate_mat = mat4_mult(do_rotate_mat, rot_to_z);
+    do_rotate_mat = mat4_mult(do_rotate_mat, rot_around_z);
+
+    mat4* rot_from_z = inverse_mat4(rot_to_z);
+    mat4* rot_from_yz = inverse_mat4(rot_to_yz);
+    mat4* undo_rotate = mat4_mult(rot_from_z, rot_from_yz);
+    undo_rotate = mat4_mult(undo_rotate, trans_from_origin);
+
+    final_mat = mat4_mult(do_rotate_mat, undo_rotate);
+    return final_mat;
 }
 
 /**

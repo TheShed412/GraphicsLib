@@ -43,6 +43,16 @@ vec4* scale(const vec4* vector, GLfloat x, GLfloat y, GLfloat z) {
     return result_vec;
 }
 
+mat4* get_translation_matrix(GLfloat x, GLfloat y, GLfloat z) {
+    
+    mat4* trans_mat = copy_id();
+    trans_mat->cols[COL4].vec[X] = x;
+    trans_mat->cols[COL4].vec[Y] = y;
+    trans_mat->cols[COL4].vec[Z] = z;
+
+    return trans_mat;
+}
+
 mat4* get_scaling_matrix_con(GLfloat scale_factor) {
     mat4* scale_mat = copy_id();
     scale_mat->cols[COL1].vec[X] = scale_factor;
