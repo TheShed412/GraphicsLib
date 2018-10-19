@@ -272,14 +272,14 @@ void idle(int value)
         vec4* end_vec = get_ball_vec(curr_x, curr_y);
         vec4* axis = vec_cross(end_vec, start_vec);
         GLfloat dot_prod = vec_mult(start_vec, end_vec);
-        theta += acos((dot_prod > 1.0) ? 1.0 : dot_prod);
+        theta = acos((dot_prod > 1.0) ? 1.0 : dot_prod);
 
         prev_x = curr_x;
         prev_y = curr_y;
         free(start_vec);
         free(end_vec);
 
-        rot_mat = mat_add(rot_mat, arbitrary_rotate(theta, axis));
+        rot_mat = mat4_mult(rot_mat, arbitrary_rotate(theta, axis));
     }
     ctm = *rot_mat;
     glutPostRedisplay();
@@ -318,7 +318,7 @@ mat4* arbitrary_rotate(GLfloat z_theta, const vec4* axis) {
     vec4* at_z = mat_mult_vec(rot_to_z, at_yz);
 
     /* step 4: rotate around the Z-axis */
-    mat4* rot_around_z = get_rotation_matrix(2*z_theta, Z);
+    mat4* rot_around_z = get_rotation_matrix(z_theta, Z);
 
     /* step 5: undo everything and multiply to make the mother of all matrices */
     mat4* do_rotate_mat = mat4_mult(trans_to_origin, rot_to_yz);
