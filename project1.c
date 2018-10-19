@@ -127,7 +127,7 @@ vec4* bottom(int num_vertices, GLfloat twist, int axis)
 
 
     GLfloat scale_factor = 0.20;
-    rotate_vertices(vertices, 0.5, axis);
+    //rotate_vertices(vertices, 0.5, axis);
     //translate_vertices(vertices, x_trans, y_trans, 0);
     scale_vertices(vertices, scale_factor, scale_factor, scale_factor);
     return vertices;
@@ -299,21 +299,13 @@ mat4* arbitrary_rotate(GLfloat z_theta, const vec4* axis) {
     GLfloat vx = at_origin->vec[X];
     GLfloat vz = at_origin->vec[Z];
     GLfloat vy = at_origin->vec[Y];
-    int flip_y = 1;
-    if((vx < 0 && vz < 0) || (vx > 0 && vz > 0)) {
-        flip_y = -1;
-    }
-    GLfloat y_theta = flip_y * atan(vx/vz);
+    GLfloat y_theta = atan(vx/vz);
     mat4* rot_to_yz = get_rotation_matrix(y_theta, Y);
     vec4* at_yz = mat_mult_vec(rot_to_yz, at_origin);
 
     /* step 3: rotate around X-axis to the Z-axis */
-    int flip_x = 1;
-    if(vy < 0) {
-        flip_x = -1;
-    }
     GLfloat z_adj = sqrt(vz*vz + vx*vx);
-    GLfloat x_theta = flip_x * atan(vy/z_adj);
+    GLfloat x_theta = atan(vy/z_adj);
     mat4* rot_to_z = get_rotation_matrix(x_theta, X);
     vec4* at_z = mat_mult_vec(rot_to_z, at_yz);
 
