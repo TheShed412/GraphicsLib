@@ -57,16 +57,19 @@ vec4* genRandomTriangleColors(int num_vertices)
 
     vec4 *colors = (vec4 *) malloc(sizeof(vec4) * num_vertices);
 
-    for(i = 0; i < num_vertices / 3; i++)
+    for(i = 0; i < num_vertices / 6; i++)
     {
         r = rand() / (float) RAND_MAX;
         g = rand() / (float) RAND_MAX;
         b = rand() / (float) RAND_MAX;
 
-        colors[index] = (vec4){r, g, b, 1.0};
+        colors[index + 0] = (vec4){r, g, b, 1.0};
         colors[index + 1] = (vec4){r, g, b, 1.0};
         colors[index + 2] = (vec4){r, g, b, 1.0};
-        index += 3;
+        colors[index + 3] = (vec4){r, g, b, 1.0};
+        colors[index + 4] = (vec4){r, g, b, 1.0};
+        colors[index + 5] = (vec4){r, g, b, 1.0};
+        index += 6;
     }
 
     return colors;
