@@ -99,42 +99,6 @@ static mat4* y_rotate(GLfloat theta) {
     return rot_mat;
 }
 
-static mat4* y_rotate2(GLfloat vy, GLfloat vz) {
-    mat4* rot_mat = copy_id();
-    GLfloat d = sqrt(vy*vy + vz*vz);
-
-    mat4 temp_mat = {1,     0,    0, 0,
-                     0,  vz/d, vy/d, 0,
-                     0, -vy/d, vz/d, 0,
-                     0,     0,    0, 1};
-    
-    for(int i=0; i < COL_SIZE; i++) {
-        for(int j=0; j < ROW_SIZE; j++) {
-            rot_mat->cols[i].vec[j] = temp_mat.cols[i].vec[j];
-        }
-    }
-
-    return rot_mat;
-}
-
-static mat4* x_rotate2(GLfloat vx, GLfloat vy, GLfloat vz) {
-    mat4* rot_mat = copy_id();
-    GLfloat d = sqrt(vy*vy + vz*vz);
-
-    mat4 temp_mat = {d,  0, vx, 0,
-                     0,  1,  0, 0,
-                    -vx, 0,  d, 0,
-                     0,  0,  0, 1};
-    
-    for(int i=0; i < COL_SIZE; i++) {
-        for(int j=0; j < ROW_SIZE; j++) {
-            rot_mat->cols[i].vec[j] = temp_mat.cols[i].vec[j];
-        }
-    }
-
-    return rot_mat;
-}
-
 static mat4* z_rotate(GLfloat theta) {
     mat4* rot_mat = copy_id();
 
@@ -180,27 +144,6 @@ mat4* get_rotation_matrix(GLfloat theta, int axis) {
             break;
         case Y:
             rot_mat = y_rotate(theta);
-            break;
-        case Z:
-            rot_mat = z_rotate(theta);
-            break;
-    }
-
-    return rot_mat;
-}
-
-mat4* get_rotation_matrix2(const vec4* dest, int axis, GLfloat theta) {
-    mat4* rot_mat;
-    GLfloat vx = dest->vec[X];
-    GLfloat vz = dest->vec[Z];
-    GLfloat vy = dest->vec[Y];
-
-    switch(axis) {
-        case X:
-            rot_mat = x_rotate2(vx, vy, vz);
-            break;
-        case Y:
-            rot_mat = y_rotate2(vy, vz);
             break;
         case Z:
             rot_mat = z_rotate(theta);

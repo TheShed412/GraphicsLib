@@ -309,12 +309,18 @@ mat4* arbitrary_rotate(GLfloat z_theta, const vec4* axis) {
     GLfloat vz = at_origin->vec[Z];
     GLfloat vy = at_origin->vec[Y];
     GLfloat d = sqrt(vy*vy + vz*vz);
-    mat4 rot_to_yz = *get_rotation_matrix2(at_origin, Y, 0);
+    mat4 rot_to_yz = {1, 0, 0, 0,
+                 0, vz/d, vy/d, 0,
+                 0, -vy/d, vz/d, 0,
+                 0, 0, 0, 1};
     vec4* at_yz = mat_mult_vec(&rot_to_yz, at_origin);
 
     /* step 3: rotate around X-axis to the Z,-axis */
     GLfloat z_adj = sqrt(vz*vz + vx*vx);
-    mat4 rot_to_z = *get_rotation_matrix2(at_origin, X, 0);
+    mat4 rot_to_z = {d, 0, vx, 0,
+                 0, 1, 0, 0,
+                 -vx, 0, d, 0,
+                 0, 0, 0, 1};
     vec4* at_z = mat_mult_vec(&rot_to_z, at_yz);
 
     /* step 4: rotate around the Z-axis */
