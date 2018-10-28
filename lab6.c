@@ -21,8 +21,11 @@ mat4 ctm =             {1, 0, 0, 0,
                         0, 0, 1, 0,
                         0, 0, 0, 1};
 
+vec4 all_cube_vertices[108];
+vec4 all_cube_colors[144];
+
 vec4* genRandomTriangleColors(int num_vertices);
-vec4* bottom(int num_vertices, GLfloat twist, int axis);
+vec4* cone(int num_vertices, GLfloat twist, int axis);
 void init(void);
 void display(void);
 void keyboard(unsigned char key, int mousex, int mousey);
@@ -34,7 +37,7 @@ int main(int argc, char **argv)
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
     glutInitWindowSize(1024, 1024);
     glutInitWindowPosition(100,100);
-    glutCreateWindow("Cone Spinning");
+    glutCreateWindow("Lab6 Cubes");
     glewInit();
     init();
     glutDisplayFunc(display);
@@ -45,93 +48,64 @@ int main(int argc, char **argv)
     return 0;
 }
 
-/**
- * From the circle.c file with a couple small changes
-*/
-vec4* genRandomTriangleColors(int num_vertices)
-{
+
+/* assuming the size is 36 cause I don't think I'll use any other size */
+vec4* set_cube_colors(vec4* cube_colors){
+
+    int index = 0;
     GLfloat r, g, b;
-    int index = 0, i;
+    for(int i=0; i<6; i++) {
 
-    srand(time(0));
+        switch(i) {
+            case 0:
+                r = 1.0;
+                g = 0.0;
+                b = 0.0;
+            break;
+            case 1:
+                r = 0.0;
+                g = 1.0;
+                b = 0.0;
+            break;
+            case 2:
+                r = 0.0;
+                g = 0.0;
+                b = 1.0;
+            break;
+            case 3:
+                r = 1.0;
+                g = 1.0;
+                b = 0.0;
+            break;
+            case 4:
+                r = 1.0;
+                g = 0.0;
+                b = 1.0;
+            break;
+            case 5:
+                r = 0.0;
+                g = 1.0;
+                b = 1.0;
+            break;
+        }
 
-    vec4 *colors = (vec4 *) malloc(sizeof(vec4) * num_vertices);
-
-    for(i = 0; i < num_vertices / 6; i++)
-    {
-        r = rand() / (float) RAND_MAX;
-        g = rand() / (float) RAND_MAX;
-        b = rand() / (float) RAND_MAX;
-
-        colors[index + 0] = (vec4){r, g, b, 1.0};
-        colors[index + 1] = (vec4){r, g, b, 1.0};
-        colors[index + 2] = (vec4){r, g, b, 1.0};
-        colors[index + 3] = (vec4){r, g, b, 1.0};
-        colors[index + 4] = (vec4){r, g, b, 1.0};
-        colors[index + 5] = (vec4){r, g, b, 1.0};
+        cube_colors[index + 0] = (vec4){r, g, b, 1.0};
+        cube_colors[index + 1] = (vec4){r, g, b, 1.0};
+        cube_colors[index + 2] = (vec4){r, g, b, 1.0};
+        cube_colors[index + 3] = (vec4){r, g, b, 1.0};
+        cube_colors[index + 4] = (vec4){r, g, b, 1.0};
+        cube_colors[index + 5] = (vec4){r, g, b, 1.0};
         index += 6;
     }
 
-    return colors;
 }
 
-/**
- * From the circle.c file with a couple small changes
-*/
-vec4* bottom(int num_vertices, GLfloat twist, int axis)
-{
-    float theta, theta_r, theta10_r;
-    int index = 0;
-    vec4 *vertices = (vec4 *) malloc (sizeof(vec4) * num_vertices);
-    for(theta = 0; theta <= 350; theta += 10)
-    {
-        theta_r = theta * M_PI / 180.0;
-        theta10_r = (theta + 10) * M_PI / 180.0;
-        GLfloat og_z = -1.25;
-        GLfloat x_trans = 0.0;
-        GLfloat y_trans = 0.5;
+vec4* twin_cubes(){
+    vec4* cubes = calloc(36, 36*sizeof(vec4));
 
-        /* the vectors for the slopes of the cone */
-        vec4 first = (vec4){0.0, 0.0, og_z, 1.0};
-        vec4 second = (vec4){cos(theta_r), sin(theta_r), 0.0, 1.0};
-        vec4 third = (vec4){cos(theta10_r), sin(theta10_r), 0.0, 1.0};
 
-        /* the vectors for the base of the cone */
-        vec4 first_base = (vec4){0.0, 0.0, 0.0, 1.0};
-        vec4 second_base = (vec4){cos(theta_r), sin(theta_r), 0.0, 1.0};
-        vec4 third_base = (vec4){cos(theta10_r), sin(theta10_r), 0.0, 1.0};
 
-        /* rotating slope vectors  */
-        vec4* rot_first = rotation(&first, twist, axis);
-        vec4* rot_second = rotation(&second, twist, axis);
-        vec4* rot_third = rotation(&third, twist, axis);
-
-        /* rotating base vectors */
-        vec4* rot_first_base = rotation(&first_base, twist, axis);
-        vec4* rot_second_base = rotation(&second_base, twist, axis);
-        vec4* rot_third_base = rotation(&third_base, twist, axis);
-
-        /* moving slopes along x axis to keep cone in view */
-        vec4* tran_rot_first = translation(rot_first, x_trans, y_trans, 0.0);
-        vec4* tran_rot_second = translation(rot_second, x_trans, y_trans, 0.0);
-        vec4* tran_rot_third = translation(rot_third, x_trans, y_trans, 0.0);
-
-        /* moving base along x axis to keep it in view */
-        vec4* tran_rot_first_base = translation(rot_first_base, x_trans, y_trans, 0.0);
-        vec4* tran_rot_second_base = translation(rot_second_base, x_trans, y_trans, 0.0);
-        vec4* tran_rot_third_base = translation(rot_third_base, x_trans, y_trans, 0.0);
-
-        /* add all vertecies */
-        vertices[index + 0] = *tran_rot_third;
-        vertices[index + 1] = *tran_rot_second;
-        vertices[index + 2] = *tran_rot_first;
-        vertices[index + 5] = *tran_rot_third_base;
-        vertices[index + 4] = *tran_rot_second_base;
-        vertices[index + 3] = *tran_rot_first_base;
-	    index += 6;
-    }
-
-    return vertices;
+    return cubes;
 }
 
 /**
@@ -142,8 +116,8 @@ void init(void)
     GLuint program = initShader("shaders/vshader_lab4.glsl", "shaders/fshader_lab4.glsl");
     glUseProgram(program);
 
-    vec4 *circle_vertices = bottom(NUM_VERTICES, 5, X);
-    vec4 *circle_colors = genRandomTriangleColors(NUM_VERTICES);
+    vec4 *circle_vertices = NULL;
+    vec4 *circle_colors = NULL;
     
     GLuint vao;
     glGenVertexArrays(1, &vao);
