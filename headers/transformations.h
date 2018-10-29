@@ -20,4 +20,10 @@ mat4* get_translation_matrix(GLfloat x, GLfloat y, GLfloat z);
 
 mat4* get_rotation_matrix2(const vec4* dest, int axis, GLfloat theta);
 
+vec4* translate_vertices(vec4* vertices, int num_vertices, GLfloat x, GLfloat y, GLfloat z);
+
+vec4* scale_vertices(vec4* vertices, int num_vertices, GLfloat x, GLfloat y, GLfloat z);
+
+vec4* const_scale(vec4* vertices, int num_vertices, GLfloat scale_fac);
+
 #endif

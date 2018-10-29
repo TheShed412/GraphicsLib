@@ -40,9 +40,9 @@ void display(void);
 void keyboard(unsigned char key, int mousex, int mousey);
 void idle(int);
 vec4* tor_band(GLfloat end, GLfloat start);
-void translate_vertices(vec4* vertices, GLfloat x, GLfloat y, GLfloat z);
+void translate_vertices_p1(vec4* vertices, GLfloat x, GLfloat y, GLfloat z);
 void rotate_vertices(vec4* vertices, GLfloat twist, int axis);
-void scale_vertices(vec4* vertices, GLfloat x, GLfloat y, GLfloat z);
+void scale_vertices_p1(vec4* vertices, GLfloat x, GLfloat y, GLfloat z);
 void rotate_n_vertices(vec4* vertices, GLfloat twist, int axis, int num_vertices);
 void mouse(int button, int state, int x, int y);
 void motion(int x, int y);
@@ -115,7 +115,7 @@ vec4* bottom(int num_vertices, GLfloat twist, int axis)
         end = dist;
         start = end - dist;
         vec4* band = tor_band(end, start);
-        translate_vertices(band, -1*(radius-1.25), 0, 0);
+        translate_vertices_p1(band, -1*(radius-1.25), 0, 0);
         rotate_n_vertices(band, theta_r, Y, 216);
     
         for(int i=0; i<216; i++) {
@@ -127,7 +127,7 @@ vec4* bottom(int num_vertices, GLfloat twist, int axis)
 
 
     GLfloat scale_factor = 0.20;
-    scale_vertices(vertices, scale_factor, scale_factor, scale_factor);
+    scale_vertices_p1(vertices, scale_factor, scale_factor, scale_factor);
     return vertices;
 }
 
@@ -147,7 +147,7 @@ void rotate_n_vertices(vec4* vertices, GLfloat twist, int axis, int num_vertices
     }
 }
 
-void translate_vertices(vec4* vertices, GLfloat x, GLfloat y, GLfloat z) {
+void translate_vertices_p1(vec4* vertices, GLfloat x, GLfloat y, GLfloat z) {
     vec4 temp;
     for (int i=0; i < NUM_VERTICES; i++) {
         temp = vertices[i];
@@ -155,7 +155,7 @@ void translate_vertices(vec4* vertices, GLfloat x, GLfloat y, GLfloat z) {
     }
 }
 
-void scale_vertices(vec4* vertices, GLfloat x, GLfloat y, GLfloat z) {
+void scale_vertices_p1(vec4* vertices, GLfloat x, GLfloat y, GLfloat z) {
     vec4 temp;
     for (int i=0; i < NUM_VERTICES; i++) {
         temp = vertices[i];

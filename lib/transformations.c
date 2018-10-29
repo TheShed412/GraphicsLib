@@ -209,3 +209,27 @@ mat4* get_rotation_matrix2(const vec4* dest, int axis, GLfloat theta) {
 
     return rot_mat;
 }
+
+vec4* translate_vertices(vec4* vertices, int num_vertices, GLfloat x, GLfloat y, GLfloat z) {
+    vec4 temp;
+    for (int i=0; i < num_vertices; i++) {
+        temp = vertices[i];
+        vertices[i] = *translation(&temp, x, y, z);
+    }
+
+    return vertices;
+}
+
+vec4* scale_vertices(vec4* vertices, int num_vertices, GLfloat x, GLfloat y, GLfloat z) {
+    vec4 temp;
+    for (int i=0; i < num_vertices; i++) {
+        temp = vertices[i];
+        vertices[i] = *scale(&temp, x, y, z);
+    }
+
+    return vertices;
+}
+
+vec4* const_scale(vec4* vertices, int num_vertices, GLfloat scale_fac) {
+    return scale_vertices(vertices, num_vertices, scale_fac, scale_fac, scale_fac);
+}
