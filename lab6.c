@@ -13,7 +13,7 @@
 /* numTriangles = 360/degreePerVertex */
 /* for the circle, vertices are 3 x numTriangles */
 /* for the cone, vertices are 6 x numTriangles */
-#define NUM_VERTICES 72
+#define NUM_VERTICES 108
 
 GLuint ctm_location;
 mat4 ctm =             {1, 0, 0, 0,
@@ -23,6 +23,25 @@ mat4 ctm =             {1, 0, 0, 0,
 
 vec4 all_cube_vertices[108];
 vec4 all_cube_colors[108];
+
+vec4 twin_cube_location = {0.0, 0.5, 0.0, 1.0};
+vec4 left_cube_location = {-0.5, -0.5, 0.0, 1.0};
+vec4 right_cube_location = {0.5, -0.5, 0.0, 1.0};
+
+GLfloat twin_cube_degree = 0.0, left_cube_degree = 0.0, right_cube_degree = 0.0;
+
+mat4 twin_cube_ctm =   {1, 0, 0, 0,
+                        0, 1, 0, 0,
+                        0, 0, 1, 0,
+                        0, 0, 0, 1};
+mat4 left_cube_ctm =   {1, 0, 0, 0,
+                        0, 1, 0, 0,
+                        0, 0, 1, 0,
+                        0, 0, 0, 1};
+mat4 right_cube_ctm =  {1, 0, 0, 0,
+                        0, 1, 0, 0,
+                        0, 0, 1, 0,
+                        0, 0, 0, 1};
 
 void init(void);
 void display(void);
@@ -50,10 +69,10 @@ int main(int argc, char **argv)
 
 /* assuming the size is 36 cause I don't think I'll use any other size */
 vec4* set_cube_colors(){
-    vec4* cube_colors = calloc(72, 72*sizeof(vec4));
+    vec4* cube_colors = calloc(NUM_VERTICES, NUM_VERTICES*sizeof(vec4));
     int index = 0;
     GLfloat r, g, b;
-    for(int i=0; i<72/6; i++) {
+    for(int i=0; i<NUM_VERTICES/6; i++) {
         int rem = i%6;
         switch(rem) {
             case 0:
@@ -239,9 +258,17 @@ void display(void)
     glPolygonMode(GL_FRONT, GL_FILL);
     glPolygonMode(GL_BACK, GL_LINE);
 
-    glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ctm);
+    /* twin cubes */
+    glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &twin_cube_ctm);
+    glDrawArrays(GL_TRIANGLES, 0, 72);
 
-    glDrawArrays(GL_TRIANGLES, 0, NUM_VERTICES);
+    /* left cube */
+    glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &left_cube_ctm);
+    glDrawArrays(GL_TRIANGLES, 72, 36);
+
+    /* right cube */
+    glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &right_cube_ctm);
+    glDrawArrays(GL_TRIANGLES, 72, 36);
 
     glutSwapBuffers();
 }
@@ -250,9 +277,9 @@ GLfloat spin = 0.0;
 
 void idle(void) 
 {
-    mat4* rotation_matrix = get_rotation_matrix(spin, Y);
-    ctm = *rotation_matrix;
-    spin += 0.01;
+    mat4* rotation_matrix = get_rotation_matrix(twin_cube_degree, Y);
+    twin_cube_ctm = *rotation_matrix;
+    twin_cube_degree += 0.01;
     glutPostRedisplay();
 }
 
