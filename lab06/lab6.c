@@ -282,8 +282,6 @@ void display(void)
     glutSwapBuffers();
 }
 
-GLfloat spin_amount = 0.05;
-
 void idle(void) 
 {   
     vec4 down_left = {-0.5, -0.5, 0, 1};
@@ -302,9 +300,9 @@ void idle(void)
     left_cube_ctm = *left_trans_mat;
     twin_cube_ctm = *twin_cube_rotation;
 
-    twin_cube_degree += spin_amount;
-    right_cube_degree += spin_amount;
-    left_cube_degree += spin_amount;
+    twin_cube_degree += 0.01;
+    right_cube_degree += 0.01;
+    left_cube_degree += 0.01;
     glutPostRedisplay();
 }
 
