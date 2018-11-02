@@ -200,13 +200,13 @@ vec4* single_cube(){
     cube[29].vec[X] = -x,  cube[29].vec[Y] = -y, cube[29].vec[Z] = z;//0
 
     /* top: const y */
-    cube[24].vec[X] = -x, cube[24].vec[Y] = y,  cube[24].vec[Z] = z;//2
-    cube[25].vec[X] = x,  cube[25].vec[Y] = y,  cube[25].vec[Z] = z;//3
-    cube[26].vec[X] = x,  cube[26].vec[Y] = y, cube[26].vec[Z] = -z;//7
+    cube[30].vec[X] = -x, cube[30].vec[Y] = y,  cube[30].vec[Z] = z;//2
+    cube[31].vec[X] = x,  cube[31].vec[Y] = y,  cube[31].vec[Z] = z;//3
+    cube[32].vec[X] = x,  cube[32].vec[Y] = y, cube[32].vec[Z] = -z;//7
 
-    cube[27].vec[X] = -x,  cube[27].vec[Y] = y,cube[27].vec[Z] = z;//2
-    cube[28].vec[X] = x, cube[28].vec[Y] = y, cube[28].vec[Z] = -z;//7
-    cube[29].vec[X] = -x,  cube[29].vec[Y] = y, cube[29].vec[Z] = -z;//6
+    cube[33].vec[X] = -x,  cube[33].vec[Y] = y,cube[33].vec[Z] = z;//2
+    cube[34].vec[X] = x, cube[34].vec[Y] = y, cube[34].vec[Z] = -z;//7
+    cube[35].vec[X] = -x,  cube[35].vec[Y] = y, cube[35].vec[Z] = -z;//6
 
     return cube;
 }
@@ -219,8 +219,20 @@ void init(void)
     GLuint program = initShader("shaders/vshader_lab6.glsl", "shaders/fshader_lab6.glsl");
     glUseProgram(program);
 
-    vec4 *circle_vertices = twin_cubes();
-    vec4 *circle_colors = set_cube_colors();
+    vec4* cube_vertices = calloc(NUM_VERTICES, NUM_VERTICES*sizeof(vec4));
+
+    vec4* twin_verts = twin_cubes();
+    vec4* other_cubes = single_cube();
+    vec4* circle_colors = set_cube_colors();
+
+    int i;
+    for (i=0; i < 72; i ++) {
+        cube_vertices[i] = twin_verts[i];
+    }
+
+    for (i=72; i<NUM_VERTICES; i++) {
+        cube_vertices[i] = other_cubes[i-72];
+    }
     
     GLuint vao;
     glGenVertexArrays(1, &vao);
@@ -230,7 +242,7 @@ void init(void)
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vec4) * 2 * NUM_VERTICES, NULL, GL_STATIC_DRAW);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vec4) * NUM_VERTICES, circle_vertices);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vec4) * NUM_VERTICES, cube_vertices);
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(vec4) * NUM_VERTICES, sizeof(vec4) * NUM_VERTICES, circle_colors);
 
     GLuint vPosition = glGetAttribLocation(program, "vPosition");
@@ -273,13 +285,27 @@ void display(void)
     glutSwapBuffers();
 }
 
-GLfloat spin = 0.0;
-
 void idle(void) 
-{
-    mat4* rotation_matrix = get_rotation_matrix(twin_cube_degree, Y);
-    twin_cube_ctm = *rotation_matrix;
+{   
+    vec4 down_left = {-0.5, -0.5, 0, 1};
+    vec4 down_right = {0.5, -0.5, 0, 1};
+
+    mat4* down_left_mat = get_translation_matrix(down_left.vec[X], down_left.vec[Y], down_left.vec[Z]);
+    mat4* down_right_mat = get_translation_matrix(down_right.vec[X], down_right.vec[Y], down_right.vec[Z]);
+    mat4* left_cube_rot_mat = get_rotation_matrix(left_cube_degree, Z);
+    mat4* right_cube_rot_mat = get_rotation_matrix(right_cube_degree, X);
+    mat4* scale_mat = get_scaling_matrix_con(0.5);
+
+    mat4* left_trans_mat = mat4_mult(down_left_mat, mat4_mult(left_cube_rot_mat, scale_mat));
+    mat4* right_trans_mat = mat4_mult(down_right_mat, mat4_mult(right_cube_rot_mat, scale_mat));
+    mat4* twin_cube_rotation = get_rotation_matrix(twin_cube_degree, Y);
+    right_cube_ctm = *right_trans_mat;
+    left_cube_ctm = *left_trans_mat;
+    twin_cube_ctm = *twin_cube_rotation;
+
     twin_cube_degree += 0.01;
+    right_cube_degree += 0.01;
+    left_cube_degree += 0.01;
     glutPostRedisplay();
 }
 
