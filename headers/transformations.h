@@ -28,4 +28,6 @@ vec4* const_scale(vec4* vertices, int num_vertices, GLfloat scale_fac);
 
 vec4* rotate_vertices(vec4* vertices, int num_vertices, GLfloat theta, int axis);
 
+vec4* my_normalize(const vec4* vector);
+
 #endif

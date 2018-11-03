@@ -244,7 +244,7 @@ vec4* const_scale(vec4* vertices, int num_vertices, GLfloat scale_fac) {
     return scale_vertices(vertices, num_vertices, scale_fac, scale_fac, scale_fac);
 }
 
-vec4* normalize(const vec4* vector) {
+vec4* my_normalize(const vec4* vector) {
     GLfloat size_of_vector = sqrt(vector->vec[X]*vector->vec[X] + vector->vec[Z]*vector->vec[Z] + vector->vec[Y]*vector->vec[Y]);
     return scalar_mult_vec4(vector, 1/size_of_vector);
 }
