@@ -3,6 +3,8 @@
 
 #include "matrix_lib.h"
 
+#define VERTS_IN_CUBE 36
+
 typedef struct {
     GLboolean north_wall;
     GLboolean south_wall;

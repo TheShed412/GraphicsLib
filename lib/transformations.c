@@ -230,6 +230,16 @@ vec4* scale_vertices(vec4* vertices, int num_vertices, GLfloat x, GLfloat y, GLf
     return vertices;
 }
 
+vec4* rotate_vertices(vec4* vertices, int num_vertices, GLfloat theta, int axis) {
+    vec4 temp;
+    for (int i=0; i < num_vertices; i++) {
+        temp = vertices[i];
+        vertices[i] = *rotation(&temp, theta, axis);
+    }
+
+    return vertices;
+}
+
 vec4* const_scale(vec4* vertices, int num_vertices, GLfloat scale_fac) {
     return scale_vertices(vertices, num_vertices, scale_fac, scale_fac, scale_fac);
 }

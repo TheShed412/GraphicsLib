@@ -73,6 +73,16 @@ vec4* genRandomTriangleColors(int num_vertices)
     return colors;
 }
 
+vec4* ground() {
+    vec4* starting_cube = single_cube();
+
+    starting_cube = const_scale(starting_cube, 36, 0.25);
+    starting_cube = rotate_vertices(starting_cube, VERTS_IN_CUBE, 0.1, Y);
+    starting_cube = rotate_vertices(starting_cube, VERTS_IN_CUBE, 0.1, X);
+
+    return starting_cube;
+}
+
 /**
  * From the circle.c file with a couple small changes
 */
@@ -81,7 +91,7 @@ void init(void)
     GLuint program = initShader("shaders/vshader_lab4.glsl", "shaders/fshader_lab4.glsl");
     glUseProgram(program);
 
-    vec4 *circle_vertices = single_cube();
+    vec4 *circle_vertices = ground();
     vec4 *circle_colors = genRandomTriangleColors(NUM_VERTICES);
     
     GLuint vao;

@@ -26,4 +26,6 @@ vec4* scale_vertices(vec4* vertices, int num_vertices, GLfloat x, GLfloat y, GLf
 
 vec4* const_scale(vec4* vertices, int num_vertices, GLfloat scale_fac);
 
+vec4* rotate_vertices(vec4* vertices, int num_vertices, GLfloat theta, int axis);
+
 #endif
