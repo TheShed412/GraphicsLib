@@ -29,3 +29,20 @@ mat4* look_at(const vec4* eye_pos, const vec4* look_at_pos, const vec4* up_vecto
 
     return ret_mat;
 }
+
+mat4* frustum(GLfloat left, GLfloat right, GLfloat top, GLfloat bottom, GLfloat near, GLfloat far) {
+    mat4* ret_mat = calloc(1, sizeof(mat4));
+
+    ret_mat->cols[COL1].vec[X] = (2*near)/(right-left);
+    ret_mat->cols[COL2].vec[Y] = (2*near)/(top-bottom);
+
+    ret_mat->cols[COL3].vec[X] = (right+left)/(right-left);
+    ret_mat->cols[COL3].vec[Y] = (top+bottom)/(top-bottom);
+    ret_mat->cols[COL3].vec[Z] =-1 * (far+near)/(far-near);
+    ret_mat->cols[COL3].vec[W] = -1;
+
+    ret_mat->cols[COL4].vec[Z] = -1 * (2*far*near)/(far-near);
+
+    return ret_mat;
+}
+ 
