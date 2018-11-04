@@ -10,6 +10,7 @@
 #include "headers/matrix_lib.h"
 #include "headers/transformations.h"
 #include "headers/maze_helper.h"
+#include "headers/view.h"
 
 /* numTriangles = 360/degreePerVertex */
 /* for the circle, vertices are 3 x numTriangles */
@@ -17,6 +18,7 @@
 #define NUM_VERTICES 36
 
 GLuint ctm_location;
+GLuint perspective_shift;
 mat4 ctm =             {1, 0, 0, 0,
                         0, 1, 0, 0,
                         0, 0, 1, 0,
@@ -75,8 +77,7 @@ vec4* genRandomTriangleColors(int num_vertices)
 
 vec4* ground() {
     vec4* starting_cube = single_cube();
-
-    starting_cube = const_scale(starting_cube, 36, 0.25);
+    starting_cube = scale_vertices(starting_cube, VERTS_IN_CUBE, 0.8, 0.1, 0.8);
     starting_cube = rotate_vertices(starting_cube, VERTS_IN_CUBE, 0.1, Y);
     starting_cube = rotate_vertices(starting_cube, VERTS_IN_CUBE, 0.1, X);
 
