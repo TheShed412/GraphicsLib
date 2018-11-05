@@ -119,6 +119,11 @@ cell** make_maze() {
  */
 
 static void rec_maze_builder(cell** maze, int start_vert, int end_vert, int start_hor, int end_hor) {
+
+    if(end_hor-start_hor == 0 && end_vert-start_vert == 0) {
+        return;
+    }
+
     /* do the vertical line first */
     int vert_index = rand() % (end_hor - start_hor);// find the index im walling up
     int hole_index = rand() % (end_hor - start_hor);// find the index where the hole is going
@@ -129,6 +134,18 @@ static void rec_maze_builder(cell** maze, int start_vert, int end_vert, int star
 
 
     /* then do the horizontal line */
+    int hor_index = rand() % (end_vert - start_vert);// find the index im walling up
+    hole_index = rand() % (end_vert - start_vert);// find the index where the hole is going
+    for(int i=start_hor; i < end_hor; i++) {
+        maze[hor_index][i].south_wall = GL_TRUE;
+    }
+    maze[hor_index][hole_index].south_wall = GL_FALSE;
+
+    rec_maze_builder(maze, vert_index, end_vert, hor_index, end_hor);
+    rec_maze_builder(maze, start_vert, vert_index, start_hor, hor_index);
+
+    rec_maze_builder(maze, vert_index, end_vert, start_hor, hor_index);
+    rec_maze_builder(maze, start_vert, vert_index, hor_index, end_hor);
 }
 
 void print_cell(const cell* cell_print) {
