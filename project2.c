@@ -90,7 +90,7 @@ vec4* ground() {
 void init(void)
 {   
     cell** maze = make_maze();
-    print_cell(&maze[7][7]);
+    print_cell(&maze[6][7]);
     GLuint program = initShader("shaders/vshader_lab4.glsl", "shaders/fshader_lab4.glsl");
     glUseProgram(program);
 

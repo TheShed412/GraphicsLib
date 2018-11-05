@@ -2,6 +2,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h> 
+
+//enum wall {HORZ, VERT};
+
+#define MAX_REC_INDEX 6
 
 vec4* single_cube(){
     vec4* cube = calloc(36, 36*sizeof(vec4));
@@ -74,6 +79,8 @@ vec4* single_cube(){
 
 /* makes an 8x8 maze */
 cell** make_maze() {
+    srand(time(0));
+
     cell** maze_arr = calloc(8, sizeof(cell*));
     for(int i=0; i < 8; i++) {
         maze_arr[i] = calloc(8, sizeof(cell));
@@ -93,8 +100,35 @@ cell** make_maze() {
     for (i = 7; i >= 0; i--) {
         maze_arr[i][7].west_wall = GL_TRUE;
     }
+    /* entrance and exit */
+    maze_arr[0][0].east_wall = GL_FALSE;
+    maze_arr[7][7].west_wall = GL_FALSE;
 
     return maze_arr;
+}
+
+/*  I need a recursive function that will make the maze using division
+    rules:
+        1. generating vert lines:
+            a. arr from 0 to 6
+            b. only spawn east_wall
+        2. generating horizontal lines
+            a. arr from 0 to 6
+            b. only spawning south_walls
+    This is to avoid generating an adjacent wall and not generating to matching adjacent wall
+ */
+
+static void rec_maze_builder(cell** maze, int start_vert, int end_vert, int start_hor, int end_hor) {
+    /* do the vertical line first */
+    int vert_index = rand() % (end_hor - start_hor);// find the index im walling up
+    int hole_index = rand() % (end_hor - start_hor);// find the index where the hole is going
+    for(int i=start_vert; i < end_vert; i++) {
+        maze[i][vert_index].east_wall = GL_TRUE;
+    }
+    maze[hole_index][vert_index].east_wall = GL_FALSE;
+
+
+    /* then do the horizontal line */
 }
 
 void print_cell(const cell* cell_print) {
