@@ -14,4 +14,8 @@ typedef struct {
 
 vec4* single_cube();
 
+void print_cell(const cell* cell_print);
+
+cell** make_maze();
+
 #endif

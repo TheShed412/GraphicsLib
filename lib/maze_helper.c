@@ -1,4 +1,7 @@
 #include "../headers/maze_helper.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 vec4* single_cube(){
     vec4* cube = calloc(36, 36*sizeof(vec4));
@@ -69,3 +72,52 @@ vec4* single_cube(){
     return cube;
 }
 
+/* makes an 8x8 maze */
+cell** make_maze() {
+    cell** maze_arr = calloc(8, sizeof(cell*));
+    for(int i=0; i < 8; i++) {
+        maze_arr[i] = calloc(8, sizeof(cell));
+    }
+
+    /* set boundaries for maze */
+    int i;
+    for (i = 0; i < 8; i++) {
+        maze_arr[0][i].north_wall = GL_TRUE;
+    }
+    for (i = 0; i < 8; i++) {
+        maze_arr[i][0].east_wall = GL_TRUE;
+    }
+    for (i = 7; i >= 0; i--) {
+        maze_arr[7][i].south_wall = GL_TRUE;
+    }
+    for (i = 7; i >= 0; i--) {
+        maze_arr[i][7].west_wall = GL_TRUE;
+    }
+
+    return maze_arr;
+}
+
+void print_cell(const cell* cell_print) {
+    //char* top_filled = "*---*\n|   |\n*---*\n";
+    char* cell_str = calloc(1, 19 * sizeof(char));
+
+    char* top_filled = (cell_print->north_wall) ? "*---*\n" : "*   *\n";
+    char* bot_filled = (cell_print->south_wall) ? "*---*\n" : "*   *\n";
+    char* left_right = "";
+
+    if(cell_print->east_wall && cell_print->west_wall) {
+        left_right = "|   |\n";
+    } else if (cell_print->east_wall && !cell_print->west_wall) {
+        left_right = "|    \n";
+    } else if (!cell_print->east_wall && cell_print->west_wall) {
+        left_right = "    |\n";
+    } else {
+        left_right = "     \n";
+    }
+
+    //char* result = calloc(1, 19 * sizeof(char));
+    strcat(cell_str, top_filled);
+    strcat(cell_str, left_right);
+    strcat(cell_str, bot_filled);
+    printf("%s", cell_str);
+}
