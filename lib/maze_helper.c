@@ -6,7 +6,9 @@
 
 //enum wall {HORZ, VERT};
 
-#define MAX_REC_INDEX 6
+#define MAX_REC_INDEX 7
+
+static void rec_maze_builder(cell** maze, int start_vert, int end_vert, int start_hor, int end_hor);
 
 vec4* single_cube(){
     vec4* cube = calloc(36, 36*sizeof(vec4));
@@ -104,6 +106,8 @@ cell** make_maze() {
     maze_arr[0][0].east_wall = GL_FALSE;
     maze_arr[7][7].west_wall = GL_FALSE;
 
+    rec_maze_builder(maze_arr, 0, MAX_REC_INDEX, 0, MAX_REC_INDEX);
+
     return maze_arr;
 }
 
@@ -120,32 +124,46 @@ cell** make_maze() {
 
 static void rec_maze_builder(cell** maze, int start_vert, int end_vert, int start_hor, int end_hor) {
 
-    if(end_hor-start_hor == 0 && end_vert-start_vert == 0) {
+    int hor_diff = end_hor-start_hor;
+    int vert_diff = end_vert-start_vert;
+
+    if(hor_diff <= 0 && (vert_diff <= 0)) {
         return;
     }
 
     /* do the vertical line first */
-    int vert_index = rand() % (end_hor - start_hor);// find the index im walling up
-    int hole_index = rand() % (end_hor - start_hor);// find the index where the hole is going
-    for(int i=start_vert; i < end_vert; i++) {
-        maze[i][vert_index].east_wall = GL_TRUE;
+    int vert_index;
+    int hole_index;
+    if (hor_diff > 0) {
+        vert_index = (rand() % (hor_diff)) + start_hor;// find the index im walling up
+        hole_index = (rand() % (hor_diff)) + start_hor;// find the index where the hole is going
+        for(int i=start_vert; i < end_vert; i++) {
+            maze[i][vert_index].east_wall = GL_TRUE;
+        }
+        maze[hole_index][vert_index].east_wall = GL_FALSE;
+    } else {
+        vert_index = start_vert;
     }
-    maze[hole_index][vert_index].east_wall = GL_FALSE;
 
 
     /* then do the horizontal line */
-    int hor_index = rand() % (end_vert - start_vert);// find the index im walling up
-    hole_index = rand() % (end_vert - start_vert);// find the index where the hole is going
-    for(int i=start_hor; i < end_hor; i++) {
-        maze[hor_index][i].south_wall = GL_TRUE;
+    int hor_index;
+    if (vert_diff > 0) {
+        hor_index = start_vert + (rand() % (vert_diff));// find the index im walling up
+        hole_index = start_vert + (rand() % (vert_diff));// find the index where the hole is going
+        for(int i=start_hor; i < end_hor; i++) {
+            maze[hor_index][i].south_wall = GL_TRUE;
+        }
+        maze[hor_index][hole_index].south_wall = GL_FALSE;
+    } else {
+        hor_index = start_hor;
     }
-    maze[hor_index][hole_index].south_wall = GL_FALSE;
 
-    rec_maze_builder(maze, vert_index, end_vert, hor_index, end_hor);
-    rec_maze_builder(maze, start_vert, vert_index, start_hor, hor_index);
+    rec_maze_builder(maze, vert_index+1, end_vert, hor_index+1, end_hor);
+    rec_maze_builder(maze, start_vert, vert_index-1, start_hor, hor_index-1);
 
-    rec_maze_builder(maze, vert_index, end_vert, start_hor, hor_index);
-    rec_maze_builder(maze, start_vert, vert_index, hor_index, end_hor);
+    rec_maze_builder(maze, vert_index+1, end_vert, start_hor, hor_index-1);
+    rec_maze_builder(maze, start_vert, vert_index-1, hor_index+1, end_hor);
 }
 
 void print_cell(const cell* cell_print) {
