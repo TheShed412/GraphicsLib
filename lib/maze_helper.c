@@ -134,9 +134,9 @@ static void rec_maze_builder(cell** maze, int start_vert, int end_vert, int star
     /* do the vertical line first */
     int vert_index;
     int hole_index;
-    if (hor_diff > 0) {
-        vert_index = (rand() % (hor_diff)) + start_hor;// find the index im walling up
-        hole_index = (rand() % (hor_diff)) + start_hor;// find the index where the hole is going
+    if (vert_diff > 0) {
+        vert_index = (rand() % (vert_diff)) + start_vert;// find the index im walling up
+        hole_index = (rand() % (vert_diff)) + start_vert;// find the index where the hole is going
         for(int i=start_vert; i < end_vert; i++) {
             maze[i][vert_index].east_wall = GL_TRUE;
         }
@@ -148,9 +148,9 @@ static void rec_maze_builder(cell** maze, int start_vert, int end_vert, int star
 
     /* then do the horizontal line */
     int hor_index;
-    if (vert_diff > 0) {
-        hor_index = start_vert + (rand() % (vert_diff));// find the index im walling up
-        hole_index = start_vert + (rand() % (vert_diff));// find the index where the hole is going
+    if (hor_diff > 0) {
+        hor_index = start_hor + (rand() % (hor_diff));// find the index im walling up
+        hole_index = start_hor + (rand() % (hor_diff));// find the index where the hole is going
         for(int i=start_hor; i < end_hor; i++) {
             maze[hor_index][i].south_wall = GL_TRUE;
         }
@@ -159,11 +159,22 @@ static void rec_maze_builder(cell** maze, int start_vert, int end_vert, int star
         hor_index = start_hor;
     }
 
-    rec_maze_builder(maze, vert_index+1, end_vert, hor_index+1, end_hor);
-    rec_maze_builder(maze, start_vert, vert_index-1, start_hor, hor_index-1);
-
-    rec_maze_builder(maze, vert_index+1, end_vert, start_hor, hor_index-1);
+    /* bottom left quad */
     rec_maze_builder(maze, start_vert, vert_index-1, hor_index+1, end_hor);
+
+    /* top right quad */
+    rec_maze_builder(maze, vert_index+1, end_vert, start_hor, hor_index-1);
+
+    /* bottom right quad */
+    rec_maze_builder(maze, vert_index+1, end_vert, hor_index+1, end_hor);
+
+    /* top left quad */
+    rec_maze_builder(maze, start_vert, vert_index-1, start_hor, hor_index-1);
+    // rec_maze_builder(maze, vert_index-1, end_vert, hor_index+1, end_hor);
+    // rec_maze_builder(maze, start_vert, vert_index-1, start_hor, hor_index-1);
+
+    // rec_maze_builder(maze, vert_index+1, end_vert, start_hor, hor_index+1);
+    // rec_maze_builder(maze, start_vert, vert_index-1, hor_index-1, end_hor);
 }
 
 void print_cell(const cell* cell_print) {
