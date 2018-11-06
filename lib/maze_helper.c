@@ -106,7 +106,8 @@ cell** make_maze() {
     maze_arr[0][0].east_wall = GL_FALSE;
     maze_arr[7][7].west_wall = GL_FALSE;
 
-    rec_maze_builder(maze_arr, 0, MAX_REC_INDEX, 0, MAX_REC_INDEX);
+    /* uncomment when other things are done */
+    //rec_maze_builder(maze_arr, 0, MAX_REC_INDEX, 0, MAX_REC_INDEX);
 
     return maze_arr;
 }

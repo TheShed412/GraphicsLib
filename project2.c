@@ -91,7 +91,7 @@ void init(void)
 {   
     cell** maze = make_maze();
     print_cell(&maze[6][7]);
-    GLuint program = initShader("shaders/vshader_lab4.glsl", "shaders/fshader_lab4.glsl");
+    GLuint program = initShader("shaders/vshader_proj2.glsl", "shaders/fshader_proj2.glsl");
     glUseProgram(program);
 
     vec4 *circle_vertices = ground();
