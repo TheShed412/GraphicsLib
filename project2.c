@@ -24,7 +24,7 @@ mat4 ctm =             {1, 0, 0, 0,
                         0, 0, 1, 0,
                         0, 0, 0, 1};
 
-vec2 tex_coords[6] = {{0.0, 1.0}, {0.0, 1.0}, {1.0, 0.0}, {0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}};
+//vec2 tex_coords[6] = {{0.0, 1.0}, {0.0, 1.0}, {1.0, 0.0}, {0.0, 0.0}, {1.0, 0.0}, {0.0, 0.0}};
 
 vec4* genRandomTriangleColors(int num_vertices);
 vec4* bottom(int num_vertices, GLfloat twist, int axis);
@@ -86,6 +86,20 @@ vec4* ground() {
     return starting_cube;
 }
 
+pos_tex* ground_with_tex() {
+    pos_tex* starting_cube = single_cube_texture();
+    vec4* starting_cube_pos = get_pos_verts(starting_cube, 36);
+    starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, 0.8, 0.1, 0.8);
+    starting_cube_pos = rotate_vertices(starting_cube_pos, VERTS_IN_CUBE, 0.1, Y);
+    starting_cube_pos = rotate_vertices(starting_cube_pos, VERTS_IN_CUBE, 0.1, X);
+
+    for (int i = 0; i < 36; i++) {
+        starting_cube[i].pos_vert = starting_cube_pos[i];
+    }
+
+    return starting_cube;
+}
+
 /**
  * From the circle.c file with a couple small changes
 */
@@ -96,8 +110,10 @@ void init(void)
     GLuint program = initShader("shaders/vshader_proj2.glsl", "shaders/fshader_proj2.glsl");
     glUseProgram(program);
 
-    vec4 *ground_vertices = ground();
+    pos_tex* ground_tex_pos = ground_with_tex();
     vec4 *circle_colors = genRandomTriangleColors(NUM_VERTICES);
+    vec2* tex_coords = get_tex_verts(ground_tex_pos, 36);
+    vec4 *ground_vertices = get_pos_verts(ground_tex_pos, 36);
 
     GLuint mytex[1];
     glGenTextures(1, mytex);
@@ -124,7 +140,7 @@ void init(void)
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(ground_vertices), ground_vertices);
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(ground_vertices), sizeof(circle_colors), circle_colors);
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(ground_vertices) + sizeof(circle_colors)
-    , sizeof(tex_coords), tex_coords);
+        , sizeof(tex_coords), tex_coords);
 
 
     GLuint vPosition = glGetAttribLocation(program, "vPosition");

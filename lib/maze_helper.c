@@ -92,10 +92,10 @@ pos_tex* single_cube_texture(){
     z = 0.5;
 
     vec2 bot_rt, bot_lt, top_rt, top_lt;
-    bot_lt.x = 0, bot_lt.y = 0;
-    bot_rt.x = 1, bot_rt.y = 0;
-    top_rt.x = 1, top_lt.y = 1;
-    top_lt.x = 0, top_lt.y = 1;
+    bot_lt.x = 0.0, bot_lt.y = 1.0;
+    bot_rt.x = 1.0, bot_rt.y = 1.0;
+    top_rt.x = 1.0, top_lt.y = 0.0;
+    top_lt.x = 0.0, top_lt.y = 0.0;
 
     /* face 1 */
     tcube[0].pos_vert.vec[X] = -x, tcube[0].pos_vert.vec[Y] = -y, tcube[0].pos_vert.vec[Z] = z;//0
@@ -188,6 +188,26 @@ pos_tex* single_cube_texture(){
     tcube[35].tex_vert = top_lt;
 
     return tcube;
+}
+
+vec4* get_pos_verts(const pos_tex* tex_pos, int size) {
+    vec4* pos_verts = calloc(size, size*sizeof(vec4));
+
+    for(int i=0; i < size; i ++) {
+        pos_verts[i] = tex_pos[i].pos_vert;
+    }
+
+    return pos_verts;
+}
+
+vec2* get_tex_verts(const pos_tex* tex_pos, int size) {
+    vec2* tex_verts = calloc(size, size*sizeof(vec2));
+
+    for(int i=0; i < size; i ++) {
+        tex_verts[i] = tex_pos[i].tex_vert;
+    }
+
+    return tex_verts;
 }
 
 /* makes an 8x8 maze */

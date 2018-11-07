@@ -31,4 +31,10 @@ void print_cell(const cell* cell_print);
 
 cell** make_maze();
 
+pos_tex* single_cube_texture();
+
+vec2* get_tex_verts(const pos_tex* tex_pos, int size);
+
+vec4* get_pos_verts(const pos_tex* tex_pos, int size) ;
+
 #endif
