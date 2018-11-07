@@ -12,7 +12,20 @@ typedef struct {
     GLboolean west_wall;
 } cell;
 
+typedef struct
+{
+    GLfloat x;
+    GLfloat y;
+} vec2;
+
+typedef struct {
+    vec4* pos_verts;
+    vec2* tex_verts;
+} world_object;
+
 vec4* single_cube();
+
+GLubyte*** get_texture(const char* file_name);
 
 void print_cell(const cell* cell_print);
 

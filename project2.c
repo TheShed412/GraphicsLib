@@ -88,13 +88,13 @@ vec4* ground() {
  * From the circle.c file with a couple small changes
 */
 void init(void)
-{   
+{
+    GLubyte*** grass_tex = get_texture("textures/grass.raw");  
     cell** maze = make_maze();
-    print_cell(&maze[6][7]);
     GLuint program = initShader("shaders/vshader_proj2.glsl", "shaders/fshader_proj2.glsl");
     glUseProgram(program);
 
-    vec4 *circle_vertices = ground();
+    vec4 *ground_vertices = ground();
     vec4 *circle_colors = genRandomTriangleColors(NUM_VERTICES);
     
     GLuint vao;
@@ -105,7 +105,7 @@ void init(void)
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vec4) * 2 * NUM_VERTICES, NULL, GL_STATIC_DRAW);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vec4) * NUM_VERTICES, circle_vertices);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vec4) * NUM_VERTICES, ground_vertices);
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(vec4) * NUM_VERTICES, sizeof(vec4) * NUM_VERTICES, circle_colors);
 
     GLuint vPosition = glGetAttribLocation(program, "vPosition");

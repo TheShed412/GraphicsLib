@@ -202,3 +202,20 @@ void print_cell(const cell* cell_print) {
     strcat(cell_str, bot_filled);
     printf("%s", cell_str);
 }
+
+/* returning triple array. yikes. */
+GLubyte*** get_texture(const char* file_name) {
+    GLubyte*** tex_array = (GLubyte***) calloc(400, 400*sizeof(GLubyte**));
+
+    for (int i=0; i < 400; i++) {
+        tex_array[i] = (GLubyte**) calloc(400, 400*sizeof(GLubyte*));
+
+        for(int j=0; j < 4; j++) {
+            tex_array[i][j] = (GLubyte*) calloc(4, 4*sizeof(GLubyte));
+        }
+    }
+    FILE* fp = fopen(file_name, "r");
+    fread(tex_array, 400 * 400 * 3, 1, fp);
+    fclose(fp);
+    return tex_array;
+}
