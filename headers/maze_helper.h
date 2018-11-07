@@ -19,9 +19,9 @@ typedef struct
 } vec2;
 
 typedef struct {
-    vec4* pos_verts;
-    vec2* tex_verts;
-} world_object;
+    vec4 pos_vert;
+    vec2 tex_vert;
+} pos_tex;
 
 vec4* single_cube();
 

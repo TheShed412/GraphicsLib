@@ -79,6 +79,117 @@ vec4* single_cube(){
     return cube;
 }
 
+pos_tex* single_cube_texture(){
+    pos_tex* tcube = calloc(36, 36*sizeof(pos_tex));
+
+    for(int i=0; i<36; i++) {
+        tcube[i].pos_vert.vec[W] = 1;
+    }
+
+    GLfloat x, y, z;    
+    x = 0.5;
+    y = 0.5;
+    z = 0.5;
+
+    vec2 bot_rt, bot_lt, top_rt, top_lt;
+    bot_lt.x = 0, bot_lt.y = 0;
+    bot_rt.x = 1, bot_rt.y = 0;
+    top_rt.x = 1, top_lt.y = 1;
+    top_lt.x = 0, top_lt.y = 1;
+
+    /* face 1 */
+    tcube[0].pos_vert.vec[X] = -x, tcube[0].pos_vert.vec[Y] = -y, tcube[0].pos_vert.vec[Z] = z;//0
+    tcube[0].tex_vert = bot_lt;
+    tcube[1].pos_vert.vec[X] = x, tcube[1].pos_vert.vec[Y] = -y, tcube[1].pos_vert.vec[Z] = z;//1
+    tcube[1].tex_vert = bot_rt;
+    tcube[2].pos_vert.vec[X] = x, tcube[2].pos_vert.vec[Y] = y, tcube[2].pos_vert.vec[Z] = z;//3
+    tcube[2].tex_vert = top_rt;
+
+    tcube[3].pos_vert.vec[X] = -x, tcube[3].pos_vert.vec[Y] = -y, tcube[3].pos_vert.vec[Z] = z;//0
+    tcube[3].tex_vert = bot_lt;
+    tcube[4].pos_vert.vec[X] = x, tcube[4].pos_vert.vec[Y] = y, tcube[4].pos_vert.vec[Z] = z;//3
+    tcube[4].tex_vert = top_rt;
+    tcube[5].pos_vert.vec[X] = -x, tcube[5].pos_vert.vec[Y] = y, tcube[5].pos_vert.vec[Z] = z;//2
+    tcube[5].tex_vert = top_lt;
+
+    /* face 2: +x, changing z */
+    tcube[6].pos_vert.vec[X] = x, tcube[6].pos_vert.vec[Y] = -y,  tcube[6].pos_vert.vec[Z] = z;//1
+    tcube[6].tex_vert = bot_lt;
+    tcube[7].pos_vert.vec[X] = x,  tcube[7].pos_vert.vec[Y] = -y,  tcube[7].pos_vert.vec[Z] = -z;//5
+    tcube[7].tex_vert = bot_rt;
+    tcube[8].pos_vert.vec[X] = x,  tcube[8].pos_vert.vec[Y] = y, tcube[8].pos_vert.vec[Z] = -z;//7
+    tcube[8].tex_vert = top_rt;
+
+    tcube[9].pos_vert.vec[X] = x,  tcube[9].pos_vert.vec[Y] = -y,   tcube[9].pos_vert.vec[Z] = z;//1
+    tcube[9].tex_vert = bot_lt;
+    tcube[10].pos_vert.vec[X] = x, tcube[10].pos_vert.vec[Y] = y,  tcube[10].pos_vert.vec[Z] = -z;//7
+    tcube[10].tex_vert = top_rt;
+    tcube[11].pos_vert.vec[X] = x,  tcube[11].pos_vert.vec[Y] = y, tcube[11].pos_vert.vec[Z] = z;//3
+    tcube[11].tex_vert = top_lt;
+
+    /* face 3: -z */
+    tcube[12].pos_vert.vec[X] = x, tcube[12].pos_vert.vec[Y] = -y,  tcube[12].pos_vert.vec[Z] = -z;//5
+    tcube[12].tex_vert = bot_lt;
+    tcube[13].pos_vert.vec[X] = -x,  tcube[13].pos_vert.vec[Y] = -y,  tcube[13].pos_vert.vec[Z] = -z;//4
+    tcube[13].tex_vert = bot_lt;
+    tcube[14].pos_vert.vec[X] = -x,  tcube[14].pos_vert.vec[Y] = y, tcube[14].pos_vert.vec[Z] = -z;//6
+    tcube[14].tex_vert = top_lt;
+
+    tcube[15].pos_vert.vec[X] = x,  tcube[15].pos_vert.vec[Y] = -y,   tcube[15].pos_vert.vec[Z] = -z;//5
+    tcube[15].tex_vert = bot_lt;
+    tcube[16].pos_vert.vec[X] = -x, tcube[16].pos_vert.vec[Y] = y,  tcube[16].pos_vert.vec[Z] = -z;//6
+    tcube[16].tex_vert = top_rt;
+    tcube[17].pos_vert.vec[X] = x,  tcube[17].pos_vert.vec[Y] = y, tcube[17].pos_vert.vec[Z] = -z;//7
+    tcube[17].tex_vert = top_lt;
+
+    /* face 4: const -x, changing z */
+    tcube[18].pos_vert.vec[X] = -x, tcube[18].pos_vert.vec[Y] = -y,  tcube[18].pos_vert.vec[Z] = -z;//4
+    tcube[18].tex_vert = bot_lt;
+    tcube[19].pos_vert.vec[X] = -x,  tcube[19].pos_vert.vec[Y] = -y,  tcube[19].pos_vert.vec[Z] = z;//0
+    tcube[19].tex_vert = bot_rt;
+    tcube[20].pos_vert.vec[X] = -x,  tcube[20].pos_vert.vec[Y] = y, tcube[20].pos_vert.vec[Z] = z;//2
+    tcube[20].tex_vert = top_rt;
+
+    tcube[21].pos_vert.vec[X] = -x,  tcube[21].pos_vert.vec[Y] = -y,tcube[21].pos_vert.vec[Z] = -z;//4
+    tcube[21].tex_vert = bot_lt;
+    tcube[22].pos_vert.vec[X] = -x, tcube[22].pos_vert.vec[Y] = y, tcube[22].pos_vert.vec[Z] = z;//2
+    tcube[22].tex_vert = top_rt;
+    tcube[23].pos_vert.vec[X] = -x,  tcube[23].pos_vert.vec[Y] = y, tcube[23].pos_vert.vec[Z] = -z;//6
+    tcube[23].tex_vert = top_lt;
+
+    /* bottom: const -y */
+    tcube[24].pos_vert.vec[X] = -x, tcube[24].pos_vert.vec[Y] = -y,  tcube[24].pos_vert.vec[Z] = -z;//4
+    tcube[24].tex_vert = bot_lt;
+    tcube[25].pos_vert.vec[X] = x,  tcube[25].pos_vert.vec[Y] = -y,  tcube[25].pos_vert.vec[Z] = -z;//5
+    tcube[25].tex_vert = bot_rt;
+    tcube[26].pos_vert.vec[X] = x,  tcube[26].pos_vert.vec[Y] = -y, tcube[26].pos_vert.vec[Z] = z;//1
+    tcube[26].tex_vert = top_rt;
+
+    tcube[27].pos_vert.vec[X] = -x,  tcube[27].pos_vert.vec[Y] = -y,tcube[27].pos_vert.vec[Z] = -z;//4
+    tcube[27].tex_vert = bot_lt;
+    tcube[28].pos_vert.vec[X] = x, tcube[28].pos_vert.vec[Y] = -y, tcube[28].pos_vert.vec[Z] = z;//1
+    tcube[28].tex_vert = top_rt;
+    tcube[29].pos_vert.vec[X] = -x,  tcube[29].pos_vert.vec[Y] = -y, tcube[29].pos_vert.vec[Z] = z;//0
+    tcube[29].tex_vert = top_lt;
+
+    /* top: const y */
+    tcube[30].pos_vert.vec[X] = -x, tcube[30].pos_vert.vec[Y] = y,  tcube[30].pos_vert.vec[Z] = z;//2
+    tcube[30].tex_vert = bot_lt;
+    tcube[31].pos_vert.vec[X] = x,  tcube[31].pos_vert.vec[Y] = y,  tcube[31].pos_vert.vec[Z] = z;//3
+    tcube[31].tex_vert = bot_rt;
+    tcube[32].pos_vert.vec[X] = x,  tcube[32].pos_vert.vec[Y] = y, tcube[32].pos_vert.vec[Z] = -z;//7
+    tcube[32].tex_vert = top_rt;
+
+    tcube[33].pos_vert.vec[X] = -x,  tcube[33].pos_vert.vec[Y] = y,tcube[33].pos_vert.vec[Z] = z;//2
+    tcube[33].tex_vert = bot_lt;
+    tcube[34].pos_vert.vec[X] = x, tcube[34].pos_vert.vec[Y] = y, tcube[34].pos_vert.vec[Z] = -z;//7
+    tcube[34].tex_vert = top_rt;
+    tcube[35].pos_vert.vec[X] = -x,  tcube[35].pos_vert.vec[Y] = y, tcube[35].pos_vert.vec[Z] = -z;//6
+    tcube[35].tex_vert = top_lt;
+
+    return tcube;
+}
+
 /* makes an 8x8 maze */
 cell** make_maze() {
     srand(time(0));
