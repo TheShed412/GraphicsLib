@@ -105,7 +105,7 @@ pos_tex* ground_with_tex() {
 */
 void init(void)
 {
-    GLubyte*** grass_tex = get_texture("textures/grass.raw");  
+    GLubyte*** grass_tex = get_texture("textures/p2texture04.raw");  
     cell** maze = make_maze();
     GLuint program = initShader("shaders/vshader_proj2.glsl", "shaders/fshader_proj2.glsl");
     glUseProgram(program);
@@ -135,12 +135,12 @@ void init(void)
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
     glBufferData(GL_ARRAY_BUFFER
-        , sizeof(ground_vertices) + sizeof(circle_colors) + sizeof(tex_coords) 
+        , sizeof(vec4) * 36 + sizeof(vec4)*36 + sizeof(vec2) *36 
         , NULL, GL_STATIC_DRAW);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(ground_vertices), ground_vertices);
-    glBufferSubData(GL_ARRAY_BUFFER, sizeof(ground_vertices), sizeof(circle_colors), circle_colors);
-    glBufferSubData(GL_ARRAY_BUFFER, sizeof(ground_vertices) + sizeof(circle_colors)
-        , sizeof(tex_coords), tex_coords);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vec4) * 36, ground_vertices);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(vec4) * 36, sizeof(vec4) * 36, circle_colors);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(vec4) * 36 + sizeof(vec4) * 36
+        , sizeof(vec2) *36, tex_coords);
 
 
     GLuint vPosition = glGetAttribLocation(program, "vPosition");
