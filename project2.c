@@ -19,6 +19,10 @@
 
 GLuint ctm_location;
 GLuint perspective_shift;
+GLuint cam_shit;
+mat4 projection;
+mat4 model_view;
+GLuint perspective_shift;
 mat4 ctm =             {1, 0, 0, 0,
                         0, 1, 0, 0,
                         0, 0, 1, 0,
@@ -114,6 +118,14 @@ void init(void)
     vec4 *circle_colors = genRandomTriangleColors(NUM_VERTICES);
     vec2* tex_coords = get_tex_verts(ground_tex_pos, 36);
     vec4 *ground_vertices = get_pos_verts(ground_tex_pos, 36);
+
+    vec4 eyes = {0.0, 0.2, -1.6, 1};
+    vec4 look_at_pos = {0, 0, 0, 1};
+    vec4 up_vec = {0, 1, 0, 1};
+
+    int f = 1;
+    projection = *frustum(-f, f, f, -f, -f, f);
+    model_view = *look_at(&eyes, &look_at_pos, &up_vec);
 
     GLuint mytex[1];
     glGenTextures(1, mytex);
