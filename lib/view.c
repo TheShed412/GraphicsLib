@@ -1,5 +1,4 @@
 #include "../headers/view.h"
-#include "../headers/matrix_lib.h"
 #include "../headers/transformations.h"
 
 mat4* look_at(const vec4* eye_pos, const vec4* look_at_pos, const vec4* up_vector) {
@@ -12,15 +11,15 @@ mat4* look_at(const vec4* eye_pos, const vec4* look_at_pos, const vec4* up_vecto
     up_normal = vec_cross(right_vector, look_dir_norm);//u
 
     ret_mat->cols[COL1].vec[X] = right_vector->vec[X];
-    ret_mat->cols[COL1].vec[Y] = right_vector->vec[Y];
-    ret_mat->cols[COL1].vec[Z] = right_vector->vec[Z];
+    ret_mat->cols[COL2].vec[X] = right_vector->vec[Y];
+    ret_mat->cols[COL3].vec[X] = right_vector->vec[Z];
 
-    ret_mat->cols[COL2].vec[X] = up_normal->vec[X];
+    ret_mat->cols[COL1].vec[Y] = up_normal->vec[X];
     ret_mat->cols[COL2].vec[Y] = up_normal->vec[Y];
-    ret_mat->cols[COL2].vec[Z] = up_normal->vec[Z];
+    ret_mat->cols[COL3].vec[Y] = up_normal->vec[Z];
 
-    ret_mat->cols[COL3].vec[X] = -look_dir_norm->vec[X];
-    ret_mat->cols[COL3].vec[Y] = -look_dir_norm->vec[Y];
+    ret_mat->cols[COL1].vec[Z] = -look_dir_norm->vec[X];
+    ret_mat->cols[COL2].vec[Z] = -look_dir_norm->vec[Y];
     ret_mat->cols[COL3].vec[Z] = -look_dir_norm->vec[Z];
 
     ret_mat->cols[COL4].vec[X] = -vec_mult(right_vector, eye_pos);
@@ -33,12 +32,10 @@ mat4* look_at(const vec4* eye_pos, const vec4* look_at_pos, const vec4* up_vecto
 mat4* frustum(GLfloat left, GLfloat right, GLfloat top, GLfloat bottom, GLfloat near, GLfloat far) {
     mat4* ret_mat = calloc(1, sizeof(mat4));
 
-    ret_mat->cols[COL1].vec[X] = (2*near)/(right-left);
-    ret_mat->cols[COL2].vec[Y] = (2*near)/(top-bottom);
+    ret_mat->cols[COL1].vec[X] = -1 * near/right;
+    ret_mat->cols[COL2].vec[Y] = -1 * near/top;
 
-    ret_mat->cols[COL3].vec[X] = (right+left)/(right-left);
-    ret_mat->cols[COL3].vec[Y] = (top+bottom)/(top-bottom);
-    ret_mat->cols[COL3].vec[Z] =-1 * (far+near)/(far-near);
+    ret_mat->cols[COL3].vec[Z] = (far+near)/(far-near);
     ret_mat->cols[COL3].vec[W] = -1;
 
     ret_mat->cols[COL4].vec[Z] = -1 * (2*far*near)/(far-near);
