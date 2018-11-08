@@ -7,6 +7,8 @@ varying vec2 texCoord;
 varying vec4 color;
 
 uniform mat4 ctm;
+uniform mat4 projection;
+uniform mat4 model_view;
 
 void main()
 {
