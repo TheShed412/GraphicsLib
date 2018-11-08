@@ -147,12 +147,14 @@ pos_tex* single_cube_texture(enum texture tex_type){
     tcube[11].tex_vert = top_lt;
 
     /* face 3: -z */
+    /* this triangle is acting weird  */
     tcube[12].pos_vert.vec[X] = x, tcube[12].pos_vert.vec[Y] = -y,  tcube[12].pos_vert.vec[Z] = -z;//5
     tcube[12].tex_vert = bot_lt;
     tcube[13].pos_vert.vec[X] = -x,  tcube[13].pos_vert.vec[Y] = -y,  tcube[13].pos_vert.vec[Z] = -z;//4
-    tcube[13].tex_vert = bot_lt;
+    tcube[13].tex_vert = bot_rt;
     tcube[14].pos_vert.vec[X] = -x,  tcube[14].pos_vert.vec[Y] = y, tcube[14].pos_vert.vec[Z] = -z;//6
     tcube[14].tex_vert = top_lt;
+    /* ^^^ this triangle is acting weird ^^^ */
 
     tcube[15].pos_vert.vec[X] = x,  tcube[15].pos_vert.vec[Y] = -y,   tcube[15].pos_vert.vec[Z] = -z;//5
     tcube[15].tex_vert = bot_lt;
