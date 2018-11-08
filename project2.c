@@ -87,7 +87,7 @@ vec4* ground() {
 }
 
 pos_tex* ground_with_tex() {
-    pos_tex* starting_cube = single_cube_texture();
+    pos_tex* starting_cube = single_cube_texture(GRASS);
     vec4* starting_cube_pos = get_pos_verts(starting_cube, 36);
     starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, 0.8, 0.1, 0.8);
     starting_cube_pos = rotate_vertices(starting_cube_pos, VERTS_IN_CUBE, 0.1, Y);
@@ -105,7 +105,7 @@ pos_tex* ground_with_tex() {
 */
 void init(void)
 {
-    GLubyte*** grass_tex = get_texture("textures/p2texture04.raw");  
+    GLubyte*** grass_tex = get_textures();  
     cell** maze = make_maze();
     GLuint program = initShader("shaders/vshader_proj2.glsl", "shaders/fshader_proj2.glsl");
     glUseProgram(program);
@@ -118,7 +118,7 @@ void init(void)
     GLuint mytex[1];
     glGenTextures(1, mytex);
     glBindTexture(GL_TEXTURE_2D, mytex[0]);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 400, 400, 0, GL_RGBA, GL_UNSIGNED_BYTE, grass_tex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 800, 0, GL_RGB, GL_UNSIGNED_BYTE, grass_tex);
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
@@ -153,7 +153,7 @@ void init(void)
 
     GLuint vTexCoord = glGetAttribLocation(program, "vTexCoord");
     glEnableVertexAttribArray(vTexCoord);
-    glVertexAttribPointer(vTexCoord, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0 + (sizeof(ground_vertices) + sizeof(circle_colors)));
+    glVertexAttribPointer(vTexCoord, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0 + (sizeof(vec4) * NUM_VERTICES) + (sizeof(vec4) * NUM_VERTICES));
 
     GLuint texture_location = glGetUniformLocation(program, "texture");
     glUniform1i(texture_location, 0);

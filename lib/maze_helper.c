@@ -79,7 +79,7 @@ vec4* single_cube(){
     return cube;
 }
 
-pos_tex* single_cube_texture(){
+pos_tex* single_cube_texture(enum texture tex_type){
     pos_tex* tcube = calloc(36, 36*sizeof(pos_tex));
 
     for(int i=0; i<36; i++) {
@@ -92,10 +92,29 @@ pos_tex* single_cube_texture(){
     z = 0.5;
 
     vec2 bot_rt, bot_lt, top_rt, top_lt;
-    bot_lt.x = 0.0, bot_lt.y = 1.0;
-    bot_rt.x = 1.0, bot_rt.y = 1.0;
-    top_rt.x = 1.0, top_lt.y = 0.0;
-    top_lt.x = 0.0, top_lt.y = 0.0;
+
+    switch(tex_type) {
+        case GRASS:
+            top_lt.x = 0.0, top_lt.y = 0.5;
+            top_rt.x = 0.5, top_rt.y = 0.5;
+            bot_lt.x = 0.0, bot_lt.y = 1.0;
+            bot_rt.x = 0.5, bot_rt.y = 1.0; 
+        break;
+        
+        case PILLAR:
+            top_lt.x = 0.5, top_lt.y = 0.0;
+            top_rt.x = 1.0, top_rt.y = 0.0;
+            bot_lt.x = 0.5, bot_lt.y = 0.5;
+            bot_rt.x = 1.0, bot_rt.y = 0.5;
+        break;
+
+        case BRICK:
+            top_lt.x = 0.0, top_lt.y = 0.0;
+            top_rt.x = 0.5, top_rt.y = 0.0;
+            bot_lt.x = 0.0, bot_lt.y = 0.5;
+            bot_rt.x = 0.5, bot_rt.y = 0.5; 
+        break;
+    }
 
     /* face 1 */
     tcube[0].pos_vert.vec[X] = -x, tcube[0].pos_vert.vec[Y] = -y, tcube[0].pos_vert.vec[Z] = z;//0
@@ -350,3 +369,20 @@ GLubyte*** get_texture(const char* file_name) {
     fclose(fp);
     return tex_array;
 }
+
+GLubyte*** get_textures() {
+    GLubyte*** tex_array = (GLubyte***) calloc(800, 800*sizeof(GLubyte**));
+
+    for (int i=0; i < 800; i++) {
+        tex_array[i] = (GLubyte**) calloc(800, 800*sizeof(GLubyte*));
+
+        for(int j=0; j < 4; j++) {
+            tex_array[i][j] = (GLubyte*) calloc(4, 4*sizeof(GLubyte));
+        }
+    }
+    FILE* fp = fopen("textures/p2texture04.raw", "r");
+    fread(tex_array, 800 * 800 * 3, 1, fp);
+    fclose(fp);
+    return tex_array;
+}
+

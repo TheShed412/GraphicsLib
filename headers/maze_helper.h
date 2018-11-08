@@ -23,6 +23,8 @@ typedef struct {
     vec2 tex_vert;
 } pos_tex;
 
+enum texture{GRASS, BRICK, PILLAR};
+
 vec4* single_cube();
 
 GLubyte*** get_texture(const char* file_name);
@@ -31,10 +33,12 @@ void print_cell(const cell* cell_print);
 
 cell** make_maze();
 
-pos_tex* single_cube_texture();
+pos_tex* single_cube_texture(enum texture tex_type);
 
 vec2* get_tex_verts(const pos_tex* tex_pos, int size);
 
-vec4* get_pos_verts(const pos_tex* tex_pos, int size) ;
+vec4* get_pos_verts(const pos_tex* tex_pos, int size);
+
+GLubyte*** get_textures();
 
 #endif
