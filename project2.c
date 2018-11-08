@@ -171,6 +171,8 @@ void init(void)
     glUniform1i(texture_location, 0);
 
     ctm_location = glGetUniformLocation(program, "ctm");
+    perspective_shift = glGetUniformLocation(program, "projection");
+    cam_shit = glGetUniformLocation(program, "model_view");
 
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.0, 0.0, 0.0, 1.0);
