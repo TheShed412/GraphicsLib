@@ -94,6 +94,7 @@ pos_tex* ground_with_tex() {
     pos_tex* starting_cube = single_cube_texture(GRASS);
     vec4* starting_cube_pos = get_pos_verts(starting_cube, 36);
     starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, 0.8, 0.1, 0.8);
+    starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, 20, 20, 20);
     // starting_cube_pos = rotate_vertices(starting_cube_pos, VERTS_IN_CUBE, 0.1, Y);
     // starting_cube_pos = rotate_vertices(starting_cube_pos, VERTS_IN_CUBE, 0.1, X);
 
@@ -119,8 +120,8 @@ void init(void)
     vec2* tex_coords = get_tex_verts(ground_tex_pos, 36);
     vec4 *ground_vertices = get_pos_verts(ground_tex_pos, 36);
 
-    vec4 eyes = {0.0, 0.5, -1.5, 1};
-    vec4 look_at_pos = {0, 0, 0, 1};
+    vec4 eyes = {0.0, 1.2, -0.5, 1};
+    vec4 look_at_pos = {0, 1.2, 0, 1};
     vec4 up_vec = {0, 1, 0, 1};
 
     int f = 1;
@@ -175,7 +176,8 @@ void init(void)
     cam_shit = glGetUniformLocation(program, "model_view");
 
     glEnable(GL_DEPTH_TEST);
-    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glEnable(GL_DEPTH_CLAMP);
+    glClearColor(0.0, 0.0, 0.5, 1.0);
     glDepthRange(1,0);
 }
 
