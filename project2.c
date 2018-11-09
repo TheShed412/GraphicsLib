@@ -226,6 +226,25 @@ pos_tex* whole_maze() {
     return maze_shapess;
 }
 
+pos_tex* whole_maze_and_ground() {
+    pos_tex* whole_shabang = empty_cube_arr(whole_maze_cubes + 1);
+
+    pos_tex* the_ground = ground_with_tex();
+    pos_tex* the_maze = whole_maze();
+
+    the_maze = translate_pos_verts(the_maze, VERTS_IN_CUBE*whole_maze_cubes, -10, 10, -10);
+
+    for (int i=0; i < VERTS_IN_CUBE*512; i++) {
+        whole_shabang[i] = the_maze[i];
+    }
+
+    for(int i=VERTS_IN_CUBE*512; i < VERTS_IN_CUBE*513; i++) {
+        whole_shabang[i] = the_ground[i - (VERTS_IN_CUBE*512)];
+    }
+
+    return whole_shabang;
+}
+
 /**
  * From the circle.c file with a couple small changes
 */
@@ -236,12 +255,12 @@ void init(void)
     GLuint program = initShader("shaders/vshader_proj2.glsl", "shaders/fshader_proj2.glsl");
     glUseProgram(program);
 
-    pos_tex* ground_tex_pos = whole_maze();
+    pos_tex* ground_tex_pos = whole_maze_and_ground();
     total_vertices = get_total_verts();
     vec2* tex_coords = get_tex_verts(ground_tex_pos, total_vertices);
     vec4 *ground_vertices = get_pos_verts(ground_tex_pos, total_vertices);
 
-    vec4 eyes = {0.0, 15, -15, 1};
+    vec4 eyes = {0.0, 20, -20, 1};
     vec4 look_at_pos = {0, 1.2, 0, 1};
     vec4 up_vec = {0, 1, 0, 1};
 

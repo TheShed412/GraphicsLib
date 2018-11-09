@@ -430,7 +430,7 @@ pos_tex* ground_with_tex() {
     pos_tex* starting_cube = single_cube_texture(GRASS);
     vec4* starting_cube_pos = get_pos_verts(starting_cube, VERTS_IN_CUBE);
     starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, 0.8, 0.1, 0.8);
-    starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, 35, 35, 35);
+    starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, 200, 200, 200);
 
     for (int i = 0; i < VERTS_IN_CUBE; i++) {
         starting_cube[i].pos_vert = starting_cube_pos[i];
