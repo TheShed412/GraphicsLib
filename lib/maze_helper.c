@@ -272,23 +272,23 @@ cell** make_maze() {
     /* set boundaries for maze */
     int i;
     for (i = 0; i < 8; i++) {
-        maze_arr[0][i].north_wall = GL_TRUE;
+        maze_arr[0][i].west_wall = GL_TRUE;
     }
+     maze_arr[0][0].west_wall = GL_FALSE;
     for (i = 0; i < 8; i++) {
-        maze_arr[i][0].east_wall = GL_TRUE;
+        maze_arr[i][0].north_wall = GL_TRUE;
     }
     for (i = 7; i >= 0; i--) {
-        maze_arr[7][i].south_wall = GL_TRUE;
+        maze_arr[7][i].east_wall = GL_TRUE;
     }
+    maze_arr[7][7].east_wall = GL_FALSE;
     for (i = 7; i >= 0; i--) {
-        maze_arr[i][7].west_wall = GL_TRUE;
+        maze_arr[i][7].south_wall = GL_TRUE;
     }
     /* entrance and exit */
-    maze_arr[0][0].east_wall = GL_FALSE;
-    maze_arr[7][7].west_wall = GL_FALSE;
 
     /* uncomment when other things are done */
-    //rec_maze_builder(maze_arr, 0, MAX_REC_INDEX, 0, MAX_REC_INDEX);
+    rec_maze_builder(maze_arr, 0, MAX_REC_INDEX, 0, MAX_REC_INDEX);
 
     return maze_arr;
 }

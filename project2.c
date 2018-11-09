@@ -17,6 +17,8 @@
 /* for the cone, vertices are 6 x numTriangles */
 #define NUM_VERTICES 36
 
+int whole_maze_cubes = 512;
+
 GLuint ctm_location;
 GLuint perspective_shift;
 GLuint cam_shit;
@@ -109,12 +111,55 @@ pos_tex* cell_3d() {
     return grnd_pillar;
 }
 
+void print_maze(cell** maze)
+{
+    int i, j;
+    for (j = 0; j < 8; j++) {
+        for (i = 0; i < 8; i++) {
+            printf("+");
+            if (maze[i][j].north_wall) {
+                printf("---");
+            } else {
+                printf("   ");
+            }
+        }
+        printf("+\n");
+        for (i = 0; i < 8; i++) {
+            if (maze[i][j].west_wall) {
+                printf("|");
+            } else {
+                printf(" ");
+            }
+            printf("   ");
+            if (i == 7) {
+                if (maze[i][j].east_wall) {
+                    printf("|");
+                } else {
+                    printf(" ");
+                }
+            }
+        }
+        printf("\n");
+        if (j == 7) {
+            for (int i = 0; i < 8; i++) {
+                printf("+");
+                if (maze[i][j].south_wall) {
+                    printf("---");
+                } else {
+                    printf("   ");
+                }
+            }
+            printf("+\n");
+        }
+    }
+}
+
 pos_tex* cell_walls(const cell* walls) {
     pos_tex* grnd_pillar = empty_cube_arr(8);
     pos_tex* wp1 = wall_with_pillar(walls->west_wall);
-    pos_tex* wp2 = wall_with_pillar(walls->north_wall);
+    pos_tex* wp2 = wall_with_pillar(walls->south_wall);
     pos_tex* wp3 = wall_with_pillar(walls->east_wall);
-    pos_tex* wp4 = wall_with_pillar(walls->south_wall);
+    pos_tex* wp4 = wall_with_pillar(walls->north_wall);
 
     wp2 = translate_pos_verts(wp2, VERTS_IN_CUBE*2, -1.35, 0, 1.35);
     wp2 = rotate_pos_verts(wp2, VERTS_IN_CUBE*2, M_PI/2);
@@ -144,9 +189,12 @@ pos_tex* cell_walls(const cell* walls) {
     return grnd_pillar;
 }
 
+
+
 pos_tex* whole_maze() {
-    pos_tex* maze_shapess = empty_cube_arr(512);
+    pos_tex* maze_shapess = empty_cube_arr(whole_maze_cubes);
     cell** maze_cells = make_maze();
+    print_maze(maze_cells);
 
     GLfloat trans_x = 0;
     GLfloat trans_z = 0;
@@ -154,9 +202,10 @@ pos_tex* whole_maze() {
     int inner = 0;
     int bound = VERTS_IN_CUBE*8;
     int diff = 0;
+    int size = 8;
     for (int i = 0; i < 8; i ++) {
         for (int j = 0; j < 8; j++) {
-            cell curr_cell = maze_cells[j][i];
+            cell curr_cell = maze_cells[i][j];
             pos_tex* curr_shape_cell = cell_walls(&curr_cell);
             curr_shape_cell = translate_pos_verts(curr_shape_cell, VERTS_IN_CUBE*8, 
                 trans_x, 0, trans_z);
@@ -168,10 +217,10 @@ pos_tex* whole_maze() {
             diff = bound;
             bound += VERTS_IN_CUBE*8;
 
-            trans_z += (1.35*2) * flip;
+            trans_z += ((1.35*2));
         }
-        flip *= -1;
         trans_x += (1.35*2);
+        trans_z = 0;
     }
 
     return maze_shapess;
@@ -192,7 +241,7 @@ void init(void)
     vec2* tex_coords = get_tex_verts(ground_tex_pos, total_vertices);
     vec4 *ground_vertices = get_pos_verts(ground_tex_pos, total_vertices);
 
-    vec4 eyes = {0.0, 7, -7, 1};
+    vec4 eyes = {0.0, 15, -15, 1};
     vec4 look_at_pos = {0, 1.2, 0, 1};
     vec4 up_vec = {0, 1, 0, 1};
 
