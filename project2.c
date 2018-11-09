@@ -30,6 +30,11 @@ mat4 ctm =             {1, 0, 0, 0,
                         0, 0, 1, 0,
                         0, 0, 0, 1};
 
+
+vec4 eyes = {0.0, 20, -20, 1};
+vec4 look_at_pos = {0, 1.2, 0, 1};
+vec4 up_vec = {0, 1, 0, 1};
+
 vec4* bottom(int num_vertices, GLfloat twist, int axis);
 void init(void);
 void display(void);
@@ -54,27 +59,6 @@ int main(int argc, char **argv)
 
     return 0;
 }
-
-// pos_tex* pillar_test() {
-//     pos_tex* grnd_pillar = empty_cube_arr(3);
-//     pos_tex* ground_tex_pos = ground_with_tex();
-//     pos_tex* pillar_tex_pos = wall_with_pillar();
-//     vec4 grndo = ground_tex_pos[30].pos_vert;
-
-//     pillar_tex_pos = 
-//         translate_pos_verts(pillar_tex_pos, VERTS_IN_CUBE*2, grndo.vec[X]+1, grndo.vec[Y]+1.2, grndo.vec[Z]-1);
-
-    
-//     for (int i = 0; i < VERTS_IN_CUBE; i ++) {
-//         grnd_pillar[i] = ground_tex_pos[i];
-//     }
-
-//     for (int i = 36; i < VERTS_IN_CUBE * 3; i ++) {
-//         grnd_pillar[i] = pillar_tex_pos[i - 36];
-//     }
-
-//     return grnd_pillar;
-// }
 
 pos_tex* cell_3d() {
     pos_tex* grnd_pillar = empty_cube_arr(8);
@@ -260,10 +244,6 @@ void init(void)
     vec2* tex_coords = get_tex_verts(ground_tex_pos, total_vertices);
     vec4 *ground_vertices = get_pos_verts(ground_tex_pos, total_vertices);
 
-    vec4 eyes = {0.0, 20, -20, 1};
-    vec4 look_at_pos = {0, 1.2, 0, 1};
-    vec4 up_vec = {0, 1, 0, 1};
-
     int f = 1;
     projection = *frustum(-f, f, f, -f, -f, f);
     model_view = *look_at(&eyes, &look_at_pos, &up_vec);
@@ -343,6 +323,7 @@ GLfloat spin = 0.0;
 void idle(void) 
 {
     mat4* rotation_matrix = get_rotation_matrix(spin, Y);
+    GLfloat x = 
     ctm = *rotation_matrix;
     spin += 0.01;
     glutPostRedisplay();
