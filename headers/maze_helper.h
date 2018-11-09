@@ -41,4 +41,6 @@ vec4* get_pos_verts(const pos_tex* tex_pos, int size);
 
 GLubyte*** get_textures();
 
+pos_tex* empty_cube_arr(int num_cubes);
+
 #endif

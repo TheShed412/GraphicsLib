@@ -79,6 +79,18 @@ vec4* single_cube(){
     return cube;
 }
 
+pos_tex* empty_cube_arr(int num_cubes) {
+    int total_verts = num_cubes * VERTS_IN_CUBE;
+
+    pos_tex* tcube = calloc(total_verts, total_verts * sizeof(pos_tex));
+
+    for(int i=0; i<total_verts; i++) {
+        tcube[i].pos_vert.vec[W] = 1;
+    }
+
+    return tcube;
+}
+
 pos_tex* single_cube_texture(enum texture tex_type){
     pos_tex* tcube = calloc(36, 36*sizeof(pos_tex));
 
