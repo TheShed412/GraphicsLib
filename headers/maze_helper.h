@@ -43,4 +43,18 @@ GLubyte*** get_textures();
 
 pos_tex* empty_cube_arr(int num_cubes);
 
+vec4* ground();
+
+pos_tex* ground_with_tex();
+
+pos_tex* wall_with_tex();
+
+pos_tex* pillar_with_tex();
+
+pos_tex* translate_pos_verts(pos_tex* tex_pos, int num_verts, GLfloat x, GLfloat y, GLfloat z);
+
+pos_tex* wall_with_pillar();
+
+int get_total_verts();
+
 #endif

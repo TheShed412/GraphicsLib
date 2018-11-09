@@ -1,4 +1,7 @@
 #include "../headers/maze_helper.h"
+#include "../headers/matrix_lib.h"
+#include "../headers/transformations.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,12 +9,20 @@
 
 //enum wall {HORZ, VERT};
 
+static int total_world_vertices = 0;
+
 #define MAX_REC_INDEX 7
 
 static void rec_maze_builder(cell** maze, int start_vert, int end_vert, int start_hor, int end_hor);
 
+int get_total_verts() {
+    return total_world_vertices;
+}
+
 vec4* single_cube(){
     vec4* cube = calloc(36, 36*sizeof(vec4));
+
+    total_world_vertices += 36;
 
     for(int i=0; i<36; i++) {
         cube[i].vec[W] = 1;
@@ -93,6 +104,8 @@ pos_tex* empty_cube_arr(int num_cubes) {
 
 pos_tex* single_cube_texture(enum texture tex_type){
     pos_tex* tcube = calloc(36, 36*sizeof(pos_tex));
+
+    total_world_vertices += 36;
 
     for(int i=0; i<36; i++) {
         tcube[i].pos_vert.vec[W] = 1;
@@ -398,5 +411,84 @@ GLubyte*** get_textures() {
     fread(tex_array, 800 * 800 * 3, 1, fp);
     fclose(fp);
     return tex_array;
+}
+
+vec4* ground() {
+    vec4* starting_cube = single_cube();
+    starting_cube = scale_vertices(starting_cube, VERTS_IN_CUBE, 0.8, 0.1, 0.8);
+    starting_cube = rotate_vertices(starting_cube, VERTS_IN_CUBE, 0.1, Y);
+    starting_cube = rotate_vertices(starting_cube, VERTS_IN_CUBE, 0.1, X);
+
+    return starting_cube;
+}
+
+pos_tex* ground_with_tex() {
+    pos_tex* starting_cube = single_cube_texture(GRASS);
+    vec4* starting_cube_pos = get_pos_verts(starting_cube, VERTS_IN_CUBE);
+    starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, 0.8, 0.1, 0.8);
+    starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, 20, 20, 20);
+
+    for (int i = 0; i < VERTS_IN_CUBE; i++) {
+        starting_cube[i].pos_vert = starting_cube_pos[i];
+    }
+
+    return starting_cube;
+}
+
+pos_tex* wall_with_tex() {
+    int scale_amt = 3;
+    pos_tex* starting_cube = single_cube_texture(BRICK);
+    vec4* starting_cube_pos = get_pos_verts(starting_cube, VERTS_IN_CUBE);
+    starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, 0.1, 0.8, 0.8);
+    starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, scale_amt, scale_amt, scale_amt);
+
+    for (int i = 0; i < VERTS_IN_CUBE; i++) {
+        starting_cube[i].pos_vert = starting_cube_pos[i];
+    }
+
+    return starting_cube;
+}
+
+pos_tex* pillar_with_tex() {
+    int scale_amt = 3;
+    pos_tex* starting_cube = single_cube_texture(PILLAR);
+    vec4* starting_cube_pos = get_pos_verts(starting_cube, VERTS_IN_CUBE);
+    starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, 0.15, 0.85, 0.15);
+    starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, scale_amt, scale_amt, scale_amt);
+
+    for (int i = 0; i < VERTS_IN_CUBE; i++) {
+        starting_cube[i].pos_vert = starting_cube_pos[i];
+    }
+
+    return starting_cube;
+}
+
+pos_tex* translate_pos_verts(pos_tex* tex_pos, int num_verts, GLfloat x, GLfloat y, GLfloat z) {
+    vec4* pos_verts = get_pos_verts(tex_pos, num_verts);
+    pos_verts = translate_vertices(pos_verts, num_verts, x, y, z);
+
+    for (int i = 0; i < num_verts; i++) {
+        tex_pos[i].pos_vert = pos_verts[i];
+    }
+
+    return tex_pos;
+}
+
+pos_tex* wall_with_pillar() {
+    pos_tex* wall_pillar = empty_cube_arr(2);
+    pos_tex* wall = wall_with_tex();
+    pos_tex* pillar = pillar_with_tex();
+
+    pillar = translate_pos_verts(pillar, VERTS_IN_CUBE, 0, 0, 1.35);
+
+    for (int i = 0; i < VERTS_IN_CUBE; i ++) {
+        wall_pillar[i] = wall[i];
+    }
+
+    for (int i = 36; i < VERTS_IN_CUBE * 2; i ++) {
+        wall_pillar[i] = pillar[i - 36];
+    }
+
+    return wall_pillar;
 }
 

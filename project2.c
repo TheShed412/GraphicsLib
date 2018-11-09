@@ -28,13 +28,13 @@ mat4 ctm =             {1, 0, 0, 0,
                         0, 0, 1, 0,
                         0, 0, 0, 1};
 
-int total_world_vertices = 36;
-
 vec4* bottom(int num_vertices, GLfloat twist, int axis);
 void init(void);
 void display(void);
 void keyboard(unsigned char key, int mousex, int mousey);
 void idle(void);
+
+int total_vertices = 0;
 
 int main(int argc, char **argv) 
 {
@@ -53,85 +53,6 @@ int main(int argc, char **argv)
     return 0;
 }
 
-vec4* ground() {
-    vec4* starting_cube = single_cube();
-    starting_cube = scale_vertices(starting_cube, VERTS_IN_CUBE, 0.8, 0.1, 0.8);
-    starting_cube = rotate_vertices(starting_cube, VERTS_IN_CUBE, 0.1, Y);
-    starting_cube = rotate_vertices(starting_cube, VERTS_IN_CUBE, 0.1, X);
-
-    return starting_cube;
-}
-
-pos_tex* ground_with_tex() {
-    pos_tex* starting_cube = single_cube_texture(GRASS);
-    vec4* starting_cube_pos = get_pos_verts(starting_cube, VERTS_IN_CUBE);
-    starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, 0.8, 0.1, 0.8);
-    starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, 20, 20, 20);
-
-    for (int i = 0; i < VERTS_IN_CUBE; i++) {
-        starting_cube[i].pos_vert = starting_cube_pos[i];
-    }
-
-    return starting_cube;
-}
-
-pos_tex* wall_with_tex() {
-    int scale_amt = 3;
-    pos_tex* starting_cube = single_cube_texture(BRICK);
-    vec4* starting_cube_pos = get_pos_verts(starting_cube, VERTS_IN_CUBE);
-    starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, 0.1, 0.8, 0.8);
-    starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, scale_amt, scale_amt, scale_amt);
-
-    for (int i = 0; i < VERTS_IN_CUBE; i++) {
-        starting_cube[i].pos_vert = starting_cube_pos[i];
-    }
-
-    return starting_cube;
-}
-
-pos_tex* pillar_with_tex() {
-    int scale_amt = 3;
-    pos_tex* starting_cube = single_cube_texture(PILLAR);
-    vec4* starting_cube_pos = get_pos_verts(starting_cube, VERTS_IN_CUBE);
-    starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, 0.15, 0.85, 0.15);
-    starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, scale_amt, scale_amt, scale_amt);
-
-    for (int i = 0; i < VERTS_IN_CUBE; i++) {
-        starting_cube[i].pos_vert = starting_cube_pos[i];
-    }
-
-    return starting_cube;
-}
-
-pos_tex* translate_pos_verts(pos_tex* tex_pos, int num_verts, GLfloat x, GLfloat y, GLfloat z) {
-    vec4* pos_verts = get_pos_verts(tex_pos, num_verts);
-    pos_verts = translate_vertices(pos_verts, num_verts, x, y, z);
-
-    for (int i = 0; i < num_verts; i++) {
-        tex_pos[i].pos_vert = pos_verts[i];
-    }
-
-    return tex_pos;
-}
-
-pos_tex* wall_with_pillar() {
-    pos_tex* wall_pillar = empty_cube_arr(2);
-    pos_tex* wall = wall_with_tex();
-    pos_tex* pillar = pillar_with_tex();
-
-    pillar = translate_pos_verts(pillar, VERTS_IN_CUBE, 0, 0, 1.35);
-
-    for (int i = 0; i < VERTS_IN_CUBE; i ++) {
-        wall_pillar[i] = wall[i];
-    }
-
-    for (int i = 36; i < VERTS_IN_CUBE * 2; i ++) {
-        wall_pillar[i] = pillar[i - 36];
-    }
-
-    return wall_pillar;
-}
-
 /**
  * From the circle.c file with a couple small changes
 */
@@ -143,9 +64,9 @@ void init(void)
     glUseProgram(program);
 
     pos_tex* ground_tex_pos = wall_with_pillar();
-    total_world_vertices *= 2;
-    vec2* tex_coords = get_tex_verts(ground_tex_pos, total_world_vertices);
-    vec4 *ground_vertices = get_pos_verts(ground_tex_pos, total_world_vertices);
+    total_vertices = get_total_verts();
+    vec2* tex_coords = get_tex_verts(ground_tex_pos, total_vertices);
+    vec4 *ground_vertices = get_pos_verts(ground_tex_pos, total_vertices);
 
     vec4 eyes = {0.0, 1.5, -3, 1};
     vec4 look_at_pos = {0, 1.2, 0, 1};
@@ -175,10 +96,10 @@ void init(void)
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
     glBufferData(GL_ARRAY_BUFFER
-        , sizeof(vec4) * total_world_vertices + sizeof(vec4)*total_world_vertices + sizeof(vec2) *total_world_vertices 
+        , sizeof(vec4) * total_vertices + sizeof(vec4)*total_vertices + sizeof(vec2) *total_vertices 
         , NULL, GL_STATIC_DRAW);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vec4) * total_world_vertices, ground_vertices);
-    glBufferSubData(GL_ARRAY_BUFFER, sizeof(vec4) * total_world_vertices , sizeof(vec2) *total_world_vertices, tex_coords);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vec4) * total_vertices, ground_vertices);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(vec4) * total_vertices , sizeof(vec2) *total_vertices, tex_coords);
 
 
     GLuint vPosition = glGetAttribLocation(program, "vPosition");
@@ -187,11 +108,11 @@ void init(void)
 
     GLuint vColor = glGetAttribLocation(program, "vColor");
     glEnableVertexAttribArray(vColor);
-    glVertexAttribPointer(vColor, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid *) (sizeof(vec4) * total_world_vertices));
+    glVertexAttribPointer(vColor, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid *) (sizeof(vec4) * total_vertices));
 
     GLuint vTexCoord = glGetAttribLocation(program, "vTexCoord");
     glEnableVertexAttribArray(vTexCoord);
-    glVertexAttribPointer(vTexCoord, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0 + (sizeof(vec4) * total_world_vertices));
+    glVertexAttribPointer(vTexCoord, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0 + (sizeof(vec4) * total_vertices));
 
     GLuint texture_location = glGetUniformLocation(program, "texture");
     glUniform1i(texture_location, 0);
@@ -220,7 +141,7 @@ void display(void)
     glUniformMatrix4fv(perspective_shift, 1, GL_FALSE, (GLfloat *) &projection);
     glUniformMatrix4fv(cam_shit, 1, GL_FALSE, (GLfloat *) &model_view);
 
-    glDrawArrays(GL_TRIANGLES, 0, total_world_vertices);
+    glDrawArrays(GL_TRIANGLES, 0, total_vertices);
 
     glutSwapBuffers();
 }
