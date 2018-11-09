@@ -5,6 +5,8 @@
 
 #define VERTS_IN_CUBE 36
 
+enum cardinal{NORTH, SOUTH, EAST, WEST};
+
 typedef struct {
     GLboolean north_wall;
     GLboolean south_wall;

@@ -262,7 +262,7 @@ vec2* get_tex_verts(const pos_tex* tex_pos, int size) {
 
 /* makes an 8x8 maze */
 cell** make_maze() {
-    srand(time(0));
+    srand(12342565);
 
     cell** maze_arr = calloc(8, sizeof(cell*));
     for(int i=0; i < 8; i++) {
