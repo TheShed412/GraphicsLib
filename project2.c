@@ -95,8 +95,34 @@ pos_tex* ground_with_tex() {
     vec4* starting_cube_pos = get_pos_verts(starting_cube, 36);
     starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, 0.8, 0.1, 0.8);
     starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, 20, 20, 20);
-    // starting_cube_pos = rotate_vertices(starting_cube_pos, VERTS_IN_CUBE, 0.1, Y);
-    // starting_cube_pos = rotate_vertices(starting_cube_pos, VERTS_IN_CUBE, 0.1, X);
+
+    for (int i = 0; i < 36; i++) {
+        starting_cube[i].pos_vert = starting_cube_pos[i];
+    }
+
+    return starting_cube;
+}
+
+pos_tex* wall_with_tex() {
+    int scale_amt = 3;
+    pos_tex* starting_cube = single_cube_texture(BRICK);
+    vec4* starting_cube_pos = get_pos_verts(starting_cube, 36);
+    starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, 0.1, 0.8, 0.8);
+    starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, scale_amt, scale_amt, scale_amt);
+
+    for (int i = 0; i < 36; i++) {
+        starting_cube[i].pos_vert = starting_cube_pos[i];
+    }
+
+    return starting_cube;
+}
+
+pos_tex* pillar_with_tex() {
+    int scale_amt = 3;
+    pos_tex* starting_cube = single_cube_texture(PILLAR);
+    vec4* starting_cube_pos = get_pos_verts(starting_cube, 36);
+    starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, 0.15, 0.8, 0.15);
+    starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, scale_amt, scale_amt, scale_amt);
 
     for (int i = 0; i < 36; i++) {
         starting_cube[i].pos_vert = starting_cube_pos[i];
@@ -115,12 +141,12 @@ void init(void)
     GLuint program = initShader("shaders/vshader_proj2.glsl", "shaders/fshader_proj2.glsl");
     glUseProgram(program);
 
-    pos_tex* ground_tex_pos = ground_with_tex();
+    pos_tex* ground_tex_pos = pillar_with_tex();
     vec4 *circle_colors = genRandomTriangleColors(NUM_VERTICES);
     vec2* tex_coords = get_tex_verts(ground_tex_pos, 36);
     vec4 *ground_vertices = get_pos_verts(ground_tex_pos, 36);
 
-    vec4 eyes = {0.0, 1.2, -0.5, 1};
+    vec4 eyes = {0.0, 1.5, -3, 1};
     vec4 look_at_pos = {0, 1.2, 0, 1};
     vec4 up_vec = {0, 1, 0, 1};
 
