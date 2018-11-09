@@ -53,33 +53,33 @@ int main(int argc, char **argv)
     return 0;
 }
 
-pos_tex* pillar_test() {
-    pos_tex* grnd_pillar = empty_cube_arr(3);
-    pos_tex* ground_tex_pos = ground_with_tex();
-    pos_tex* pillar_tex_pos = wall_with_pillar();
-    vec4 grndo = ground_tex_pos[30].pos_vert;
+// pos_tex* pillar_test() {
+//     pos_tex* grnd_pillar = empty_cube_arr(3);
+//     pos_tex* ground_tex_pos = ground_with_tex();
+//     pos_tex* pillar_tex_pos = wall_with_pillar();
+//     vec4 grndo = ground_tex_pos[30].pos_vert;
 
-    pillar_tex_pos = 
-        translate_pos_verts(pillar_tex_pos, VERTS_IN_CUBE*2, grndo.vec[X]+1, grndo.vec[Y]+1.2, grndo.vec[Z]-1);
+//     pillar_tex_pos = 
+//         translate_pos_verts(pillar_tex_pos, VERTS_IN_CUBE*2, grndo.vec[X]+1, grndo.vec[Y]+1.2, grndo.vec[Z]-1);
 
     
-    for (int i = 0; i < VERTS_IN_CUBE; i ++) {
-        grnd_pillar[i] = ground_tex_pos[i];
-    }
+//     for (int i = 0; i < VERTS_IN_CUBE; i ++) {
+//         grnd_pillar[i] = ground_tex_pos[i];
+//     }
 
-    for (int i = 36; i < VERTS_IN_CUBE * 3; i ++) {
-        grnd_pillar[i] = pillar_tex_pos[i - 36];
-    }
+//     for (int i = 36; i < VERTS_IN_CUBE * 3; i ++) {
+//         grnd_pillar[i] = pillar_tex_pos[i - 36];
+//     }
 
-    return grnd_pillar;
-}
+//     return grnd_pillar;
+// }
 
 pos_tex* cell_3d() {
     pos_tex* grnd_pillar = empty_cube_arr(8);
-    pos_tex* wp1 = wall_with_pillar();
-    pos_tex* wp2 = wall_with_pillar();
-    pos_tex* wp3 = wall_with_pillar();
-    pos_tex* wp4 = wall_with_pillar();
+    pos_tex* wp1 = wall_with_pillar(GL_TRUE);
+    pos_tex* wp2 = wall_with_pillar(GL_FALSE);
+    pos_tex* wp3 = wall_with_pillar(GL_TRUE);
+    pos_tex* wp4 = wall_with_pillar(GL_TRUE);
 
     wp2 = translate_pos_verts(wp2, VERTS_IN_CUBE*2, -1.35, 0, 1.35);
     wp2 = rotate_pos_verts(wp2, VERTS_IN_CUBE*2, M_PI/2);
@@ -109,6 +109,74 @@ pos_tex* cell_3d() {
     return grnd_pillar;
 }
 
+pos_tex* cell_walls(const cell* walls) {
+    pos_tex* grnd_pillar = empty_cube_arr(8);
+    pos_tex* wp1 = wall_with_pillar(walls->west_wall);
+    pos_tex* wp2 = wall_with_pillar(walls->north_wall);
+    pos_tex* wp3 = wall_with_pillar(walls->east_wall);
+    pos_tex* wp4 = wall_with_pillar(walls->south_wall);
+
+    wp2 = translate_pos_verts(wp2, VERTS_IN_CUBE*2, -1.35, 0, 1.35);
+    wp2 = rotate_pos_verts(wp2, VERTS_IN_CUBE*2, M_PI/2);
+
+    wp3 = rotate_pos_verts(wp3, VERTS_IN_CUBE*2, M_PI);
+    wp3 = translate_pos_verts(wp3, VERTS_IN_CUBE*2, 1.35 * 2, 0, 0);
+    
+    wp4 = translate_pos_verts(wp4, VERTS_IN_CUBE*2, -1.35, 0, -1.35);
+    wp4 = rotate_pos_verts(wp4, VERTS_IN_CUBE*2, -M_PI/2);
+
+    for (int i = 0; i < VERTS_IN_CUBE * 2; i ++) {
+        grnd_pillar[i] = wp1[i];
+    }
+
+    for (int i = VERTS_IN_CUBE * 2; i < VERTS_IN_CUBE * 4; i ++) {
+        grnd_pillar[i] = wp2[i - VERTS_IN_CUBE * 2];
+    }
+
+    for (int i = VERTS_IN_CUBE * 4; i < VERTS_IN_CUBE * 6; i ++) {
+        grnd_pillar[i] = wp3[i - VERTS_IN_CUBE * 4];
+    }
+
+    for (int i = VERTS_IN_CUBE * 6; i < VERTS_IN_CUBE * 8; i ++) {
+        grnd_pillar[i] = wp4[i - VERTS_IN_CUBE * 6];
+    }
+
+    return grnd_pillar;
+}
+
+pos_tex* whole_maze() {
+    pos_tex* maze_shapess = empty_cube_arr(512);
+    cell** maze_cells = make_maze();
+
+    GLfloat trans_x = 0;
+    GLfloat trans_z = 0;
+    int flip = 1;
+    int inner = 0;
+    int bound = VERTS_IN_CUBE*8;
+    int diff = 0;
+    for (int i = 0; i < 8; i ++) {
+        for (int j = 0; j < 8; j++) {
+            cell curr_cell = maze_cells[j][i];
+            pos_tex* curr_shape_cell = cell_walls(&curr_cell);
+            curr_shape_cell = translate_pos_verts(curr_shape_cell, VERTS_IN_CUBE*8, 
+                trans_x, 0, trans_z);
+            
+            for (; inner < bound; inner++) {
+                maze_shapess[inner] = curr_shape_cell[inner - diff];
+            }
+            inner = bound;
+            diff = bound;
+            bound += VERTS_IN_CUBE*8;
+
+            trans_z += (1.35*2) * flip;
+        }
+        flip *= -1;
+        trans_x += (1.35*2);
+    }
+
+    return maze_shapess;
+}
+
 /**
  * From the circle.c file with a couple small changes
 */
@@ -119,12 +187,12 @@ void init(void)
     GLuint program = initShader("shaders/vshader_proj2.glsl", "shaders/fshader_proj2.glsl");
     glUseProgram(program);
 
-    pos_tex* ground_tex_pos = cell_3d();
+    pos_tex* ground_tex_pos = whole_maze();
     total_vertices = get_total_verts();
     vec2* tex_coords = get_tex_verts(ground_tex_pos, total_vertices);
     vec4 *ground_vertices = get_pos_verts(ground_tex_pos, total_vertices);
 
-    vec4 eyes = {0.0, 3, -3, 1};
+    vec4 eyes = {0.0, 7, -7, 1};
     vec4 look_at_pos = {0, 1.2, 0, 1};
     vec4 up_vec = {0, 1, 0, 1};
 

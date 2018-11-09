@@ -53,7 +53,7 @@ pos_tex* pillar_with_tex();
 
 pos_tex* translate_pos_verts(pos_tex* tex_pos, int num_verts, GLfloat x, GLfloat y, GLfloat z);
 
-pos_tex* wall_with_pillar();
+pos_tex* wall_with_pillar(GLboolean make_wall) ;
 
 int get_total_verts();
 

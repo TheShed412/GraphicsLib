@@ -7,6 +7,10 @@
 #include <string.h>
 #include <time.h> 
 
+#include <GL/glew.h>
+#include <GL/freeglut.h>
+#include <GL/freeglut_ext.h>
+
 //enum wall {HORZ, VERT};
 
 static int total_world_vertices = 0;
@@ -485,12 +489,19 @@ pos_tex* rotate_pos_verts(pos_tex* tex_pos, int num_verts, GLfloat rot) {
     return tex_pos;
 }
 
-pos_tex* wall_with_pillar() {
+pos_tex* wall_with_pillar(GLboolean make_wall) {
     pos_tex* wall_pillar = empty_cube_arr(2);
-    pos_tex* wall = wall_with_tex();
     pos_tex* pillar = pillar_with_tex();
-
     pillar = translate_pos_verts(pillar, VERTS_IN_CUBE, 0, 0, 1.35);
+
+    pos_tex* wall;
+
+    if(make_wall) {
+        wall = wall_with_tex();
+    } else {
+        wall = pillar_with_tex();
+        wall = translate_pos_verts(wall, VERTS_IN_CUBE, 0, 0, 1.35);
+    }
 
     for (int i = 0; i < VERTS_IN_CUBE; i ++) {
         wall_pillar[i] = wall[i];
