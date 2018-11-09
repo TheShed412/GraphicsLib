@@ -415,7 +415,7 @@ GLubyte*** get_textures() {
 
 vec4* ground() {
     vec4* starting_cube = single_cube();
-    starting_cube = scale_vertices(starting_cube, VERTS_IN_CUBE, 0.8, 0.1, 0.8);
+    starting_cube = scale_vertices(starting_cube, VERTS_IN_CUBE, 0.9, 0.1, 0.9);
     starting_cube = rotate_vertices(starting_cube, VERTS_IN_CUBE, 0.1, Y);
     starting_cube = rotate_vertices(starting_cube, VERTS_IN_CUBE, 0.1, X);
 
@@ -426,7 +426,7 @@ pos_tex* ground_with_tex() {
     pos_tex* starting_cube = single_cube_texture(GRASS);
     vec4* starting_cube_pos = get_pos_verts(starting_cube, VERTS_IN_CUBE);
     starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, 0.8, 0.1, 0.8);
-    starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, 20, 20, 20);
+    starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, 35, 35, 35);
 
     for (int i = 0; i < VERTS_IN_CUBE; i++) {
         starting_cube[i].pos_vert = starting_cube_pos[i];
@@ -466,6 +466,17 @@ pos_tex* pillar_with_tex() {
 pos_tex* translate_pos_verts(pos_tex* tex_pos, int num_verts, GLfloat x, GLfloat y, GLfloat z) {
     vec4* pos_verts = get_pos_verts(tex_pos, num_verts);
     pos_verts = translate_vertices(pos_verts, num_verts, x, y, z);
+
+    for (int i = 0; i < num_verts; i++) {
+        tex_pos[i].pos_vert = pos_verts[i];
+    }
+
+    return tex_pos;
+}
+
+pos_tex* rotate_pos_verts(pos_tex* tex_pos, int num_verts, GLfloat rot) {
+    vec4* pos_verts = get_pos_verts(tex_pos, num_verts);
+    pos_verts = rotate_vertices(pos_verts, num_verts, rot, Y);
 
     for (int i = 0; i < num_verts; i++) {
         tex_pos[i].pos_vert = pos_verts[i];
