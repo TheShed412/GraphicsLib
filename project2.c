@@ -441,20 +441,20 @@ pos_tex* all_pillars() {
     return pillars;
 }
 
-pos_tex* whole_maze_and_ground() {
+pos_tex* whole_maze_and_ground(cell** maze_cells) {
     pos_tex* whole_shabang = empty_cube_arr(whole_maze_cubes + 1);
 
     pos_tex* the_ground = ground_with_tex();
-    pos_tex* the_maze = whole_maze(NULL);
+    pos_tex* the_maze = whole_maze(maze_cells);
 
     the_maze = translate_pos_verts(the_maze, VERTS_IN_CUBE*whole_maze_cubes, -10, 6.5, -10);
 
-    for (int i=0; i < VERTS_IN_CUBE*512; i++) {
+    for (int i=0; i < VERTS_IN_CUBE*whole_maze_cubes; i++) {
         whole_shabang[i] = the_maze[i];
     }
 
-    for(int i=VERTS_IN_CUBE*512; i < VERTS_IN_CUBE*513; i++) {
-        whole_shabang[i] = the_ground[i - (VERTS_IN_CUBE*512)];
+    for(int i=VERTS_IN_CUBE*whole_maze_cubes; i < VERTS_IN_CUBE*(whole_maze_cubes+1); i++) {
+        whole_shabang[i] = the_ground[i - (VERTS_IN_CUBE*whole_maze_cubes)];
     }
     to_maze_look = the_maze[0].pos_vert;
     return whole_shabang;
@@ -470,7 +470,7 @@ void init(void)
     GLuint program = initShader("shaders/vshader_proj2.glsl", "shaders/fshader_proj2.glsl");
     glUseProgram(program);
 
-    pos_tex* ground_tex_pos = whole_maze(maze);
+    pos_tex* ground_tex_pos = whole_maze_and_ground(maze);
     total_vertices = get_total_verts();
     vec2* tex_coords = get_tex_verts(ground_tex_pos, total_vertices);
     vec4 *ground_vertices = get_pos_verts(ground_tex_pos, total_vertices);
