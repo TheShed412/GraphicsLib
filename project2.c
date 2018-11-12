@@ -16,7 +16,7 @@
 /* for the circle, vertices are 3 x numTriangles */
 /* for the cone, vertices are 6 x numTriangles */
 #define NUM_VERTICES 36
-#define DEBUG
+//#define DEBUG
 
 enum direction {FORWARD, BACKWARDS, RIGHT, LEFT};
 
@@ -65,6 +65,7 @@ void init(void);
 void display(void);
 void keyboard(unsigned char key, int mousex, int mousey);
 void idle(void);
+pos_tex* all_pillars();
 
 int total_vertices = 0;
 
@@ -246,6 +247,44 @@ pos_tex* cell_walls_no_pillars() {
     return grnd_pillar;
 }
 
+pos_tex* whole_maze2() {
+    pos_tex* maze_shapes = empty_cube_arr(whole_maze_cubes);
+    pos_tex* pillars = all_pillars();
+
+    GLfloat trans_x = 0;
+    GLfloat trans_z = 0;
+    int flip = 1;
+    int inner = 0;
+    int bound = VERTS_IN_CUBE * 4;
+    int diff = 0;
+    int size = 8;
+    int total_wall_verts = 0;
+    for (int i = 0; i < 8; i ++) {
+        for (int j = 0; j < 8; j++) {
+            pos_tex* curr_pillar = cell_walls_no_pillars();
+            curr_pillar = translate_pos_verts(curr_pillar, VERTS_IN_CUBE*4, 
+                trans_x, 0, trans_z);
+            for (; inner < bound; inner++) {
+                maze_shapes[inner] = curr_pillar[inner - diff];
+                total_wall_verts++;
+            }
+            inner = bound;
+            diff = bound;
+            bound += VERTS_IN_CUBE*4;
+            trans_z += ((1.35*2));
+        }
+        trans_x += (1.35*2);
+        trans_z = 0;
+    }
+
+    int pillar_end_index = total_wall_verts + VERTS_IN_CUBE*81;
+    for(int i=total_wall_verts; i < pillar_end_index; i ++) {
+        maze_shapes[i] = pillars[i - total_wall_verts];
+    }
+
+    return maze_shapes;
+}
+
 enum direction get_anim(enum cardinal forward, enum cardinal new_dir) {
     if (forward == EAST) {
         switch(new_dir) {
@@ -405,8 +444,8 @@ pos_tex* all_pillars() {
     int bound = VERTS_IN_CUBE;
     int diff = 0;
     int size = 8;
-    for (int i = 0; i < 8; i ++) {
-        for (int j = 0; j < 8; j++) {
+    for (int i = 0; i < 9; i ++) {
+        for (int j = 0; j < 9; j++) {
             pos_tex* curr_pillar = pillar_with_tex();
             curr_pillar = translate_pos_verts(curr_pillar, VERTS_IN_CUBE, 
                 trans_x, 0, trans_z);
@@ -422,6 +461,8 @@ pos_tex* all_pillars() {
         trans_x += (1.35*2);
         trans_z = 0;
     }
+
+    pillars = translate_pos_verts(pillars, VERTS_IN_CUBE*81, 0, 0, -1.35);
 
     return pillars;
 }
@@ -455,7 +496,7 @@ void init(void)
     GLuint program = initShader("shaders/vshader_proj2.glsl", "shaders/fshader_proj2.glsl");
     glUseProgram(program);
 
-    pos_tex* ground_tex_pos = cell_walls_no_pillars();
+    pos_tex* ground_tex_pos = whole_maze2();
     total_vertices = get_total_verts();
     vec2* tex_coords = get_tex_verts(ground_tex_pos, total_vertices);
     vec4 *ground_vertices = get_pos_verts(ground_tex_pos, total_vertices);
