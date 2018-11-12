@@ -16,12 +16,9 @@
 /* for the circle, vertices are 3 x numTriangles */
 /* for the cone, vertices are 6 x numTriangles */
 #define NUM_VERTICES 36
-//#define DEBUG
+#define DEBUG
 
 enum direction {FORWARD, BACKWARDS, RIGHT, LEFT};
-
-enum direction solver_dir[] = {FORWARD, RIGHT, FORWARD, FORWARD, FORWARD, FORWARD, FORWARD, FORWARD, FORWARD, LEFT, FORWARD, FORWARD, 
-                               FORWARD, FORWARD, FORWARD, FORWARD, FORWARD, FORWARD, LEFT, LEFT};
 
 typedef struct {
     int i;
@@ -212,42 +209,53 @@ pos_tex* cell_walls(const cell* walls) {
     return grnd_pillar;
 }
 
-pos_tex* cell_walls_no_pillars() {
+pos_tex* cell_walls_no_pillars(const cell* walls) {
     pos_tex* grnd_pillar = empty_cube_arr(4);
-    pos_tex* wp1 = wall_with_tex();
-    pos_tex* wp2 = wall_with_tex();
-    pos_tex* wp3 = wall_with_tex();
-    pos_tex* wp4 = wall_with_tex();
+    pos_tex* wp1;
+    pos_tex* wp2;
+    pos_tex* wp3;
+    pos_tex* wp4;
 
+    wp1 = wall_with_tex();
+    for (int i = 0; i < VERTS_IN_CUBE; i ++) {
+        if (walls->east_wall) {
+            grnd_pillar[i] = wp1[i]; 
+        }
+    }
+
+    wp2 = wall_with_tex();
     wp2 = translate_pos_verts(wp2, VERTS_IN_CUBE*2, -1.35, 0, 1.35);
     wp2 = rotate_pos_verts(wp2, VERTS_IN_CUBE*2, M_PI/2);
+    for (int i = VERTS_IN_CUBE; i < VERTS_IN_CUBE * 2; i ++) {
+        if(walls->north_wall) {
+            grnd_pillar[i] = wp2[i - VERTS_IN_CUBE];
+        }
 
+    }
+
+
+    wp3 = wall_with_tex();
     wp3 = rotate_pos_verts(wp3, VERTS_IN_CUBE*2, M_PI);
     wp3 = translate_pos_verts(wp3, VERTS_IN_CUBE*2, 1.35 * 2, 0, 0);
-    
+    for (int i = VERTS_IN_CUBE * 2; i < VERTS_IN_CUBE * 3; i ++) {
+        if (walls->west_wall) {
+            grnd_pillar[i] = wp3[i - VERTS_IN_CUBE * 2];
+        }
+    }
+
+    wp4 = wall_with_tex();
     wp4 = translate_pos_verts(wp4, VERTS_IN_CUBE*2, -1.35, 0, -1.35);
     wp4 = rotate_pos_verts(wp4, VERTS_IN_CUBE*2, -M_PI/2);
-
-    for (int i = 0; i < VERTS_IN_CUBE; i ++) {
-        grnd_pillar[i] = wp1[i];
-    }
-
-    for (int i = VERTS_IN_CUBE; i < VERTS_IN_CUBE * 2; i ++) {
-        grnd_pillar[i] = wp2[i - VERTS_IN_CUBE];
-    }
-
-    for (int i = VERTS_IN_CUBE * 2; i < VERTS_IN_CUBE * 3; i ++) {
-        grnd_pillar[i] = wp3[i - VERTS_IN_CUBE * 2];
-    }
-
     for (int i = VERTS_IN_CUBE * 3; i < VERTS_IN_CUBE * 4; i ++) {
-        grnd_pillar[i] = wp4[i - VERTS_IN_CUBE * 3];
+        if (walls->south_wall) {
+            grnd_pillar[i] = wp4[i - VERTS_IN_CUBE * 3];
+        }
     }
 
     return grnd_pillar;
 }
 
-pos_tex* whole_maze2() {
+pos_tex* whole_maze(cell** maze_cells) {
     pos_tex* maze_shapes = empty_cube_arr(whole_maze_cubes);
     pos_tex* pillars = all_pillars();
 
@@ -261,7 +269,7 @@ pos_tex* whole_maze2() {
     int total_wall_verts = 0;
     for (int i = 0; i < 8; i ++) {
         for (int j = 0; j < 8; j++) {
-            pos_tex* curr_pillar = cell_walls_no_pillars();
+            pos_tex* curr_pillar = cell_walls_no_pillars(&maze_cells[i][j]);
             curr_pillar = translate_pos_verts(curr_pillar, VERTS_IN_CUBE*4, 
                 trans_x, 0, trans_z);
             for (; inner < bound; inner++) {
@@ -400,40 +408,6 @@ dir* solver(const cell** maze) {
     return dirs;
 }
 
-pos_tex* whole_maze() {
-    pos_tex* maze_shapess = empty_cube_arr(whole_maze_cubes);
-    cell** maze_cells = make_maze();
-
-    GLfloat trans_x = 0;
-    GLfloat trans_z = 0;
-    int flip = 1;
-    int inner = 0;
-    int bound = VERTS_IN_CUBE*8;
-    int diff = 0;
-    int size = 8;
-    for (int i = 0; i < 8; i ++) {
-        for (int j = 0; j < 8; j++) {
-            cell curr_cell = maze_cells[i][j];
-            pos_tex* curr_shape_cell = cell_walls(&curr_cell);
-            curr_shape_cell = translate_pos_verts(curr_shape_cell, VERTS_IN_CUBE*8, 
-                trans_x, 0, trans_z);
-            
-            for (; inner < bound; inner++) {
-                maze_shapess[inner] = curr_shape_cell[inner - diff];
-            }
-            inner = bound;
-            diff = bound;
-            bound += VERTS_IN_CUBE*8;
-
-            trans_z += ((1.35*2));
-        }
-        trans_x += (1.35*2);
-        trans_z = 0;
-    }
-
-    return maze_shapess;
-}
-
 pos_tex* all_pillars() {
     pos_tex* pillars = empty_cube_arr(81);
 
@@ -471,7 +445,7 @@ pos_tex* whole_maze_and_ground() {
     pos_tex* whole_shabang = empty_cube_arr(whole_maze_cubes + 1);
 
     pos_tex* the_ground = ground_with_tex();
-    pos_tex* the_maze = whole_maze();
+    pos_tex* the_maze = whole_maze(NULL);
 
     the_maze = translate_pos_verts(the_maze, VERTS_IN_CUBE*whole_maze_cubes, -10, 6.5, -10);
 
@@ -496,7 +470,7 @@ void init(void)
     GLuint program = initShader("shaders/vshader_proj2.glsl", "shaders/fshader_proj2.glsl");
     glUseProgram(program);
 
-    pos_tex* ground_tex_pos = whole_maze2();
+    pos_tex* ground_tex_pos = whole_maze(maze);
     total_vertices = get_total_verts();
     vec2* tex_coords = get_tex_verts(ground_tex_pos, total_vertices);
     vec4 *ground_vertices = get_pos_verts(ground_tex_pos, total_vertices);
