@@ -16,7 +16,7 @@
 /* for the circle, vertices are 3 x numTriangles */
 /* for the cone, vertices are 6 x numTriangles */
 #define NUM_VERTICES 36
-#define DEBUG
+//#define DEBUG
 
 enum direction {FORWARD, BACKWARDS, RIGHT, LEFT};
 
@@ -218,7 +218,7 @@ pos_tex* cell_walls_no_pillars(const cell* walls) {
 
     wp1 = wall_with_tex();
     for (int i = 0; i < VERTS_IN_CUBE; i ++) {
-        if (walls->east_wall) {
+        if (walls->west_wall) {
             grnd_pillar[i] = wp1[i]; 
         }
     }
@@ -227,7 +227,7 @@ pos_tex* cell_walls_no_pillars(const cell* walls) {
     wp2 = translate_pos_verts(wp2, VERTS_IN_CUBE*2, -1.35, 0, 1.35);
     wp2 = rotate_pos_verts(wp2, VERTS_IN_CUBE*2, M_PI/2);
     for (int i = VERTS_IN_CUBE; i < VERTS_IN_CUBE * 2; i ++) {
-        if(walls->north_wall) {
+        if(walls->south_wall) {
             grnd_pillar[i] = wp2[i - VERTS_IN_CUBE];
         }
 
@@ -238,7 +238,7 @@ pos_tex* cell_walls_no_pillars(const cell* walls) {
     wp3 = rotate_pos_verts(wp3, VERTS_IN_CUBE*2, M_PI);
     wp3 = translate_pos_verts(wp3, VERTS_IN_CUBE*2, 1.35 * 2, 0, 0);
     for (int i = VERTS_IN_CUBE * 2; i < VERTS_IN_CUBE * 3; i ++) {
-        if (walls->west_wall) {
+        if (walls->east_wall) {
             grnd_pillar[i] = wp3[i - VERTS_IN_CUBE * 2];
         }
     }
@@ -247,7 +247,7 @@ pos_tex* cell_walls_no_pillars(const cell* walls) {
     wp4 = translate_pos_verts(wp4, VERTS_IN_CUBE*2, -1.35, 0, -1.35);
     wp4 = rotate_pos_verts(wp4, VERTS_IN_CUBE*2, -M_PI/2);
     for (int i = VERTS_IN_CUBE * 3; i < VERTS_IN_CUBE * 4; i ++) {
-        if (walls->south_wall) {
+        if (walls->north_wall) {
             grnd_pillar[i] = wp4[i - VERTS_IN_CUBE * 3];
         }
     }

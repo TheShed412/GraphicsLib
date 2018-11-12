@@ -288,7 +288,7 @@ cell** make_maze() {
     /* entrance and exit */
 
     /* uncomment when other things are done */
-    rec_maze_builder(maze_arr, 0, MAX_REC_INDEX, 0, MAX_REC_INDEX);
+    //rec_maze_builder(maze_arr, 0, MAX_REC_INDEX, 0, MAX_REC_INDEX);
 
     return maze_arr;
 }
