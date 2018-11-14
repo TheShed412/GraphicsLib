@@ -11,18 +11,30 @@
 #include <GL/freeglut.h>
 #include <GL/freeglut_ext.h>
 
-//enum wall {HORZ, VERT};
+enum ort {HORZ, VERT};
 
 static int total_world_vertices = 0;
 
-#define MAX_REC_INDEX 7
+#define MAX_REC_INDEX 8
 
 static void rec_maze_builder(cell** maze, int start_vert, int end_vert, int start_hor, int end_hor);
 static void rec_maze_builder_vert(cell** maze, int start_vert, int end_vert, int start_hor, int end_hor);
 static void rec_maze_builder_hor(cell** maze, int start_vert, int end_vert, int start_hor, int end_hor);
+static void divide(cell** maze, int x, int y, int w, int h, enum ort orientation);
 
 int get_total_verts() {
     return total_world_vertices;
+}
+
+static enum ort choose_ort(int w, int h) {
+    if(w < h) {
+        return HORZ;
+    } else if(h < w) {
+        return VERT;
+    } else {
+        int pick = rand() % 2;
+        return (pick) ? VERT : HORZ;
+    }
 }
 
 vec4* single_cube(){
@@ -264,7 +276,7 @@ vec2* get_tex_verts(const pos_tex* tex_pos, int size) {
 
 /* makes an 8x8 maze */
 cell** make_maze() {
-    int time_rand = 1542169262;
+    int time_rand = time(0);
     srand(time_rand);
     printf("time: %d\n", time_rand);
 
@@ -292,10 +304,64 @@ cell** make_maze() {
     /* entrance and exit */
 
     /* uncomment when other things are done */
-    rec_maze_builder_vert(maze_arr, 0, MAX_REC_INDEX, 0, MAX_REC_INDEX);
+    divide(maze_arr, 0, 0, MAX_REC_INDEX, MAX_REC_INDEX, choose_ort(MAX_REC_INDEX, MAX_REC_INDEX));
 
     return maze_arr;
 }
+
+static void divide(cell** maze, int x, int y, int w, int h, enum ort orientation) {
+    if (w <= 1 || h <= 1) 
+        return;
+
+    GLboolean is_horizontal = orientation == HORZ;
+
+    int wall_x = (is_horizontal) ? 0 : rand() % (w-1);
+    int wall_y = (is_horizontal) ? rand() % (h-1) : 0;
+    wall_x += x;
+    wall_y += y;
+
+    int hole_x = (is_horizontal) ? rand() % (w) : 0;
+    int hole_y = (is_horizontal) ? 0 : rand() % (h);
+    hole_x += wall_x;
+    hole_y += wall_y;
+
+    int dir_x = (is_horizontal) ? 1 : 0;
+    int dir_y = (is_horizontal) ? 0 : 1;
+
+    int wall_len = (is_horizontal) ? w : h;
+
+    if (is_horizontal) { // do the east wall
+
+        for (int i = 0; i < wall_len; i++) {
+            maze[wall_y][wall_x].east_wall = GL_TRUE;
+            wall_y += dir_y;
+            wall_x += dir_x;
+        }
+        maze[hole_y][hole_x].east_wall = GL_FALSE;
+
+    } else { // do the south wall
+        for (int i = 0; i < wall_len; i++) {
+            maze[wall_y][wall_x].south_wall = GL_TRUE;
+            wall_y += dir_y;
+            wall_x += dir_x;
+        }
+        maze[hole_y][hole_x].south_wall = GL_FALSE;
+    } 
+
+
+    int next_x = x;
+    int next_y = y;
+    int next_w = (is_horizontal) ? w : wall_x-x+1;
+    int next_h = (is_horizontal) ? wall_y-y+1 : h;
+    divide(maze, next_x, next_y, next_w, next_h, choose_ort(w, h));
+
+    next_x = (is_horizontal) ? x : wall_x+1;
+    next_y = (is_horizontal) ? wall_y+1 : y;
+    next_w = (is_horizontal) ? w : x+w-wall_x-1;
+    next_h = (is_horizontal) ? y+h-wall_y-1 : h;
+    divide(maze, next_x, next_y, next_w, next_h, choose_ort(w, h));
+}
+
 int test_rec = 0;
 static void rec_maze_builder_vert(cell** maze, int start_vert, int end_vert, int start_hor, int end_hor) {
     int vert_diff = end_vert-start_vert;
