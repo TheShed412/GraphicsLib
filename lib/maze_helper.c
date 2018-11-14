@@ -18,6 +18,8 @@ static int total_world_vertices = 0;
 #define MAX_REC_INDEX 7
 
 static void rec_maze_builder(cell** maze, int start_vert, int end_vert, int start_hor, int end_hor);
+static void rec_maze_builder_vert(cell** maze, int start_vert, int end_vert, int start_hor, int end_hor);
+static void rec_maze_builder_hor(cell** maze, int start_vert, int end_vert, int start_hor, int end_hor);
 
 int get_total_verts() {
     return total_world_vertices;
@@ -262,7 +264,9 @@ vec2* get_tex_verts(const pos_tex* tex_pos, int size) {
 
 /* makes an 8x8 maze */
 cell** make_maze() {
-    srand(12342565);
+    int time_rand = 1542169262;
+    srand(time_rand);
+    printf("time: %d\n", time_rand);
 
     cell** maze_arr = calloc(8, sizeof(cell*));
     for(int i=0; i < 8; i++) {
@@ -288,9 +292,86 @@ cell** make_maze() {
     /* entrance and exit */
 
     /* uncomment when other things are done */
-    rec_maze_builder(maze_arr, 0, MAX_REC_INDEX, 0, MAX_REC_INDEX);
+    rec_maze_builder_vert(maze_arr, 0, MAX_REC_INDEX, 0, MAX_REC_INDEX);
 
     return maze_arr;
+}
+int test_rec = 0;
+static void rec_maze_builder_vert(cell** maze, int start_vert, int end_vert, int start_hor, int end_hor) {
+    int vert_diff = end_vert-start_vert;
+
+    if(vert_diff <= 0) {
+        return;
+    }
+
+    int vert_index;
+    int vert_hole_index;
+    if (vert_diff > 0) {
+        vert_index = start_vert + (rand() % (vert_diff));// find the index im walling up
+        vert_hole_index = start_vert + (rand() % (vert_diff));// find the index where the hole is going
+        for(int i=start_vert; i < end_vert+1; i++) {
+            maze[vert_index][i].east_wall = GL_TRUE;
+        }
+        maze[vert_index][vert_hole_index].east_wall = GL_FALSE;
+    } else {
+        vert_index = start_vert;
+    }
+
+    int left_hor_start;
+    int left_hor_end;
+    int right_hor_start;
+    int right_hor_end;
+
+    left_hor_start = vert_index+1;
+    if(left_hor_start > 7) left_hor_start = 7; 
+    left_hor_end = end_hor;
+
+    right_hor_start = start_hor;
+    if(right_hor_start < 0) right_hor_start = 0;
+    right_hor_end = vert_index-1;
+
+    if(test_rec == 1) return;
+    test_rec++;
+    rec_maze_builder_hor(maze, start_vert, vert_index, left_hor_start, left_hor_end);// good
+    //rec_maze_builder_hor(maze, start_vert, vert_index, right_hor_start, right_hor_end);// good
+}
+
+static void rec_maze_builder_hor(cell** maze, int start_vert, int end_vert, int start_hor, int end_hor) {
+    int hor_diff = end_hor-start_hor;
+
+    if(hor_diff <= 0) {
+        return;
+    }
+
+    int hor_index;
+    int hor_hole_index;
+    if (hor_diff > 0) {
+        hor_index = start_hor + (rand() % (hor_diff));// find the index im walling up
+        hor_hole_index = start_hor + (rand() % (hor_diff));// find the index where the hole is going
+        for(int i=start_hor; i < end_hor+1; i++) {
+            maze[i][hor_index].south_wall = GL_TRUE;
+        }
+        maze[hor_hole_index][hor_index].south_wall = GL_FALSE;
+    } else {
+        hor_index = start_hor;
+    }
+
+    int left_vert_start;
+    int left_vert_end;
+    int right_vert_start;
+    int right_vert_end;
+
+    left_vert_start = hor_index;
+    if(left_vert_start > 7) left_vert_start = 7;
+    left_vert_end = end_vert;
+    right_vert_start = end_vert;
+    if(right_vert_start < 0) right_vert_start = 0;
+    right_vert_end = hor_index;
+
+    //return;
+    rec_maze_builder_vert(maze, left_vert_end, left_vert_start, start_hor, end_hor);// good
+    //return;
+    //rec_maze_builder_vert(maze, right_vert_end, right_vert_start, start_hor, end_hor);// good
 }
 
 /*  I need a recursive function that will make the maze using division
@@ -303,7 +384,7 @@ cell** make_maze() {
             b. only spawning south_walls
     This is to avoid generating an adjacent wall and not generating to matching adjacent wall
  */
-
+int test_counter = 0;
 static void rec_maze_builder(cell** maze, int start_vert, int end_vert, int start_hor, int end_hor) {
 
     int hor_diff = end_hor-start_hor;
@@ -315,43 +396,60 @@ static void rec_maze_builder(cell** maze, int start_vert, int end_vert, int star
 
     /* do the vertical line first */
     int vert_index;
-    int hole_index;
+    int vert_hole_index;
     if (vert_diff > 0) {
-        vert_index = (rand() % (vert_diff)) + start_vert;// find the index im walling up
-        hole_index = (rand() % (vert_diff)) + start_vert;// find the index where the hole is going
-        for(int i=start_vert; i < end_vert; i++) {
-            maze[i][vert_index].east_wall = GL_TRUE;
+        vert_index = start_vert + (rand() % (vert_diff));// find the index im walling up
+        vert_hole_index = start_hor + (rand() % (hor_diff));// find the index where the hole is going
+        for(int i=start_vert; i < end_vert+1; i++) {
+            maze[vert_index][i].east_wall = GL_TRUE;
         }
-        maze[hole_index][vert_index].east_wall = GL_FALSE;
+        maze[vert_index][vert_hole_index].east_wall = GL_FALSE;
     } else {
         vert_index = start_vert;
     }
 
+    //return;
 
     /* then do the horizontal line */
     int hor_index;
+    int hor_hole_index;
     if (hor_diff > 0) {
         hor_index = start_hor + (rand() % (hor_diff));// find the index im walling up
-        hole_index = start_hor + (rand() % (hor_diff));// find the index where the hole is going
-        for(int i=start_hor; i < end_hor; i++) {
-            maze[hor_index][i].south_wall = GL_TRUE;
+        if (vert_index >= MAX_REC_INDEX || vert_hole_index > hor_index) {
+            hor_hole_index = vert_index;
+            printf("plus 1\n");
+        } else {
+            if (vert_index < 7)
+                hor_hole_index = vert_index+1;
+            else
+                hor_hole_index = vert_index;
+            printf("plus 1 new\n");
+        }// find the index where the hole is going
+        for(int i=start_hor; i < end_hor+1; i++) {
+            maze[i][hor_index].south_wall = GL_TRUE;
         }
-        maze[hor_index][hole_index].south_wall = GL_FALSE;
+        maze[hor_hole_index][hor_index].south_wall = GL_FALSE;
     } else {
         hor_index = start_hor;
     }
 
+    //return;
+
     /* bottom left quad */
-    rec_maze_builder(maze, start_vert, vert_index-1, hor_index+1, end_hor);
+    rec_maze_builder(maze, vert_index+1, end_vert, hor_index+1, end_hor);// good
+    return;
 
     /* top right quad */
-    rec_maze_builder(maze, vert_index+1, end_vert, start_hor, hor_index-1);
+    rec_maze_builder(maze, start_vert, vert_index-1, start_hor, hor_index-1);// good
+    // return;
 
     /* bottom right quad */
-    rec_maze_builder(maze, vert_index+1, end_vert, hor_index+1, end_hor);
+    rec_maze_builder(maze, start_vert, vert_index-1, hor_index+1, end_hor);// good
+    //return;
 
     /* top left quad */
-    rec_maze_builder(maze, start_vert, vert_index-1, start_hor, hor_index-1);
+    rec_maze_builder(maze, vert_index+1, end_vert, start_hor, hor_index-1);
+    //return;
     // rec_maze_builder(maze, vert_index-1, end_vert, hor_index+1, end_hor);
     // rec_maze_builder(maze, start_vert, vert_index-1, start_hor, hor_index-1);
 

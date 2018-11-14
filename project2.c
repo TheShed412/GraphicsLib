@@ -51,7 +51,7 @@ vec4 look_at_maze_start = {0, 11, -10, 1};
 #ifndef DEBUG
 vec4 eyes = {0, 20, -20, 1};// starting point {-10, 11, -10, 1}
 #else
-vec4 eyes = {0, 5, -5, 1};// starting point {-10, 11, -10, 1}
+vec4 eyes = {0, 20, -20, 1};// starting point {-10, 11, -10, 1}
 #endif
 vec4 look_at_pos = {0, 0, 0, 1};// starting point {0, 11, -10, 1}
 vec4 up_vec = {0, 1, 0, 1};
