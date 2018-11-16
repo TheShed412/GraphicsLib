@@ -546,7 +546,7 @@ GLfloat fwd_dist = 1.35 * 2;
 GLfloat mv_counter = 0.0;
 GLfloat rot_amnt = 0.0;
 int state_counter = 0;
-vec4 old_look_at = {10, 7, -10, 1};
+vec4 old_look_at = {100, 7, -10, 1};
 enum cardinal curr_forward = EAST;
 
 int test = 0;
@@ -664,7 +664,7 @@ void idle(int value)
 
                 GLfloat theta = vec_angle_btw(old_look_at.vec[X], old_look_at.vec[Z], look_at_pos.vec[X], look_at_pos.vec[Z]);
 
-                if (theta <= 2.05) {
+                if (theta <= M_PI/2) {
                     trans_mat = get_rotation_matrix(-0.02, Y);
                 } else {
                     finished = 1;
