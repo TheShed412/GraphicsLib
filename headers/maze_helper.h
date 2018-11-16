@@ -59,6 +59,8 @@ pos_tex* wall_with_pillar(GLboolean make_wall) ;
 
 int get_total_verts();
 
-pos_tex* rotate_pos_verts(pos_tex* tex_pos, int num_verts, GLfloat rot) ;
+pos_tex* rotate_pos_verts(pos_tex* tex_pos, int num_verts, GLfloat rot);
+
+cell* get_cell(const cell** maze, int x, int y, int size);
 
 #endif

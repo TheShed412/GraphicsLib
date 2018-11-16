@@ -16,6 +16,7 @@
 /* for the circle, vertices are 3 x numTriangles */
 /* for the cone, vertices are 6 x numTriangles */
 #define NUM_VERTICES 36
+#define DELTA 0.01
 //#define DEBUG
 
 enum direction {FORWARD, BACKWARDS, RIGHT, LEFT};
@@ -49,7 +50,7 @@ mat4 id =             {1, 0, 0, 0,
                         0, 0, 0, 1};
 
 vec4 eyes_maze_start = {-11.5, 7, -10, 1};
-vec4 look_at_maze_start = {100, 7, -10, 1};
+vec4 look_at_maze_start = {10, 7, -10, 1};
 vec4 orbit_stop = {20, 20, 0, 1};
 #ifndef DEBUG
 vec4 eyes = {0, 20, -20, 1};// starting point {-10, 11, -10, 1}
@@ -554,7 +555,13 @@ void idle(int value)
 {
     glutTimerFunc(1, idle, 0);
     vec4* dist_vec = &eyes_maze_start;
-    enum state states[] = {MOVING_FORWARD, MOVING_FORWARD, MOVING_FORWARD, MOVING_FORWARD, TURNING_RIGHT, MOVING_FORWARD, TURNING_RIGHT, MOVING_FORWARD, SOLVED};
+    enum state states[] = {MOVING_FORWARD, MOVING_FORWARD, MOVING_FORWARD, 
+    MOVING_FORWARD, TURNING_RIGHT, MOVING_FORWARD, TURNING_RIGHT, MOVING_FORWARD, TURNING_LEFT, MOVING_FORWARD,
+    TURNING_LEFT, MOVING_FORWARD, TURNING_RIGHT, MOVING_FORWARD, MOVING_FORWARD, TURNING_RIGHT, MOVING_FORWARD,
+    MOVING_FORWARD, TURNING_LEFT, MOVING_FORWARD, TURNING_RIGHT, MOVING_FORWARD, TURNING_LEFT, MOVING_FORWARD,
+    MOVING_FORWARD, TURNING_LEFT, MOVING_FORWARD, MOVING_FORWARD, MOVING_FORWARD, MOVING_FORWARD, MOVING_FORWARD,
+    MOVING_FORWARD, MOVING_FORWARD, MOVING_FORWARD,
+    SOLVED};
     
     #ifndef DEBUG
     // enum state {ORBITING, ORBIT_STOPPED, MOVING_TO_MAZE, MOVING_FORWARD, TURNING_RIGHT, TURNING_LEFT, SOLVED};
@@ -602,6 +609,7 @@ void idle(int value)
 
                 if(finished) {
                     eyes = eyes_maze_start;
+                    look_at_pos = old_look_at;
                     curr_state = states[state_counter];
                 }
 
@@ -664,7 +672,7 @@ void idle(int value)
 
                 GLfloat theta = vec_angle_btw(old_look_at.vec[X], old_look_at.vec[Z], look_at_pos.vec[X], look_at_pos.vec[Z]);
 
-                if (theta <= M_PI/2) {
+                if (theta <= (M_PI/2 + DELTA)) {
                     trans_mat = get_rotation_matrix(-0.02, Y);
                 } else {
                     finished = 1;
@@ -696,7 +704,7 @@ void idle(int value)
 
                 GLfloat theta = vec_angle_btw(old_look_at.vec[X], old_look_at.vec[Z], look_at_pos.vec[X], look_at_pos.vec[Z]);
 
-                if (theta <= M_PI/2) {
+                if (theta <= M_PI/2+DELTA) {
                     trans_mat = get_rotation_matrix(0.02, Y);;
                 } else {
                     finished = 1;

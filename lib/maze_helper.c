@@ -517,3 +517,29 @@ pos_tex* wall_with_pillar(GLboolean make_wall) {
     return wall_pillar;
 }
 
+cell* get_cell(const cell** maze, int x, int y, int size) {
+    cell* ret_cell = calloc(1, sizeof(cell));
+
+    cell curr_cell = maze[x][y];
+
+    ret_cell->east_wall = curr_cell.east_wall;
+    ret_cell->west_wall = curr_cell.west_wall;
+    ret_cell->south_wall = curr_cell.south_wall;
+    ret_cell->north_wall = curr_cell.north_wall;
+
+    if(!ret_cell->east_wall && x > 0) {
+        ret_cell->east_wall = maze[x-1][y].west_wall;
+    }
+    if(!ret_cell->west_wall && x < size-1) {
+        ret_cell->west_wall = maze[x+1][y].east_wall;
+    }
+
+    if(!ret_cell->south_wall && y > 0) {
+        ret_cell->south_wall = maze[x][y-1].north_wall;
+    }
+    if(!ret_cell->north_wall && y < size-1) {
+        ret_cell->north_wall = maze[x][y+1].south_wall;
+    }
+
+    return ret_cell;
+}
