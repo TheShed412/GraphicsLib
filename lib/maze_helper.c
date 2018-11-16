@@ -517,7 +517,7 @@ pos_tex* wall_with_pillar(GLboolean make_wall) {
     return wall_pillar;
 }
 
-cell* get_cell(const cell** maze, int x, int y, int size) {
+cell* get_cell(cell** maze, int x, int y, int size) {
     cell* ret_cell = calloc(1, sizeof(cell));
 
     cell curr_cell = maze[x][y];
@@ -526,6 +526,8 @@ cell* get_cell(const cell** maze, int x, int y, int size) {
     ret_cell->west_wall = curr_cell.west_wall;
     ret_cell->south_wall = curr_cell.south_wall;
     ret_cell->north_wall = curr_cell.north_wall;
+    printf("Before:\n");
+    print_cell(ret_cell);
 
     if(!ret_cell->east_wall && x > 0) {
         ret_cell->east_wall = maze[x-1][y].west_wall;
@@ -541,22 +543,30 @@ cell* get_cell(const cell** maze, int x, int y, int size) {
         ret_cell->north_wall = maze[x][y+1].south_wall;
     }
 
+    printf("After:\n");
+    print_cell(ret_cell);
+    printf("x: %d y: %d\n\n", x, y);
     return ret_cell;
 }
 
-static GLboolean right_open(const cell* curr_cell, enum cardinal curr_for) {
-    if (curr_for == EAST) {
+static GLboolean right_open(const cell* curr_cell, enum cardinal* curr_for) {
+    if (*curr_for == EAST) {
+        *curr_for = SOUTH;
         return curr_cell->south_wall;
-    } else if (curr_for == SOUTH) {
+    } else if (*curr_for == SOUTH) {
+        *curr_for = WEST;
         return curr_cell->west_wall;
-    } else if (curr_for == WEST) {
+    } else if (*curr_for == WEST) {
+        *curr_for = NORTH;
         return curr_cell->north_wall;
     } else { //if north
+        *curr_for = EAST;
         return curr_cell->east_wall;
     }
 }
 
-static GLboolean forward_open(const cell* curr_cell, enum cardinal curr_for) {
+static GLboolean forward_open(const cell* curr_cell, enum cardinal* _curr_for) {
+    enum cardinal curr_for = *_curr_for;
     if (curr_for == EAST) {
         return curr_cell->east_wall;
     } else if (curr_for == SOUTH) {
@@ -568,19 +578,67 @@ static GLboolean forward_open(const cell* curr_cell, enum cardinal curr_for) {
     }
 }
 
-static GLboolean left_open(const cell* curr_cell, enum cardinal curr_for) {
-    if (curr_for == EAST) {
+static GLboolean left_open(const cell* curr_cell, enum cardinal* curr_for) {
+    if (*curr_for == EAST) {
+        *curr_for = NORTH;
         return curr_cell->north_wall;
-    } else if (curr_for == SOUTH) {
+    } else if (*curr_for == SOUTH) {
+        *curr_for = EAST;
         return curr_cell->east_wall;
-    } else if (curr_for == WEST) {
+    } else if (*curr_for == WEST) {
+        *curr_for = SOUTH;
         return curr_cell->south_wall;
     } else { //if north
+        *curr_for = WEST;
         return curr_cell->west_wall;
     }
 }
 
-enum state* right_hand_rule(const cell** maze, int size) {
+static GLboolean back_open(const cell* curr_cell, enum cardinal* curr_for) {
+    if (*curr_for == EAST) {
+        *curr_for = WEST;
+        return curr_cell->west_wall;
+    } else if (*curr_for == SOUTH) {
+        *curr_for = NORTH;
+        return curr_cell->north_wall;
+    } else if (*curr_for == WEST) {
+        *curr_for = EAST;
+        return curr_cell->east_wall;
+    } else { //if north
+        *curr_for = SOUTH;
+        return curr_cell->south_wall;
+    }
+}
+
+static int change_x(int x, enum cardinal curr_for) {
+    if (curr_for == EAST) {
+        x++;
+        return x;
+    } else if (curr_for == SOUTH) {
+        return x;
+    } else if (curr_for == WEST) {
+        x--;
+        return x;
+    } else { //if north
+        return x;
+    }
+}
+
+static int change_y(int y, enum cardinal curr_for) {
+    if (curr_for == EAST) {
+        return y;
+    } else if (curr_for == SOUTH) {
+        y++;
+        return y;
+    } else if (curr_for == WEST) {
+        return y;
+    } else { //if north
+        y--;
+        return y;
+    }
+}
+
+enum state* right_hand_rule(cell** maze, int size) {
     enum state* directions = calloc(256, 256*sizeof(enum state));// arbitrary size cause it stops at the solved state
     int bounds = size-1;
     int x = 0;
@@ -589,13 +647,42 @@ enum state* right_hand_rule(const cell** maze, int size) {
     directions[0] = MOVING_FORWARD;// always move forward from starting position
     enum cardinal curr_forward = EAST; // starting facing east
 
-    while(x < bounds && y < bounds) {
+    while(x != bounds || y != bounds) {
         cell* curr_cell = get_cell(maze, x, y, size);
 
-
+        if(right_open(curr_cell, &curr_forward)) {
+            directions[dir_index] = TURNING_RIGHT;
+            directions[dir_index+1] = MOVING_FORWARD;
+            dir_index+=2;
+            x = change_x(x, curr_forward);
+            y = change_y(y, curr_forward);
+        } else if (forward_open(curr_cell, &curr_forward)) {
+            directions[dir_index] = MOVING_FORWARD;
+            dir_index++;
+            x = change_x(x, curr_forward);
+            y = change_y(y, curr_forward);
+        } else if (left_open(curr_cell, &curr_forward)) {
+            directions[dir_index] = TURNING_LEFT;
+            directions[dir_index+1] = MOVING_FORWARD;
+            dir_index+=2;
+            x = change_x(x, curr_forward);
+            y = change_y(y, curr_forward);
+        } else {// I have to turn around
+            back_open(curr_cell, &curr_forward);
+            directions[dir_index] = TURNING_RIGHT;
+            directions[dir_index+1] = TURNING_RIGHT;
+            directions[dir_index+2] = MOVING_FORWARD;
+            dir_index+=3;
+            x = change_x(x, curr_forward);
+            y = change_y(y, curr_forward);
+        }
 
         free(curr_cell);
     }
 
+    directions[dir_index] = MOVING_FORWARD;//at the end so solved
+    directions[dir_index+1] = SOLVED;
+
+    printf("X: %d Y: %d\n", x, y);
     return directions;
 }

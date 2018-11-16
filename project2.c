@@ -18,6 +18,7 @@
 #define NUM_VERTICES 36
 #define DELTA 0.01
 //#define DEBUG
+//#define AUTO_SOLVER
 
 enum direction {FORWARD, BACKWARDS, RIGHT, LEFT};
 
@@ -60,6 +61,8 @@ vec4 look_at_pos = {100, 7, -10, 1};
 #endif
 vec4 up_vec = {0, 1, 0, 1};
 vec4 to_maze_look;
+
+enum state* solve_states;
 
 enum state curr_state = ORBITING;
 
@@ -418,6 +421,21 @@ pos_tex* whole_maze_and_ground(cell** maze_cells) {
     return whole_shabang;
 }
 
+void print_states(enum state* states) {
+
+    for (int i = 0; i < 256; i ++) {
+        if(states[i] == MOVING_FORWARD) {
+            printf("MOVING FORWARD\n");
+        } else if (states[i] == TURNING_LEFT) {
+            printf("TURNING LEFT\n");
+        } else if (states[i] == TURNING_RIGHT) {
+            printf("TURNING RIGHT\n");
+        }  else if (states[i] == SOLVED) {
+            printf("SOLVED\n");
+        }
+    }
+}
+
 /**
  * From the circle.c file with a couple small changes
 */
@@ -425,6 +443,9 @@ void init(void)
 {
     GLubyte*** grass_tex = get_textures();  
     cell** maze = make_maze();
+    print_maze(maze);
+    solve_states = right_hand_rule(maze, 8);
+    print_states(solve_states);
     GLuint program = initShader("shaders/vshader_proj2.glsl", "shaders/fshader_proj2.glsl");
     glUseProgram(program);
 
@@ -553,6 +574,7 @@ void idle(int value)
 {
     glutTimerFunc(1, idle, 0);
     vec4* dist_vec = &eyes_maze_start;
+    #ifndef AUTO_SOLVER
     enum state states[] = {MOVING_FORWARD, MOVING_FORWARD, MOVING_FORWARD, 
     MOVING_FORWARD, TURNING_RIGHT, MOVING_FORWARD, TURNING_RIGHT, MOVING_FORWARD, TURNING_LEFT, MOVING_FORWARD,
     TURNING_LEFT, MOVING_FORWARD, TURNING_RIGHT, MOVING_FORWARD, MOVING_FORWARD, TURNING_RIGHT, MOVING_FORWARD,
@@ -560,6 +582,9 @@ void idle(int value)
     MOVING_FORWARD, TURNING_LEFT, MOVING_FORWARD, MOVING_FORWARD, MOVING_FORWARD, MOVING_FORWARD, MOVING_FORWARD,
     MOVING_FORWARD, MOVING_FORWARD, MOVING_FORWARD,
     SOLVED};
+
+    solve_states = states;
+    #endif
     
     #ifndef DEBUG
     switch(curr_state) {
@@ -607,7 +632,7 @@ void idle(int value)
                 if(finished) {
                     eyes = eyes_maze_start;
                     look_at_pos = old_look_at;
-                    curr_state = states[state_counter];
+                    curr_state = solve_states[state_counter];
                 }
 
                 model_view = *look_at(&eyes, &look_at_pos, &up_vec);
@@ -654,7 +679,7 @@ void idle(int value)
                     look_at_pos = *mat_mult_vec(trans_mat, &look_at_pos);
                 } else {
                     state_counter++;
-                    curr_state = states[state_counter];
+                    curr_state = solve_states[state_counter];
                     old_look_at = look_at_pos;
                     mv_counter = 0.0;
                 }
@@ -684,7 +709,7 @@ void idle(int value)
                     else if(curr_forward == WEST) temp_fwd = NORTH;
                     else if(curr_forward == NORTH) temp_fwd = EAST;
                     state_counter++;
-                    curr_state = states[state_counter];
+                    curr_state = solve_states[state_counter];
                     old_look_at = look_at_pos;
                     rot_amnt = 0.0;
                     curr_forward = temp_fwd;
@@ -716,7 +741,7 @@ void idle(int value)
                     else if(curr_forward == WEST) temp_fwd = SOUTH;
                     else if(curr_forward == NORTH) temp_fwd = WEST;
                     state_counter++;
-                    curr_state = states[state_counter];
+                    curr_state = solve_states[state_counter];
                     old_look_at = look_at_pos;
                     rot_amnt = 0.0;
                     curr_forward = temp_fwd;

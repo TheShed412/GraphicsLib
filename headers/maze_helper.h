@@ -63,6 +63,8 @@ int get_total_verts();
 
 pos_tex* rotate_pos_verts(pos_tex* tex_pos, int num_verts, GLfloat rot);
 
-cell* get_cell(const cell** maze, int x, int y, int size);
+cell* get_cell(cell** maze, int x, int y, int size);
+
+enum state* right_hand_rule(cell** maze, int size);
 
 #endif
