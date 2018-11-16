@@ -16,7 +16,7 @@
 /* for the circle, vertices are 3 x numTriangles */
 /* for the cone, vertices are 6 x numTriangles */
 #define NUM_VERTICES 36
-#define DEBUG
+//#define DEBUG
 
 enum direction {FORWARD, BACKWARDS, RIGHT, LEFT};
 
@@ -49,7 +49,7 @@ mat4 id =             {1, 0, 0, 0,
                         0, 0, 0, 1};
 
 vec4 eyes_maze_start = {-11.5, 7, -10, 1};
-vec4 look_at_maze_start = {10, 7, -10, 1};
+vec4 look_at_maze_start = {100, 7, -10, 1};
 vec4 orbit_stop = {20, 20, 0, 1};
 #ifndef DEBUG
 vec4 eyes = {0, 20, -20, 1};// starting point {-10, 11, -10, 1}
@@ -57,7 +57,7 @@ vec4 look_at_pos = {0, 0, 0, 1};// starting point {0, 11, -10, 1}
 #else
 // orbit stop point: {20, 20, 0, 1}
 vec4 eyes = {-11.5, 7, -10, 1};// starting point {-10, 11, -10, 1}
-vec4 look_at_pos = {-10, 7, -10, 1};
+vec4 look_at_pos = {100, 7, -10, 1};
 #endif
 vec4 up_vec = {0, 1, 0, 1};
 vec4 to_maze_look;
@@ -751,7 +751,7 @@ void idle(int value)
         if(start_solve) {
             GLfloat theta = vec_angle_btw(old_look_at.vec[X], old_look_at.vec[Z], look_at_pos.vec[X], look_at_pos.vec[Z]);
 
-            if (theta <= M_PI) {
+            if (theta <= M_PI/2) {
                 trans_mat = get_rotation_matrix(-0.02, Y);
             } else {
                 finished = 1;
