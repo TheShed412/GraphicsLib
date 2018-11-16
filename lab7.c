@@ -102,27 +102,23 @@ vec4* generate_color_normals(const vec4* shape_verts, int num_vertices)
 
     vec4 *colors = (vec4 *) malloc(sizeof(vec4) * num_vertices);
 
-    for(i = 0; i < num_vertices / 3; i++)
+    for(i = 0; i < num_vertices; i++)
     {
         vec4 vert1 = shape_verts[index];
-        vec4 vert2 = shape_verts[index+1];
-        vec4 vert3 = shape_verts[index+2];
 
-        vec4* vector1 = vec_sub(&vert2, &vert1);
-        vec4* vector2 = vec_sub(&vert3, &vert2);
+        vec4* vector1 = vec_sub(&vert1, &origin);
         vector1->vec[W] = 0;
-        vector2->vec[W] = 0;
 
-        vec4* color_norm = vec_cross(vector1, vector2);
+        //vec4* color_norm = vec_cross(vector1, vector2);
 
-        r = color_norm->vec[X]*300;
-        g = color_norm->vec[Y]*300;
-        b = color_norm->vec[Z]*300;
+        r = vector1->vec[X];
+        g = vector1->vec[Y];
+        b = vector1->vec[Z];
 
         colors[index] = (vec4){r, g, b, 1.0};
-        colors[index + 1] = (vec4){r, g, b, 1.0};
-        colors[index + 2] = (vec4){r, g, b, 1.0};
-        index += 3;
+        // colors[index + 1] = (vec4){r, g, b, 1.0};
+        // colors[index + 2] = (vec4){r, g, b, 1.0};
+        index += 1;
     }
 
     return colors;
