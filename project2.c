@@ -18,7 +18,7 @@
 #define NUM_VERTICES 36
 #define DELTA 0.01
 //#define DEBUG
-//#define AUTO_SOLVER
+#define AUTO_SOLVER
 
 enum direction {FORWARD, BACKWARDS, RIGHT, LEFT};
 
@@ -443,9 +443,7 @@ void init(void)
 {
     GLubyte*** grass_tex = get_textures();  
     cell** maze = make_maze();
-    print_maze(maze);
     solve_states = right_hand_rule(maze, 8);
-    print_states(solve_states);
     GLuint program = initShader("shaders/vshader_proj2.glsl", "shaders/fshader_proj2.glsl");
     glUseProgram(program);
 
@@ -694,7 +692,7 @@ void idle(int value)
 
                 GLfloat theta = vec_angle_btw(old_look_at.vec[X], old_look_at.vec[Z], look_at_pos.vec[X], look_at_pos.vec[Z]);
 
-                if (theta <= (M_PI/2 + DELTA)) {
+                if (theta <= (M_PI/2 - DELTA)) {
                     trans_mat = get_rotation_matrix(-0.02, Y);
                 } else {
                     finished = 1;

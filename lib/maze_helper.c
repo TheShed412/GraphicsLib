@@ -17,10 +17,7 @@ static int total_world_vertices = 0;
 
 #define MAX_REC_INDEX 8
 
-static void rec_maze_builder(cell** maze, int start_vert, int end_vert, int start_hor, int end_hor);
-static void rec_maze_builder_vert(cell** maze, int start_vert, int end_vert, int start_hor, int end_hor);
-static void rec_maze_builder_hor(cell** maze, int start_vert, int end_vert, int start_hor, int end_hor);
-static void divide(cell** maze, int x, int y, int w, int h, enum ort orientation);
+static void rec_maze_builder(cell** maze, int x, int y, int w, int h, enum ort orientation);
 
 int get_total_verts() {
     return total_world_vertices;
@@ -276,7 +273,8 @@ vec2* get_tex_verts(const pos_tex* tex_pos, int size) {
 
 /* makes an 8x8 maze */
 cell** make_maze() {
-    int time_rand = 1542258418;
+    // 1542258418
+    int time_rand = time(0);
     srand(time_rand);
     printf("time: %d\n", time_rand);
 
@@ -304,12 +302,12 @@ cell** make_maze() {
     /* entrance and exit */
 
     /* uncomment when other things are done */
-    divide(maze_arr, 0, 0, MAX_REC_INDEX, MAX_REC_INDEX, choose_ort(MAX_REC_INDEX, MAX_REC_INDEX));
+    rec_maze_builder(maze_arr, 0, 0, MAX_REC_INDEX, MAX_REC_INDEX, choose_ort(MAX_REC_INDEX, MAX_REC_INDEX));
 
     return maze_arr;
 }
 
-static void divide(cell** maze, int x, int y, int w, int h, enum ort orientation) {
+static void rec_maze_builder(cell** maze, int x, int y, int w, int h, enum ort orientation) {
     if (w <= 1 || h <= 1) 
         return;
 
@@ -353,13 +351,13 @@ static void divide(cell** maze, int x, int y, int w, int h, enum ort orientation
     int next_y = y;
     int next_w = (is_horizontal) ? w : wall_x-x+1;
     int next_h = (is_horizontal) ? wall_y-y+1 : h;
-    divide(maze, next_x, next_y, next_w, next_h, choose_ort(w, h));
+    rec_maze_builder(maze, next_x, next_y, next_w, next_h, choose_ort(w, h));
 
     next_x = (is_horizontal) ? x : wall_x+1;
     next_y = (is_horizontal) ? wall_y+1 : y;
     next_w = (is_horizontal) ? w : x+w-wall_x-1;
     next_h = (is_horizontal) ? y+h-wall_y-1 : h;
-    divide(maze, next_x, next_y, next_w, next_h, choose_ort(w, h));
+    rec_maze_builder(maze, next_x, next_y, next_w, next_h, choose_ort(w, h));
 }
 
 void print_cell(const cell* cell_print) {
@@ -526,87 +524,86 @@ cell* get_cell(cell** maze, int x, int y, int size) {
     ret_cell->west_wall = curr_cell.west_wall;
     ret_cell->south_wall = curr_cell.south_wall;
     ret_cell->north_wall = curr_cell.north_wall;
-    printf("Before:\n");
-    print_cell(ret_cell);
 
-    if(!ret_cell->east_wall && x > 0) {
-        ret_cell->east_wall = maze[x-1][y].west_wall;
+    if(!ret_cell->east_wall && x < size-1) {
+        cell temp = maze[x+1][y];
+        ret_cell->east_wall = temp.west_wall;
     }
-    if(!ret_cell->west_wall && x < size-1) {
-        ret_cell->west_wall = maze[x+1][y].east_wall;
-    }
-
-    if(!ret_cell->south_wall && y > 0) {
-        ret_cell->south_wall = maze[x][y-1].north_wall;
-    }
-    if(!ret_cell->north_wall && y < size-1) {
-        ret_cell->north_wall = maze[x][y+1].south_wall;
+    if(!ret_cell->west_wall && x > 0) {
+        cell temp = maze[x-1][y];
+        ret_cell->west_wall = temp.east_wall;
     }
 
-    printf("After:\n");
-    print_cell(ret_cell);
-    printf("x: %d y: %d\n\n", x, y);
+    if(!ret_cell->south_wall && y < size-1) {
+        cell temp = maze[x][y+1];
+        ret_cell->south_wall = temp.north_wall;
+    }
+    if(!ret_cell->north_wall && y > 0) {
+        cell temp =  maze[x][y-1];
+        ret_cell->north_wall = temp.south_wall;
+    }
+
     return ret_cell;
 }
 
 static GLboolean right_open(const cell* curr_cell, enum cardinal* curr_for) {
     if (*curr_for == EAST) {
-        *curr_for = SOUTH;
-        return curr_cell->south_wall;
+        if (!curr_cell->south_wall) *curr_for = SOUTH;
+        return !curr_cell->south_wall;
     } else if (*curr_for == SOUTH) {
-        *curr_for = WEST;
-        return curr_cell->west_wall;
+        if(!curr_cell->west_wall) *curr_for = WEST;
+        return !curr_cell->west_wall;
     } else if (*curr_for == WEST) {
-        *curr_for = NORTH;
-        return curr_cell->north_wall;
+        if(!curr_cell->north_wall) *curr_for = NORTH;
+        return !curr_cell->north_wall;
     } else { //if north
-        *curr_for = EAST;
-        return curr_cell->east_wall;
+        if(!curr_cell->east_wall) *curr_for = EAST;
+        return !curr_cell->east_wall;
     }
 }
 
 static GLboolean forward_open(const cell* curr_cell, enum cardinal* _curr_for) {
     enum cardinal curr_for = *_curr_for;
     if (curr_for == EAST) {
-        return curr_cell->east_wall;
+        return !curr_cell->east_wall;
     } else if (curr_for == SOUTH) {
-        return curr_cell->south_wall;
+        return !curr_cell->south_wall;
     } else if (curr_for == WEST) {
-        return curr_cell->west_wall;
+        return !curr_cell->west_wall;
     } else { //if north
-        return curr_cell->north_wall;
+        return !curr_cell->north_wall;
     }
 }
 
 static GLboolean left_open(const cell* curr_cell, enum cardinal* curr_for) {
     if (*curr_for == EAST) {
-        *curr_for = NORTH;
-        return curr_cell->north_wall;
+        if(!curr_cell->north_wall) *curr_for = NORTH;
+        return !curr_cell->north_wall;
     } else if (*curr_for == SOUTH) {
-        *curr_for = EAST;
-        return curr_cell->east_wall;
+        if(!curr_cell->east_wall) *curr_for = EAST;
+        return !curr_cell->east_wall;
     } else if (*curr_for == WEST) {
-        *curr_for = SOUTH;
-        return curr_cell->south_wall;
+        if(!curr_cell->south_wall) *curr_for = SOUTH;
+        return !curr_cell->south_wall;
     } else { //if north
-        *curr_for = WEST;
-        return curr_cell->west_wall;
+        if(!curr_cell->west_wall) *curr_for = WEST;
+        return !curr_cell->west_wall;
     }
 }
 
 static GLboolean back_open(const cell* curr_cell, enum cardinal* curr_for) {
     if (*curr_for == EAST) {
-        *curr_for = WEST;
-        return curr_cell->west_wall;
+        if(!curr_cell->west_wall) *curr_for = WEST;
+        return !curr_cell->west_wall;
     } else if (*curr_for == SOUTH) {
-        *curr_for = NORTH;
-        return curr_cell->north_wall;
+        if(!curr_cell->north_wall) *curr_for = NORTH;
+        return !curr_cell->north_wall;
     } else if (*curr_for == WEST) {
-        *curr_for = EAST;
-        return curr_cell->east_wall;
+        if(!curr_cell->east_wall) *curr_for = EAST;
+        return !curr_cell->east_wall;
     } else { //if north
-        *curr_for = SOUTH;
-        return curr_cell->south_wall;
+        if(!curr_cell->south_wall) *curr_for = SOUTH;
+        return !curr_cell->south_wall;
     }
 }
 
