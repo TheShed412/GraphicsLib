@@ -7,6 +7,8 @@
 
 enum cardinal{NORTH, SOUTH, EAST, WEST};
 
+enum state {ORBITING, ORBIT_STOPPED, MOVING_TO_MAZE, MOVING_FORWARD, TURNING_RIGHT, TURNING_LEFT, SOLVED};
+
 typedef struct {
     GLboolean north_wall;
     GLboolean south_wall;

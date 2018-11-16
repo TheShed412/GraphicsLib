@@ -543,3 +543,59 @@ cell* get_cell(const cell** maze, int x, int y, int size) {
 
     return ret_cell;
 }
+
+static GLboolean right_open(const cell* curr_cell, enum cardinal curr_for) {
+    if (curr_for == EAST) {
+        return curr_cell->south_wall;
+    } else if (curr_for == SOUTH) {
+        return curr_cell->west_wall;
+    } else if (curr_for == WEST) {
+        return curr_cell->north_wall;
+    } else { //if north
+        return curr_cell->east_wall;
+    }
+}
+
+static GLboolean forward_open(const cell* curr_cell, enum cardinal curr_for) {
+    if (curr_for == EAST) {
+        return curr_cell->east_wall;
+    } else if (curr_for == SOUTH) {
+        return curr_cell->south_wall;
+    } else if (curr_for == WEST) {
+        return curr_cell->west_wall;
+    } else { //if north
+        return curr_cell->north_wall;
+    }
+}
+
+static GLboolean left_open(const cell* curr_cell, enum cardinal curr_for) {
+    if (curr_for == EAST) {
+        return curr_cell->north_wall;
+    } else if (curr_for == SOUTH) {
+        return curr_cell->east_wall;
+    } else if (curr_for == WEST) {
+        return curr_cell->south_wall;
+    } else { //if north
+        return curr_cell->west_wall;
+    }
+}
+
+enum state* right_hand_rule(const cell** maze, int size) {
+    enum state* directions = calloc(256, 256*sizeof(enum state));// arbitrary size cause it stops at the solved state
+    int bounds = size-1;
+    int x = 0;
+    int y = 0;
+    int dir_index = 1;
+    directions[0] = MOVING_FORWARD;// always move forward from starting position
+    enum cardinal curr_forward = EAST; // starting facing east
+
+    while(x < bounds && y < bounds) {
+        cell* curr_cell = get_cell(maze, x, y, size);
+
+
+
+        free(curr_cell);
+    }
+
+    return directions;
+}

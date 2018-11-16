@@ -21,8 +21,6 @@
 
 enum direction {FORWARD, BACKWARDS, RIGHT, LEFT};
 
-enum state {ORBITING, ORBIT_STOPPED, MOVING_TO_MAZE, MOVING_FORWARD, TURNING_RIGHT, TURNING_LEFT, SOLVED};
-
 typedef struct {
     int i;
     int j;
@@ -564,7 +562,6 @@ void idle(int value)
     SOLVED};
     
     #ifndef DEBUG
-    // enum state {ORBITING, ORBIT_STOPPED, MOVING_TO_MAZE, MOVING_FORWARD, TURNING_RIGHT, TURNING_LEFT, SOLVED};
     switch(curr_state) {
         case ORBITING:
             {
