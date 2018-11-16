@@ -13,18 +13,22 @@ mat4* look_at(const vec4* eye_pos, const vec4* look_at_pos, const vec4* up_vecto
     ret_mat->cols[COL1].vec[X] = right_vector->vec[X];
     ret_mat->cols[COL2].vec[X] = right_vector->vec[Y];
     ret_mat->cols[COL3].vec[X] = right_vector->vec[Z];
+    ret_mat->cols[COL4].vec[X] = 0;
 
     ret_mat->cols[COL1].vec[Y] = up_normal->vec[X];
     ret_mat->cols[COL2].vec[Y] = up_normal->vec[Y];
     ret_mat->cols[COL3].vec[Y] = up_normal->vec[Z];
+    ret_mat->cols[COL4].vec[Y] = 0;
 
     ret_mat->cols[COL1].vec[Z] = -look_dir_norm->vec[X];
     ret_mat->cols[COL2].vec[Z] = -look_dir_norm->vec[Y];
     ret_mat->cols[COL3].vec[Z] = -look_dir_norm->vec[Z];
+    ret_mat->cols[COL4].vec[Z] = 0;
 
     ret_mat->cols[COL4].vec[X] = -vec_mult(right_vector, eye_pos);
     ret_mat->cols[COL4].vec[Y] = -vec_mult(up_normal, eye_pos);
-    ret_mat->cols[COL4].vec[Z] = vec_mult(look_dir_norm, eye_pos);
+    ret_mat->cols[COL4].vec[Z] = vec_mult(eye_pos, look_dir_norm);
+    ret_mat->cols[COL4].vec[W] = 1;
 
     return ret_mat;
 }

@@ -16,9 +16,11 @@
 /* for the circle, vertices are 3 x numTriangles */
 /* for the cone, vertices are 6 x numTriangles */
 #define NUM_VERTICES 36
-//#define DEBUG
+#define DEBUG
 
 enum direction {FORWARD, BACKWARDS, RIGHT, LEFT};
+
+enum state {ORBITING, ORBIT_STOPPED, MOVING_TO_MAZE, MOVING_FORWARD, TURNING_RIGHT, TURNING_LEFT, SOLVED};
 
 typedef struct {
     int i;
@@ -46,22 +48,27 @@ mat4 id =             {1, 0, 0, 0,
                         0, 0, 1, 0,
                         0, 0, 0, 1};
 
-vec4 eyes_maze_start = {-10, 11, -10, 1};
-vec4 look_at_maze_start = {0, 11, -10, 1};
+vec4 eyes_maze_start = {-11.5, 7, -10, 1};
+vec4 look_at_maze_start = {10, 7, -10, 1};
+vec4 orbit_stop = {20, 20, 0, 1};
 #ifndef DEBUG
 vec4 eyes = {0, 20, -20, 1};// starting point {-10, 11, -10, 1}
-#else
-vec4 eyes = {0, 20, -20, 1};// starting point {-10, 11, -10, 1}
-#endif
 vec4 look_at_pos = {0, 0, 0, 1};// starting point {0, 11, -10, 1}
+#else
+// orbit stop point: {20, 20, 0, 1}
+vec4 eyes = {-11.5, 7, -10, 1};// starting point {-10, 11, -10, 1}
+vec4 look_at_pos = {10, 7, -10, 1};
+#endif
 vec4 up_vec = {0, 1, 0, 1};
 vec4 to_maze_look;
+
+enum state curr_state = ORBITING;
 
 vec4* bottom(int num_vertices, GLfloat twist, int axis);
 void init(void);
 void display(void);
 void keyboard(unsigned char key, int mousex, int mousey);
-void idle(void);
+void idle(int);
 pos_tex* all_pillars();
 
 int total_vertices = 0;
@@ -77,7 +84,7 @@ int main(int argc, char **argv)
     init();
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
-    glutIdleFunc(idle);
+    glutTimerFunc(1, idle, 0);
     glutMainLoop();
 
     return 0;
@@ -549,114 +556,261 @@ void display(void)
     glutSwapBuffers();
 }
 
+GLfloat vec_mag(const vec4* vec) {
+    GLfloat x = vec->vec[X];
+    GLfloat y = vec->vec[Y];
+    GLfloat z = vec->vec[Z];
+    GLfloat w = vec->vec[W];
+    return sqrt(x*x + y*y + z*z);
+}
+
+GLfloat vec_angle_btw(GLfloat x1, GLfloat z1, GLfloat x2, GLfloat z2) {
+
+    if(x1 == x2 && z1==z2) return 0.0;
+
+    GLfloat mag_vec1 = sqrt(x1*x1 + z1*z1);
+    GLfloat mag_vec2 =  sqrt(x2*x2 + z2*z2);
+
+    GLfloat dot_prod = x1*x2 + z1*z2;
+
+    GLfloat val = dot_prod/(mag_vec1 * mag_vec2);
+
+    return acos(val);
+}
+
 GLfloat spin = 0.015;
 GLfloat spin_total = 0.0;
 GLfloat left_spin_total = 0.0;
-GLboolean move_to_maze = GL_FALSE;
 GLboolean start_solve = GL_FALSE;
 GLfloat move = 0.01;
 GLfloat east_move_tracker = 0;
 GLfloat south_move_tracker = 0;
 
-GLboolean move_east(GLfloat dist) {
-    if (east_move_tracker < dist) {
-        mat4* forward_mat = get_translation_matrix(east_move_tracker, 0, 0);
-        eyes = *mat_mult_vec(forward_mat, &eyes);  
-        look_at_maze_start = *mat_mult_vec(forward_mat, &look_at_maze_start);
-        model_view = *look_at(&eyes, &look_at_maze_start, &up_vec);
-        east_move_tracker += move;
-    } else {
-        //move_tracker = 0.0;
-        return GL_TRUE;
-    }
-    return GL_FALSE;
-}
-
-GLboolean move_south() {
-    if (south_move_tracker < 0.61) {
-        mat4* forward_mat = get_translation_matrix(0, 0, south_move_tracker);
-        eyes = *mat_mult_vec(forward_mat, &eyes);  
-        look_at_maze_start = *mat_mult_vec(forward_mat, &look_at_maze_start);
-        model_view = *look_at(&eyes, &look_at_maze_start, &up_vec);
-        south_move_tracker += move;
-    } else {
-        //move_tracker = 0.0;
-        return GL_TRUE;
-    }
-    return GL_FALSE;
-}
-
-GLboolean turn_right(GLfloat amt) {
-    if (spin_total < amt) {
-        mat4* rot_mat = arbitrary_rotate(spin_total, &up_vec);
-        look_at_maze_start = *mat_mult_vec(rot_mat, &look_at_maze_start);  
-        model_view = *look_at(&eyes, &look_at_maze_start, &up_vec);
-        spin_total += spin/10;
-    } else {
-        //spin_total = 0.0;
-        return GL_TRUE;
-    }
-    return GL_FALSE;
-}
-
-GLboolean turn_left() {
-    if (left_spin_total < 0.016) {
-        mat4* rot_mat = arbitrary_rotate(-spin, &up_vec);
-        look_at_maze_start = *mat_mult_vec(rot_mat, &look_at_maze_start);  
-        model_view = *look_at(&eyes, &look_at_maze_start, &up_vec);
-        left_spin_total += spin/100;
-    } else {
-        //spin_total = 0.0;
-        return GL_TRUE;
-    }
-
-    return GL_FALSE;
-}
 
 GLfloat east_dist = 0.17;
 GLboolean done = GL_FALSE;
+GLfloat move_dist = 0;
+GLfloat fwd_dist = 1.35 * 2;
+GLfloat mv_counter = 0.0;
+GLfloat rot_amnt = 0.0;
+int state_counter = 0;
+vec4 old_look_at = {10, 7, -10, 1};
+enum cardinal curr_forward = EAST;
 
-void idle(void) 
+int test = 0;
+void idle(int value) 
 {
-    //if (move_to_maze) {
-        // mat4* trans_mat = &id;
-        // //if (eyes.vec[Y] >= to_maze_look.vec[Y]) {
-        //     trans_mat = get_translation_matrix(to_maze_look.vec[X], to_maze_look.vec[Y], to_maze_look.vec[Z]);
-        //     eyes = *mat_mult_vec(trans_mat, &eyes);
-        // } else {
-        //    // eyes = to_maze_look;
-        // }
-        //mat4* rotation_matrix = get_rotation_matrix(spin, Y); 
-        
-    //     if (start_solve) {
-    //         if (done) {
-    //             if(move_east(east_dist)){
-    //                 turn_right(0.09);
-    //             }
-                
-    //             //east_move_tracker = 1222;
-    //         }
-    //         if(!done && move_east(east_dist)) {
-    //             if(turn_right(0.11)) {
-    //                 if(move_south()) {
-    //                     if (turn_left()) {
-    //                         east_dist = 0.65;
-    //                         east_move_tracker  = 0;
-    //                         done = GL_TRUE;
-    //                         spin_total = 0;
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     } else {
-    //         eyes = eyes_maze_start;
-    //         model_view = *look_at(&eyes, &look_at_maze_start, &up_vec);
-    //     }
-    // }else {
+    glutTimerFunc(1, idle, 0);
+    vec4* dist_vec = &eyes_maze_start;
+    enum state states[] = {MOVING_FORWARD, MOVING_FORWARD, MOVING_FORWARD, MOVING_FORWARD, TURNING_RIGHT, MOVING_FORWARD, TURNING_RIGHT, MOVING_FORWARD, SOLVED};
+    
     #ifndef DEBUG
-    mat4* rotation_matrix = get_rotation_matrix(spin, Y);
-    eyes = *mat_mult_vec(rotation_matrix, &eyes);
-    model_view = *look_at(&eyes, &look_at_pos, &up_vec);
+    // enum state {ORBITING, ORBIT_STOPPED, MOVING_TO_MAZE, MOVING_FORWARD, TURNING_RIGHT, TURNING_LEFT, SOLVED};
+    switch(curr_state) {
+        case ORBITING:
+            {
+                mat4* rotation_matrix = get_rotation_matrix(spin, Y);
+                eyes = *mat_mult_vec(rotation_matrix, &eyes);
+                model_view = *look_at(&eyes, &look_at_pos, &up_vec);
+                if (start_solve) 
+                    curr_state = ORBIT_STOPPED;
+            }
+        break;
+        case ORBIT_STOPPED:
+            {
+                if(!(eyes.vec[Z] >= -0.07 && eyes.vec[Z] <= 0.13 && eyes.vec[X] < 0)) {
+                    mat4* rotation_matrix = get_rotation_matrix(spin, Y);
+                    eyes = *mat_mult_vec(rotation_matrix, &eyes);
+                    model_view = *look_at(&eyes, &look_at_pos, &up_vec);
+                } else {
+                    curr_state = MOVING_TO_MAZE;
+                    vec4* dist_vec = vec_sub(&eyes_maze_start, &eyes);
+                    move_dist = vec_mag(dist_vec)*2;
+                }
+            }
+        break;
+        // vec4 eyes = {0, 20, -20, 1}; start
+        // vec4 eyes = {-11.5, 7, -10, 1}; end
+        case MOVING_TO_MAZE:
+            {   
+                int finished = 0;
+                look_at_pos = look_at_maze_start;
+                mat4* trans_mat;
+                if(!(eyes.vec[Y] < 7.1 && eyes.vec[Y] > 6.9)) {
+                    trans_mat = get_translation_matrix(0, -dist_vec->vec[Y]/move_dist, 0);
+                } else if(!(eyes.vec[Z] < -9.9 && eyes.vec[Z] > -10.2)) {
+                    trans_mat = get_translation_matrix(0, 0, dist_vec->vec[Z]/move_dist);
+                } else if (!(eyes.vec[X] > -11.7 && eyes.vec[X] < -11.3)) {
+                    trans_mat = get_translation_matrix(-dist_vec->vec[X]/move_dist, 0, 0);
+                } else {
+                    trans_mat = get_translation_matrix(0, 0, 0);
+                    finished = 1;
+                }
+                eyes = *mat_mult_vec(trans_mat, &eyes);
+
+                if(finished) {
+                    eyes = eyes_maze_start;
+                    curr_state = states[state_counter];
+                }
+
+                model_view = *look_at(&eyes, &look_at_pos, &up_vec);
+            }
+        break;
+        case MOVING_FORWARD:
+            {
+                mat4* trans_mat;
+                int finished = 0;
+
+                if(curr_forward == EAST) {
+                    
+                    if(mv_counter >= fwd_dist) {
+                        finished = 1;
+                    } else {
+                        trans_mat = get_translation_matrix(0.05, 0, 0);
+                        mv_counter += 0.05;
+                    }
+                } else if (curr_forward == WEST) {
+                    if(mv_counter >= fwd_dist) {
+                        finished = 1;
+                    } else {
+                        trans_mat = get_translation_matrix(-0.05, 0, 0);
+                        mv_counter += 0.05;
+                    }
+                } else if (curr_forward == NORTH) {
+                    if(mv_counter >= fwd_dist) {
+                        finished = 1;
+                    } else {
+                        trans_mat = get_translation_matrix(0, 0, -0.05);
+                        mv_counter += 0.05;
+                    }
+                } else if (curr_forward == SOUTH) {
+                    if(mv_counter >= fwd_dist) {
+                        finished = 1;
+                    } else {
+                        trans_mat = get_translation_matrix(0, 0, 0.05);
+                        mv_counter += 0.05;
+                    }
+                }
+
+                if(!finished) {
+                    eyes = *mat_mult_vec(trans_mat, &eyes);
+                    look_at_pos = *mat_mult_vec(trans_mat, &look_at_pos);
+                } else {
+                    state_counter++;
+                    curr_state = states[state_counter];
+                    old_look_at = look_at_pos;
+                    mv_counter = 0.0;
+                }
+
+                model_view = *look_at(&eyes, &look_at_pos, &up_vec);
+            }
+        break;
+        case TURNING_RIGHT:
+            {
+                mat4* trans_mat;
+                int finished = 0;
+
+                GLfloat theta = vec_angle_btw(old_look_at.vec[X], old_look_at.vec[Z], look_at_pos.vec[X], look_at_pos.vec[Z]);
+
+                if (theta <= 2.05) {
+                    trans_mat = arbitrary_rotate(0.02, &up_vec);
+                } else {
+                    finished = 1;
+                }
+
+                if(!finished) {
+                    look_at_pos = *mat_mult_vec(trans_mat, &look_at_pos);
+                } else {
+                    enum cardinal temp_fwd;
+                    if(curr_forward == EAST) temp_fwd = SOUTH;
+                    else if(curr_forward == SOUTH) temp_fwd = WEST;
+                    else if(curr_forward == WEST) temp_fwd = NORTH;
+                    else if(curr_forward == NORTH) temp_fwd = EAST;
+                    state_counter++;
+                    curr_state = states[state_counter];
+                    old_look_at = look_at_pos;
+                    rot_amnt = 0.0;
+                    curr_forward = temp_fwd;
+                }
+
+                model_view = *look_at(&eyes, &look_at_pos, &up_vec);
+
+            }
+        break;
+        case TURNING_LEFT:
+            {
+                mat4* trans_mat;
+                int finished = 0;
+
+                GLfloat theta = vec_angle_btw(old_look_at.vec[X], old_look_at.vec[Z], look_at_pos.vec[X], look_at_pos.vec[Z]);
+
+                if (theta <= M_PI/2) {
+                    trans_mat = arbitrary_rotate(-0.02, &up_vec);
+                } else {
+                    finished = 1;
+                }
+
+                if(!finished) {
+                    look_at_pos = *mat_mult_vec(trans_mat, &look_at_pos);
+                } else {
+                    enum cardinal temp_fwd;
+                    if(curr_forward == EAST) temp_fwd = NORTH;
+                    else if(curr_forward == SOUTH) temp_fwd = EAST;
+                    else if(curr_forward == WEST) temp_fwd = SOUTH;
+                    else if(curr_forward == NORTH) temp_fwd = WEST;
+                    state_counter++;
+                    curr_state = states[state_counter];
+                    old_look_at = look_at_pos;
+                    rot_amnt = 0.0;
+                    curr_forward = temp_fwd;
+                }
+
+                model_view = *look_at(&eyes, &look_at_pos, &up_vec);
+
+            }
+        break;
+        case SOLVED:
+            {
+                mat4* trans_mat;
+                int finished = 0;
+
+                GLfloat theta = vec_angle_btw(old_look_at.vec[X], old_look_at.vec[Z], look_at_pos.vec[X], look_at_pos.vec[Z]);
+
+                if (theta <= M_PI - 0.05) {
+                    trans_mat = arbitrary_rotate(0.02, &up_vec);
+                } else {
+                    finished = 1;
+                }
+
+                if(!finished) {
+                    look_at_pos = *mat_mult_vec(trans_mat, &look_at_pos);
+                } else {
+                    look_at_pos = *mat_mult_vec(&id, &look_at_pos);
+                }
+
+                model_view = *look_at(&eyes, &look_at_pos, &up_vec);
+
+            }
+        break;
+    }
+    #else
+        mat4* trans_mat;
+        int finished = 0;
+        if(start_solve) {
+            GLfloat theta = vec_angle_btw(old_look_at.vec[X], old_look_at.vec[Z], look_at_pos.vec[X], look_at_pos.vec[Z]);
+
+            if (theta <= M_PI/2) {
+                trans_mat = arbitrary_rotate(0.02, &up_vec);
+            } else {
+                finished = 1;
+            }
+
+            if(!finished) {
+                    look_at_pos = *mat_mult_vec(trans_mat, &look_at_pos);
+            }
+
+            model_view = *look_at(&eyes, &look_at_pos, &up_vec);
+        }
     #endif
     glutPostRedisplay();
 }
@@ -670,13 +824,7 @@ void keyboard(unsigned char key, int mousex, int mousey)
     	exit(0);
     
     if(key == ' '){
-        move_to_maze = GL_TRUE;
-    }
-
-    if(move_to_maze) {
-        if(key == 's'){
-            start_solve = GL_TRUE;
-        }
+        start_solve = GL_TRUE;
     }
 
     glutPostRedisplay();

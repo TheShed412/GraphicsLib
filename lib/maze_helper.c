@@ -276,7 +276,7 @@ vec2* get_tex_verts(const pos_tex* tex_pos, int size) {
 
 /* makes an 8x8 maze */
 cell** make_maze() {
-    int time_rand = time(0);
+    int time_rand = 1542258418;
     srand(time_rand);
     printf("time: %d\n", time_rand);
 
@@ -433,7 +433,7 @@ pos_tex* ground_with_tex() {
     pos_tex* starting_cube = single_cube_texture(GRASS);
     vec4* starting_cube_pos = get_pos_verts(starting_cube, VERTS_IN_CUBE);
     starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, 0.8, 0.1, 0.8);
-    starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, 100, 100, 100);
+    starting_cube_pos = scale_vertices(starting_cube_pos, VERTS_IN_CUBE, 110, 110, 110);
 
     for (int i = 0; i < VERTS_IN_CUBE; i++) {
         starting_cube[i].pos_vert = starting_cube_pos[i];
