@@ -57,7 +57,7 @@ vec4 look_at_pos = {0, 0, 0, 1};// starting point {0, 11, -10, 1}
 #else
 // orbit stop point: {20, 20, 0, 1}
 vec4 eyes = {-11.5, 7, -10, 1};// starting point {-10, 11, -10, 1}
-vec4 look_at_pos = {10, 7, -10, 1};
+vec4 look_at_pos = {-10, 7, -10, 1};
 #endif
 vec4 up_vec = {0, 1, 0, 1};
 vec4 to_maze_look;
@@ -88,54 +88,6 @@ int main(int argc, char **argv)
     glutMainLoop();
 
     return 0;
-}
-
-mat4* arbitrary_rotate(GLfloat z_theta, const vec4* axis) {
-    mat4* final_mat = calloc(1, sizeof(mat4));
-
-    /* step 1: translate to origin */
-    vec4* to_origin = vec_sub(&origin, axis);
-    //mat4* trans_to_origin = get_translation_matrix(to_origin->vec[X], to_origin->vec[Y], to_origin->vec[Z]);
-    //mat4* trans_from_origin = get_translation_matrix(axis->vec[X], axis->vec[Y], axis->vec[Z]);
-    GLfloat size_of_axis = sqrt(axis->vec[X]*axis->vec[X] + axis->vec[Z]*axis->vec[Z] + axis->vec[Y]*axis->vec[Y]);
-    vec4* at_origin = scalar_mult_vec4(axis, 1/size_of_axis);
-
-    /* I might need to check which way to spin on the Y and X axes */
-    /* step 2: rotate around Y axis to the Z-Y plane */
-    GLfloat vx = at_origin->vec[X];
-    GLfloat vz = at_origin->vec[Z];
-    GLfloat vy = at_origin->vec[Y];
-    GLfloat d = sqrt(vy*vy + vz*vz);
-    mat4 rot_to_yz = {1, 0, 0, 0,
-                 0, vz/d, vy/d, 0,
-                 0, -vy/d, vz/d, 0,
-                 0, 0, 0, 1};
-    vec4* at_yz = mat_mult_vec(&rot_to_yz, at_origin);
-
-    /* step 3: rotate around X-axis to the Z,-axis */
-    GLfloat z_adj = sqrt(vz*vz + vx*vx);
-    mat4 rot_to_z = {d, 0, vx, 0,
-                 0, 1, 0, 0,
-                 -vx, 0, d, 0,
-                 0, 0, 0, 1};
-    vec4* at_z = mat_mult_vec(&rot_to_z, at_yz);
-
-    /* step 4: rotate around the Z-axis */
-    mat4* rot_around_z = get_rotation_matrix(-1*z_theta, Z);
-
-    /* step 5: undo everything and multiply to make the mother of all matrices */
-    //mat4* do_rotate_mat = mat4_mult(rot_to_yz, trans_to_origin);
-    mat4*do_rotate_mat = mat4_mult(&rot_to_z, &rot_to_yz);
-    do_rotate_mat = mat4_mult(rot_around_z, do_rotate_mat);
-
-    mat4* rot_from_z = inverse_mat4(&rot_to_z);
-    mat4* rot_from_yz = inverse_mat4(&rot_to_yz);
-
-    mat4* undo_rotate = mat4_mult(rot_from_yz, rot_from_z);
-    //undo_rotate = mat4_mult(trans_from_origin, undo_rotate);
-
-    final_mat = mat4_mult(undo_rotate, do_rotate_mat);
-    return final_mat;
 }
 
 void print_maze(cell** maze)
@@ -713,7 +665,7 @@ void idle(int value)
                 GLfloat theta = vec_angle_btw(old_look_at.vec[X], old_look_at.vec[Z], look_at_pos.vec[X], look_at_pos.vec[Z]);
 
                 if (theta <= 2.05) {
-                    trans_mat = arbitrary_rotate(0.02, &up_vec);
+                    trans_mat = get_rotation_matrix(-0.02, Y);
                 } else {
                     finished = 1;
                 }
@@ -745,7 +697,7 @@ void idle(int value)
                 GLfloat theta = vec_angle_btw(old_look_at.vec[X], old_look_at.vec[Z], look_at_pos.vec[X], look_at_pos.vec[Z]);
 
                 if (theta <= M_PI/2) {
-                    trans_mat = arbitrary_rotate(-0.02, &up_vec);
+                    trans_mat = get_rotation_matrix(0.02, Y);;
                 } else {
                     finished = 1;
                 }
@@ -777,7 +729,7 @@ void idle(int value)
                 GLfloat theta = vec_angle_btw(old_look_at.vec[X], old_look_at.vec[Z], look_at_pos.vec[X], look_at_pos.vec[Z]);
 
                 if (theta <= M_PI - 0.05) {
-                    trans_mat = arbitrary_rotate(0.02, &up_vec);
+                    trans_mat = get_rotation_matrix(-0.02, Y);
                 } else {
                     finished = 1;
                 }
@@ -799,14 +751,14 @@ void idle(int value)
         if(start_solve) {
             GLfloat theta = vec_angle_btw(old_look_at.vec[X], old_look_at.vec[Z], look_at_pos.vec[X], look_at_pos.vec[Z]);
 
-            if (theta <= M_PI/2) {
-                trans_mat = arbitrary_rotate(0.02, &up_vec);
+            if (theta <= M_PI) {
+                trans_mat = get_rotation_matrix(-0.02, Y);
             } else {
                 finished = 1;
             }
 
             if(!finished) {
-                    look_at_pos = *mat_mult_vec(trans_mat, &look_at_pos);
+                look_at_pos = *mat_mult_vec(trans_mat, &look_at_pos);
             }
 
             model_view = *look_at(&eyes, &look_at_pos, &up_vec);
