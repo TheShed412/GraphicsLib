@@ -274,7 +274,7 @@ vec2* get_tex_verts(const pos_tex* tex_pos, int size) {
 /* makes an 8x8 maze */
 cell** make_maze() {
     // 1542258418
-    int time_rand = time(0);
+    int time_rand = 1542258418;
     srand(time_rand);
     printf("time: %d\n", time_rand);
 
@@ -704,7 +704,7 @@ enum state* right_hand_rule(cell** maze, int size) {
     }
     if (curr_forward == EAST) {
         directions[dir_index] = MOVING_FORWARD;//at the end so solved
-        directions[dir_index+2] = SOLVED;
+        directions[dir_index+1] = SOLVED;
     } else {
         directions[dir_index] = TURNING_LEFT;
         directions[dir_index+1] = MOVING_FORWARD;
