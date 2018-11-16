@@ -23,7 +23,7 @@ int get_total_verts() {
     return total_world_vertices;
 }
 
-static enum ort choose_ort(int w, int h) {
+static enum ort random_orientation(int w, int h) {
     if(w < h) {
         return HORZ;
     } else if(h < w) {
@@ -274,7 +274,7 @@ vec2* get_tex_verts(const pos_tex* tex_pos, int size) {
 /* makes an 8x8 maze */
 cell** make_maze() {
     // 1542258418
-    int time_rand = 1542371000;
+    int time_rand = time(0);
     srand(time_rand);
     printf("time: %d\n", time_rand);
 
@@ -302,7 +302,7 @@ cell** make_maze() {
     /* entrance and exit */
 
     /* uncomment when other things are done */
-    rec_maze_builder(maze_arr, 0, 0, MAX_REC_INDEX, MAX_REC_INDEX, choose_ort(MAX_REC_INDEX, MAX_REC_INDEX));
+    rec_maze_builder(maze_arr, 0, 0, MAX_REC_INDEX, MAX_REC_INDEX, random_orientation(MAX_REC_INDEX, MAX_REC_INDEX));
 
     return maze_arr;
 }
@@ -313,20 +313,29 @@ static void rec_maze_builder(cell** maze, int x, int y, int w, int h, enum ort o
 
     GLboolean is_horizontal = orientation == HORZ;
 
-    int wall_x = (is_horizontal) ? 0 : rand() % (w-1);
-    int wall_y = (is_horizontal) ? rand() % (h-1) : 0;
+    int wall_x, wall_y, hole_x, hole_y, dir_x, dir_y, wall_len;
+
+    if(is_horizontal) {
+        wall_x = 0;
+        wall_y = rand() % (h-1);
+        hole_x = rand() % (w);
+        hole_y = 0;
+        dir_x = 1;
+        dir_y = 0;
+        wall_len = w;
+    } else {
+        wall_x = rand() % (w-1);
+        wall_y = 0;
+        hole_x = 0;
+        hole_y = rand() % (h);
+        dir_x = 0;
+        dir_y = 1;
+        wall_len = h;
+    }
     wall_x += x;
     wall_y += y;
-
-    int hole_x = (is_horizontal) ? rand() % (w) : 0;
-    int hole_y = (is_horizontal) ? 0 : rand() % (h);
     hole_x += wall_x;
     hole_y += wall_y;
-
-    int dir_x = (is_horizontal) ? 1 : 0;
-    int dir_y = (is_horizontal) ? 0 : 1;
-
-    int wall_len = (is_horizontal) ? w : h;
 
     if (is_horizontal) { // do the east wall
 
@@ -346,18 +355,35 @@ static void rec_maze_builder(cell** maze, int x, int y, int w, int h, enum ort o
         maze[hole_y][hole_x].south_wall = GL_FALSE;
     } 
 
+    int next_x, next_y, next_w, next_h;
 
-    int next_x = x;
-    int next_y = y;
-    int next_w = (is_horizontal) ? w : wall_x-x+1;
-    int next_h = (is_horizontal) ? wall_y-y+1 : h;
-    rec_maze_builder(maze, next_x, next_y, next_w, next_h, choose_ort(w, h));
+    next_x = x;
+    next_y = y;
+    if (is_horizontal) {
+        next_w = w;
+        next_h = wall_y-y+1;
+    } else {
+        next_w = wall_x-x+1;
+        next_h = h;
+    }
+    rec_maze_builder(maze, next_x, next_y, next_w, next_h, random_orientation(w, h));
 
+    if(is_horizontal) {
+        next_x = x;
+        next_y = wall_y+1;
+        next_w = w;
+        next_h = y+h-wall_y-1;
+    } else {
+        next_x = wall_x+1;
+        next_y = y;
+        next_w = x+w-wall_x-1;
+        next_h = h;
+    }
     next_x = (is_horizontal) ? x : wall_x+1;
     next_y = (is_horizontal) ? wall_y+1 : y;
     next_w = (is_horizontal) ? w : x+w-wall_x-1;
     next_h = (is_horizontal) ? y+h-wall_y-1 : h;
-    rec_maze_builder(maze, next_x, next_y, next_w, next_h, choose_ort(w, h));
+    rec_maze_builder(maze, next_x, next_y, next_w, next_h, random_orientation(w, h));
 }
 
 void print_cell(const cell* cell_print) {
