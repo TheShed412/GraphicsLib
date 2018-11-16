@@ -34,6 +34,7 @@ vec4 origin = {0, 0, 0, 0};
 
 
 vec4* genRandomTriangleColors(int num_vertices);
+vec4* generate_color_normals(const vec4* shape_verts, int num_vertices);
 vec4* bottom(int num_vertices, GLfloat twist, int axis);
 void init(void);
 void display(void);
@@ -41,7 +42,6 @@ void keyboard(unsigned char key, int mousex, int mousey);
 void idle(int);
 vec4* tor_band(GLfloat end, GLfloat start);
 void translate_vertices_p1(vec4* vertices, GLfloat x, GLfloat y, GLfloat z);
-void rotate_vertices(vec4* vertices, GLfloat twist, int axis);
 void scale_vertices_p1(vec4* vertices, GLfloat x, GLfloat y, GLfloat z);
 void rotate_n_vertices(vec4* vertices, GLfloat twist, int axis, int num_vertices);
 void mouse(int button, int state, int x, int y);
@@ -95,6 +95,39 @@ vec4* genRandomTriangleColors(int num_vertices)
     return colors;
 }
 
+vec4* generate_color_normals(const vec4* shape_verts, int num_vertices)
+{
+    GLfloat r, g, b;
+    int index = 0, i;
+
+    vec4 *colors = (vec4 *) malloc(sizeof(vec4) * num_vertices);
+
+    for(i = 0; i < num_vertices / 3; i++)
+    {
+        vec4 vert1 = shape_verts[index];
+        vec4 vert2 = shape_verts[index+1];
+        vec4 vert3 = shape_verts[index+2];
+
+        vec4* vector1 = vec_sub(&vert2, &vert1);
+        vec4* vector2 = vec_sub(&vert3, &vert2);
+        vector1->vec[W] = 0;
+        vector2->vec[W] = 0;
+
+        vec4* color_norm = vec_cross(vector1, vector2);
+
+        r = color_norm->vec[X]*300;
+        g = color_norm->vec[Y]*300;
+        b = color_norm->vec[Z]*300;
+
+        colors[index] = (vec4){r, g, b, 1.0};
+        colors[index + 1] = (vec4){r, g, b, 1.0};
+        colors[index + 2] = (vec4){r, g, b, 1.0};
+        index += 3;
+    }
+
+    return colors;
+}
+
 /**
  * From the circle.c file with a couple small changes
 */
@@ -131,13 +164,6 @@ vec4* bottom(int num_vertices, GLfloat twist, int axis)
     return vertices;
 }
 
-void rotate_vertices(vec4* vertices, GLfloat twist, int axis) {
-    vec4 temp;
-    for (int i=0; i < NUM_VERTICES; i++) {
-        temp = vertices[i];
-        vertices[i] = *rotation(&temp, twist, axis);
-    }
-}
 
 void rotate_n_vertices(vec4* vertices, GLfloat twist, int axis, int num_vertices) {
     vec4 temp;
@@ -197,11 +223,11 @@ vec4* tor_band(GLfloat end, GLfloat start) {
 */
 void init(void)
 {
-    GLuint program = initShader("shaders/vshader_proj1.glsl", "shaders/fshader_proj1.glsl");
+    GLuint program = initShader("shaders/vshader_lab7.glsl", "shaders/fshader_lab7.glsl");
     glUseProgram(program);
 
     vec4 *circle_vertices = bottom(NUM_VERTICES, 0, X);
-    vec4 *circle_colors = genRandomTriangleColors(NUM_VERTICES);
+    vec4 *circle_colors = generate_color_normals(circle_vertices, NUM_VERTICES);
     
     GLuint vao;
     glGenVertexArrays(1, &vao);
