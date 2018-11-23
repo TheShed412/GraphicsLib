@@ -37,12 +37,9 @@ vec4 origin = {0, 0, 0, 0};
 vec4* genRandomTriangleColors(int num_vertices);
 void init(void);
 void display(void);
-void keyboard(unsigned char key, int mousex, int mousey);
 void idle(int);
-void mouse(int button, int state, int x, int y);
-void motion(int x, int y);
-vec4* get_ball_vec(int x, int y);
-mat4* arbitrary_rotate(GLfloat z_theta, const vec4* axis);
+void keyboard(unsigned char key, int mousex, int mousey);
+
 
 int main(int argc, char **argv) 
 {
@@ -55,9 +52,7 @@ int main(int argc, char **argv)
     init();
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
-    glutMouseFunc(mouse);
     glutTimerFunc(TIMER, idle, 0);
-    glutMotionFunc(motion);
     glutMainLoop();
 
     return 0;
@@ -94,8 +89,10 @@ void init(void)
 {
     GLuint program = initShader("shaders/vshader_proj3.glsl", "shaders/fshader_proj3.glsl");
     glUseProgram(program);
+    vec4* shape_verts =torus(NUM_VERTICES, 1, Y);
+    shape_verts = rotate_vertices(shape_verts, NUM_VERTICES, 0.5, X);
 
-    vec4 *circle_vertices = torus(NUM_VERTICES, 0, X);
+    vec4 *circle_vertices = shape_verts;
     vec4 *circle_colors = genRandomTriangleColors(NUM_VERTICES);
     
     GLuint vao;
@@ -143,184 +140,21 @@ void display(void)
     glutSwapBuffers();
 }
 
-GLfloat mag(const vec4* vec) {
-
-    GLfloat x_sqr = vec->vec[X] * vec->vec[X];
-    GLfloat y_sqr = vec->vec[Y] * vec->vec[Y];
-    GLfloat z_sqr = vec->vec[Z] * vec->vec[Z];
-
-    return sqrt(x_sqr + y_sqr + z_sqr);
-}
-
-int curr_x = 0;
-int curr_y = 0;
-int prev_x = 0;
-int prev_y = 0;
-int ball_grabbed = 0;
-GLfloat theta = 0.0;
-mat4* rot_mat = NULL;
+GLfloat spin = 0.0;
 
 void idle(int value) 
 {   
     glutTimerFunc(TIMER, idle, 0);
-    if (rot_mat == NULL) {
-        rot_mat = get_rotation_matrix(theta, Y);
-    }
-
-    // if the torus moved
-    if(curr_x != prev_x || curr_y != prev_y) {
-        // get the start and ending vectors
-        vec4* start_vec = get_ball_vec(prev_x, prev_y);
-        vec4* end_vec = get_ball_vec(curr_x, curr_y);
-        vec4* axis = vec_cross(end_vec, start_vec);
-        GLfloat dot_prod = vec_mult(start_vec, end_vec);
-        // dot_prod/mag_a * mag_b
-        theta = acos((dot_prod > 1.0) ? 1.0 : dot_prod);
-
-        prev_x = curr_x;
-        prev_y = curr_y;
-        free(start_vec);
-        free(end_vec);
-        
-        rot_mat = mat4_mult(arbitrary_rotate(theta, axis), rot_mat);
-    }
-    ctm = *rot_mat;
+    mat4* rotation_matrix = get_rotation_matrix(spin, Y);
+    ctm = *rotation_matrix;
+    spin += 0.01;
     glutPostRedisplay();
 }
 
-mat4* arbitrary_rotate(GLfloat z_theta, const vec4* axis) {
-    mat4* final_mat = calloc(1, sizeof(mat4));
-
-    /* step 1: translate to origin */
-    vec4* to_origin = vec_sub(&origin, axis);
-    //mat4* trans_to_origin = get_translation_matrix(to_origin->vec[X], to_origin->vec[Y], to_origin->vec[Z]);
-    //mat4* trans_from_origin = get_translation_matrix(axis->vec[X], axis->vec[Y], axis->vec[Z]);
-    GLfloat size_of_axis = sqrt(axis->vec[X]*axis->vec[X] + axis->vec[Z]*axis->vec[Z] + axis->vec[Y]*axis->vec[Y]);
-    vec4* at_origin = scalar_mult_vec4(axis, 1/size_of_axis);
-
-    /* I might need to check which way to spin on the Y and X axes */
-    /* step 2: rotate around Y axis to the Z-Y plane */
-    GLfloat vx = at_origin->vec[X];
-    GLfloat vz = at_origin->vec[Z];
-    GLfloat vy = at_origin->vec[Y];
-    GLfloat d = sqrt(vy*vy + vz*vz);
-    mat4 rot_to_yz = {1, 0, 0, 0,
-                 0, vz/d, vy/d, 0,
-                 0, -vy/d, vz/d, 0,
-                 0, 0, 0, 1};
-    vec4* at_yz = mat_mult_vec(&rot_to_yz, at_origin);
-
-    /* step 3: rotate around X-axis to the Z,-axis */
-    GLfloat z_adj = sqrt(vz*vz + vx*vx);
-    mat4 rot_to_z = {d, 0, vx, 0,
-                 0, 1, 0, 0,
-                 -vx, 0, d, 0,
-                 0, 0, 0, 1};
-    vec4* at_z = mat_mult_vec(&rot_to_z, at_yz);
-
-    /* step 4: rotate around the Z-axis */
-    mat4* rot_around_z = get_rotation_matrix(-1*z_theta, Z);
-
-    /* step 5: undo everything and multiply to make the mother of all matrices */
-    //mat4* do_rotate_mat = mat4_mult(rot_to_yz, trans_to_origin);
-    mat4*do_rotate_mat = mat4_mult(&rot_to_z, &rot_to_yz);
-    do_rotate_mat = mat4_mult(rot_around_z, do_rotate_mat);
-
-    mat4* rot_from_z = inverse_mat4(&rot_to_z);
-    mat4* rot_from_yz = inverse_mat4(&rot_to_yz);
-
-    mat4* undo_rotate = mat4_mult(rot_from_yz, rot_from_z);
-    //undo_rotate = mat4_mult(trans_from_origin, undo_rotate);
-
-    final_mat = mat4_mult(undo_rotate, do_rotate_mat);
-    return final_mat;
-}
-
-/**
- * From the circle.c file
-*/
-GLfloat scale_up = 1.02;
-GLfloat scale_dn = 1/1.02;
-mat4* scale_mat = NULL;
 void keyboard(unsigned char key, int mousex, int mousey)
 {
-    if(scale_mat == NULL)
-        scale_mat = get_scaling_matrix_con(1);
-    mat4* temp;
-    switch(key) {
-        case 'w':
-            temp = get_scaling_matrix_con(scale_up);
-            scale_mat = mat4_mult(scale_mat, temp);
-        break;
-        case 's':
-            temp = get_scaling_matrix_con(scale_dn);
-            scale_mat = mat4_mult(scale_mat, temp);
-        break;
-        default:
-            scale_mat = get_scaling_matrix_con(1);
-    }
-    scale_ctm = *scale_mat;
     if(key == 'q')
     	exit(0);
 
     glutPostRedisplay();
-}
-
-void mouse(int button, int state, int x, int y) {
-    
-    if(scale_mat == NULL)
-        scale_mat = get_scaling_matrix_con(1);
-    mat4* temp;
-    switch(button) {
-        case 3:
-            temp = get_scaling_matrix_con(scale_up);
-            scale_mat = mat4_mult(scale_mat, temp);
-        break;
-        case 4:
-            temp = get_scaling_matrix_con(scale_dn);
-            scale_mat = mat4_mult(scale_mat, temp);
-        break;
-        case GLUT_LEFT_BUTTON:
-            if(state == GLUT_DOWN) {
-                ball_grabbed = 1;
-                curr_x = x;
-                curr_y = y;
-                prev_x = curr_x;
-                prev_y = curr_y;
-            } else {
-                ball_grabbed = 0;
-            }
-        break;
-        default:
-            scale_mat = get_scaling_matrix_con(1);
-    }
-    scale_ctm = *scale_mat;
-    glutPostRedisplay();
-}
-
-void motion(int x, int y) {
-    if(ball_grabbed) {
-        curr_x = x;
-        curr_y = y;
-    }
-}
-
-vec4* get_ball_vec(int x, int y) {
-    vec4* ball_vec = calloc(1, sizeof(vec4));
-
-    GLfloat proj_x = (x/(WIDTH*1.0)) * 2.0 - 1.0;
-    GLfloat proj_y = -1*((y/(HEIGHT*1.0)) * 2.0 - 1.0);
-    GLfloat sqr_dist = proj_x*proj_x + proj_y*proj_y;
-    GLfloat proj_z;
-    if(sqr_dist <= 1.0) {
-        proj_z = sqrt(1 - sqr_dist);
-    } else {
-        proj_z = 0;
-    }
-
-    ball_vec->vec[X] = proj_x;
-    ball_vec->vec[Y] = proj_y;
-    ball_vec->vec[Z] = proj_z;
-
-    return ball_vec;
 }
