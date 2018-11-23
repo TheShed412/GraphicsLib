@@ -118,6 +118,7 @@ void init(void)
     scale_ctm_location =  glGetUniformLocation(program, "scale_ctm");
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_CLAMP);
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glDepthRange(1,0);
 }
