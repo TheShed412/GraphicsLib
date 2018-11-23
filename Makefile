@@ -33,4 +33,4 @@ proj2: $(OBJDIR)/project2.o
 	gcc -g -o project2 $(LIBDIR)/matrix_lib.c $(LIBDIR)/initShader.c $(LIBDIR)/transformations.c $(LIBDIR)/maze_helper.c $(LIBDIR)/view.c project2.c $(LIBFLAGS)
 
 proj3: $(OBJDIR)/project3.o
-	gcc -g -o project3 $(LIBDIR)/matrix_lib.c $(LIBDIR)/initShader.c $(LIBDIR)/transformations.c $(LIBDIR)/maze_helper.c $(LIBDIR)/view.c project3.c $(LIBFLAGS)
+	gcc -g -o project3 $(LIBDIR)/matrix_lib.c $(LIBDIR)/initShader.c $(LIBDIR)/transformations.c $(LIBDIR)/maze_helper.c $(LIBDIR)/view.c $(LIBDIR)/shapes.c project3.c $(LIBFLAGS)
