@@ -90,25 +90,9 @@ vec4* genRandomTriangleColors(int num_vertices)
     return colors;
 }
 
-/**
- * From the circle.c file with a couple small changes
-*/
-
-// void rotate_vertices(vec4* vertices, GLfloat twist, int axis) {
-//     vec4 temp;
-//     for (int i=0; i < NUM_VERTICES; i++) {
-//         temp = vertices[i];
-//         vertices[i] = *rotation(&temp, twist, axis);
-//     }
-// }
-
-
-/**
- * From the circle.c file with a couple small changes
-*/
 void init(void)
 {
-    GLuint program = initShader("shaders/vshader_proj1.glsl", "shaders/fshader_proj1.glsl");
+    GLuint program = initShader("shaders/vshader_proj3.glsl", "shaders/fshader_proj3.glsl");
     glUseProgram(program);
 
     vec4 *circle_vertices = torus(NUM_VERTICES, 0, X);
