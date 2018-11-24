@@ -15,7 +15,7 @@
 /* numTriangles = 360/degreePerVertex */
 /* for the circle, vertices are 3 x numTriangles */
 /* for the cone, vertices are 6 x numTriangles */
-#define NUM_VERTICES 15552
+#define NUM_VERTICES 36
 #define TIMER 1
 #define WIDTH 1024
 #define HEIGHT 1024
@@ -38,7 +38,7 @@ mat4 scale_ctm =             {1, 0, 0, 0,
 
 vec4 origin = {0, 0, 0, 0};
 
-vec4 eyes = {0, 0, -2, 1};// starting point {-10, 11, -10, 1}
+vec4 eyes = {0, 10, -40, 1};// starting point {-10, 11, -10, 1}
 vec4 look_at_pos = {0, 0, 0, 1};// starting point {0, 11, -10, 1}
 vec4 up_vec = {0, 1, 0, 1};
 
@@ -80,9 +80,9 @@ vec4* genRandomTriangleColors(int num_vertices)
 
     for(i = 0; i < num_vertices / 3; i++)
     {
-        r = rand() / (float) RAND_MAX;
-        g = rand() / (float) RAND_MAX;
-        b = rand() / (float) RAND_MAX;
+        r = 0;
+        g = 0.4;
+        b = 0;
 
         colors[index] = (vec4){r, g, b, 1.0};
         colors[index + 1] = (vec4){r, g, b, 1.0};
@@ -97,10 +97,12 @@ void init(void)
 {
     GLuint program = initShader("shaders/vshader_proj3.glsl", "shaders/fshader_proj3.glsl");
     glUseProgram(program);
-    vec4* shape_verts =torus(NUM_VERTICES, 1, Y);
-    shape_verts = rotate_vertices(shape_verts, NUM_VERTICES, 0.5, X);
+    vec4* cube_verts = cube();
+    // 20X20 cube that has y=0
+    cube_verts = scale_vertices(cube_verts, NUM_VERTICES, 40, 40, 40);
+    cube_verts = translate_vertices(cube_verts, NUM_VERTICES, 0.0, -20, 0.0);
 
-    vec4 *circle_vertices = shape_verts;
+    vec4 *circle_vertices = cube_verts;
     vec4 *circle_colors = genRandomTriangleColors(NUM_VERTICES);
 
     int f = 1;
