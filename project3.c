@@ -10,6 +10,7 @@
 #include "headers/matrix_lib.h"
 #include "headers/transformations.h"
 #include "headers/shapes.h"
+#include "headers/view.h"
 
 /* numTriangles = 360/degreePerVertex */
 /* for the circle, vertices are 3 x numTriangles */
@@ -20,6 +21,10 @@
 #define HEIGHT 1024
 
 GLuint ctm_location;
+GLuint perspective_shift;
+GLuint cam_shit;
+mat4 projection;
+mat4 model_view;
 mat4 ctm =             {1, 0, 0, 0,
                         0, 1, 0, 0,
                         0, 0, 1, 0,
@@ -33,6 +38,9 @@ mat4 scale_ctm =             {1, 0, 0, 0,
 
 vec4 origin = {0, 0, 0, 0};
 
+vec4 eyes = {0, 0, -2, 1};// starting point {-10, 11, -10, 1}
+vec4 look_at_pos = {0, 0, 0, 1};// starting point {0, 11, -10, 1}
+vec4 up_vec = {0, 1, 0, 1};
 
 vec4* genRandomTriangleColors(int num_vertices);
 void init(void);
@@ -94,6 +102,10 @@ void init(void)
 
     vec4 *circle_vertices = shape_verts;
     vec4 *circle_colors = genRandomTriangleColors(NUM_VERTICES);
+
+    int f = 1;
+    projection = *frustum(-f, f, f, -f, -f, f);
+    model_view = *look_at(&eyes, &look_at_pos, &up_vec);
     
     GLuint vao;
     glGenVertexArrays(1, &vao);
@@ -116,6 +128,8 @@ void init(void)
 
     ctm_location = glGetUniformLocation(program, "ctm");
     scale_ctm_location =  glGetUniformLocation(program, "scale_ctm");
+    perspective_shift = glGetUniformLocation(program, "projection");
+    cam_shit = glGetUniformLocation(program, "model_view");
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_DEPTH_CLAMP);
@@ -135,6 +149,9 @@ void display(void)
 
     glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ctm);
     glUniformMatrix4fv(scale_ctm_location, 1, GL_FALSE, (GLfloat *) &scale_ctm);
+    glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ctm);
+    glUniformMatrix4fv(perspective_shift, 1, GL_FALSE, (GLfloat *) &projection);
+    glUniformMatrix4fv(cam_shit, 1, GL_FALSE, (GLfloat *) &model_view);
 
     glDrawArrays(GL_TRIANGLES, 0, NUM_VERTICES);
 
