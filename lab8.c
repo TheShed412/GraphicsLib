@@ -12,7 +12,7 @@
 #include "headers/shapes.h"
 #include "headers/view.h"
 
-#define NUM_VERTICES 6144
+#define NUM_VERTICES 6180
 #define TIMER 1
 #define WIDTH 1024
 #define HEIGHT 1024
@@ -35,7 +35,7 @@ mat4 scale_ctm =             {1, 0, 0, 0,
 
 vec4 origin = {0, 0, 0, 0};
 
-vec4 eyes = {0, 2, -2, 1};// starting point {-10, 11, -10, 1}
+vec4 eyes = {0, 3, -3.5, 1};// starting point {-10, 11, -10, 1}
 vec4 look_at_pos = {0, 0, 0, 1};// starting point {0, 11, -10, 1}
 vec4 up_vec = {0, 1, 0, 1};
 
@@ -96,15 +96,22 @@ vec4* genRandomTriangleColors(int num_vertices)
 
 void init(void)
 {
-    GLuint program = initShader("shaders/vshader_proj3.glsl", "shaders/fshader_proj3.glsl");
+    GLuint program = initShader("shaders/vshader_lab8.glsl", "shaders/fshader_lab8.glsl");
     glUseProgram(program);
     vec4* cube_verts = cube();
-    // 20X20 cube that has y=0
-    vec4* sphere_verts = uv_sphere(1.5, 32, 32);
-    // cube_verts = scale_vertices(cube_verts, NUM_VERTICES, 40, 40, 40);
-    // cube_verts = translate_vertices(cube_verts, NUM_VERTICES, 0.0, -20, 0.0);
+    cube_verts = translate_vertices(cube_verts, 36, -2.5, 0, 0);
+    vec4* sphere_verts = uv_sphere(1.0, 32, 32);
 
-    vec4 *circle_vertices = sphere_verts;
+    vec4 *total_vertices = calloc(NUM_VERTICES, sizeof(vec4));
+
+    for (int i = 0; i < NUM_VERTICES-36; i++) {
+        total_vertices[i] = sphere_verts[i];
+    }
+
+    for (int i = 0; i < 36; i++) {
+        total_vertices[(NUM_VERTICES-36)+i] = cube_verts[i];
+    }
+
     vec4 *circle_colors = genRandomTriangleColors(NUM_VERTICES);
 
     int f = 1;
@@ -119,7 +126,7 @@ void init(void)
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vec4) * 2 * NUM_VERTICES, NULL, GL_STATIC_DRAW);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vec4) * NUM_VERTICES, circle_vertices);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vec4) * NUM_VERTICES, total_vertices);
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(vec4) * NUM_VERTICES, sizeof(vec4) * NUM_VERTICES, circle_colors);
 
     GLuint vPosition = glGetAttribLocation(program, "vPosition");
@@ -167,9 +174,9 @@ GLfloat spin = 0.0;
 void idle(int value) 
 {   
     glutTimerFunc(TIMER, idle, 0);
-    mat4* rotation_matrix = get_rotation_matrix(spin, Y);
-    ctm = *rotation_matrix;
-    spin += 0.01;
+    // mat4* rotation_matrix = get_rotation_matrix(spin, Y);
+    // ctm = *rotation_matrix;
+    // spin += 0.01;
     glutPostRedisplay();
 }
 
