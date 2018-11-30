@@ -11,7 +11,7 @@
 #include "../headers/transformations.h"
 
 #define VERTS_IN_CUBE 36
-#define VERTS_IN_SPHERE 1// placeholder for now
+#define VERTS_IN_SPHERE 2200// placeholder for now
 
 static void rotate_n_vertices(vec4* vertices, GLfloat twist, int axis, int num_vertices) {
     vec4 temp;
@@ -168,8 +168,100 @@ vec4* cube(){
     return cube;
 }
 
-vec4* sphere() {
+vec4* sphere(vec4 origin, float radius) {
     vec4* sphere_verts = calloc(VERTS_IN_SPHERE, VERTS_IN_SPHERE*sizeof(vec4));
+
+    int vert_index = 0;
+    for(float phi = 0; phi < 2*M_PI; phi += M_PI/10) {
+        for (float theta = 0; theta < M_PI; theta += M_PI/10) {
+
+            float x = radius * cos(phi) * sin(theta) + origin.vec[X];
+            float y = radius * sin(phi) * sin(theta) + origin.vec[Y];
+            float z = radius * cos(theta) + origin.vec[Z];
+
+            sphere_verts[vert_index].vec[X] = x;
+            sphere_verts[vert_index].vec[Y] = y;
+            sphere_verts[vert_index].vec[Z] = z;
+            sphere_verts[vert_index].vec[W] = 1;
+
+            vert_index++;
+        }
+    }
+
+    return sphere_verts;
+}
+
+vec4* uv_sphere(float radius, int stacks, int slices) {
+    int num_verts = stacks * (slices+1) * 2 * 3;
+    vec4* sphere_verts = calloc(num_verts, num_verts*sizeof(vec4));
+    int vert_index = 0;
+
+    for (int i = 0; i < stacks; i ++) {
+        GLfloat lat1 = (M_PI/stacks) * i - M_PI/2;
+        GLfloat lat2 = (M_PI/stacks) * (i+1) - M_PI/2; 
+        GLfloat sin_lat1 = sin(lat1);
+        GLfloat cos_lat1 = cos(lat1);
+        GLfloat sin_lat2 = sin(lat2);
+        GLfloat cos_lat2 = cos(lat2);
+
+        for (int j = 0; j < slices; j ++) {
+            GLfloat lon = (2*M_PI/slices) * j;
+            GLfloat lon2 = (2*M_PI/slices) * (j+1);
+            GLfloat sin_lon1 = sin(lon);
+            GLfloat cos_lon1 = cos(lon);
+
+            GLfloat sin_lon2 = sin(lon2);
+            GLfloat cos_lon2 = cos(lon2);
+
+            GLfloat x1 = cos_lon1 * cos_lat1;
+            GLfloat y1 = sin_lon1 * cos_lat1;
+            GLfloat z1 = sin_lat1;
+
+            GLfloat x2 = cos_lon1 * cos_lat2;
+            GLfloat y2 = sin_lon1 * cos_lat2;
+            GLfloat z2 = sin_lat2;
+
+            GLfloat x3 = cos_lon2 * cos_lat1;
+            GLfloat y3 = sin_lon2 * cos_lat1;
+            GLfloat z3 = sin_lat1;
+
+            GLfloat x4 = cos_lon2 * cos_lat2;
+            GLfloat y4 = sin_lon2 * cos_lat2;
+            GLfloat z4 = sin_lat2;
+
+            sphere_verts[vert_index+0].vec[X] = x3*radius;
+            sphere_verts[vert_index+0].vec[Y] = y3*radius;
+            sphere_verts[vert_index+0].vec[Z] = z3*radius;
+            sphere_verts[vert_index+0].vec[W] = 1;
+
+            sphere_verts[vert_index+1].vec[X] = x2*radius;
+            sphere_verts[vert_index+1].vec[Y] = y2*radius;
+            sphere_verts[vert_index+1].vec[Z] = z2*radius;
+            sphere_verts[vert_index+1].vec[W] = 1;
+
+            sphere_verts[vert_index+2].vec[X] = x1*radius;
+            sphere_verts[vert_index+2].vec[Y] = y1*radius;
+            sphere_verts[vert_index+2].vec[Z] = z1*radius;
+            sphere_verts[vert_index+2].vec[W] = 1;
+
+            sphere_verts[vert_index+3].vec[X] = x4*radius;
+            sphere_verts[vert_index+3].vec[Y] = y4*radius;
+            sphere_verts[vert_index+3].vec[Z] = z4*radius;
+            sphere_verts[vert_index+3].vec[W] = 1;
+
+            sphere_verts[vert_index+4].vec[X] = x2*radius;
+            sphere_verts[vert_index+4].vec[Y] = y2*radius;
+            sphere_verts[vert_index+4].vec[Z] = z2*radius;
+            sphere_verts[vert_index+4].vec[W] = 1;
+
+            sphere_verts[vert_index+5].vec[X] = x3*radius;
+            sphere_verts[vert_index+5].vec[Y] = y3*radius;
+            sphere_verts[vert_index+5].vec[Z] = z3*radius;
+            sphere_verts[vert_index+5].vec[W] = 1;
+
+            vert_index+=6;
+        }
+    }
 
     return sphere_verts;
 }

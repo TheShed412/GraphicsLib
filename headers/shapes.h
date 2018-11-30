@@ -9,4 +9,8 @@ vec4* torus(int num_vertices, GLfloat twist, int axis);
 
 vec4* cube();
 
+vec4* sphere(vec4 origin, float radius);
+
+vec4* uv_sphere(float radius, int stacks, int slices);
+
 #endif
