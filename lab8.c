@@ -198,7 +198,7 @@ void init(void)
     vec4* cube_verts = cube();
     cube_verts = translate_vertices(cube_verts, CUBE_VERTS, 0.5, 0.5, 0);
     vec4* sphere_verts = uv_sphere(0.5, 32, 32);
-    sphere_verts = translate_vertices(sphere_verts, SPHERE_VERTS, -0.5, 0.25, 0);
+    sphere_verts = translate_vertices(sphere_verts, SPHERE_VERTS, -1.0, 0.5, 0);
 
     vec4* total_vertices = calloc(NUM_VERTICES*2, sizeof(vec4));
     vec4* total_colors = calloc(NUM_VERTICES*2, sizeof(vec4));
