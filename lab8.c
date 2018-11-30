@@ -13,6 +13,8 @@
 #include "headers/view.h"
 
 #define NUM_VERTICES 6180
+#define CUBE_VERTS 36
+#define SPHERE_VERTS 6144
 #define TIMER 1
 #define WIDTH 1024
 #define HEIGHT 1024
@@ -94,25 +96,67 @@ vec4* genRandomTriangleColors(int num_vertices)
     return colors;
 }
 
+vec4* cube_colors(int num_vertices)
+{
+    GLfloat r, g, b;
+    int index = 0, i;
+
+    srand(time(0));
+
+    vec4 *colors = (vec4 *) malloc(sizeof(vec4) * num_vertices);
+
+    for(i = 0; i < num_vertices / 6; i++)
+    {
+        // r = 0;
+        // g = 0.4;
+        // b = 0;
+
+        r = rand() / (float) RAND_MAX;
+        g = rand() / (float) RAND_MAX;
+        b = rand() / (float) RAND_MAX;
+
+        colors[index + 0] = (vec4){r, g, b, 1.0};
+        colors[index + 1] = (vec4){r, g, b, 1.0};
+        colors[index + 2] = (vec4){r, g, b, 1.0};
+        colors[index + 3] = (vec4){r, g, b, 1.0};
+        colors[index + 4] = (vec4){r, g, b, 1.0};
+        colors[index + 5] = (vec4){r, g, b, 1.0};
+        index += 6;
+    }
+
+    return colors;
+}
+
 void init(void)
 {
     GLuint program = initShader("shaders/vshader_lab8.glsl", "shaders/fshader_lab8.glsl");
     glUseProgram(program);
     vec4* cube_verts = cube();
-    cube_verts = translate_vertices(cube_verts, 36, -2.5, 0, 0);
-    vec4* sphere_verts = uv_sphere(1.0, 32, 32);
+    cube_verts = translate_vertices(cube_verts, CUBE_VERTS, 0.5, 0.25, 0);
+    vec4* sphere_verts = uv_sphere(0.5, 32, 32);
+    sphere_verts = translate_vertices(sphere_verts, SPHERE_VERTS, -0.5, 0.25, 0);
 
-    vec4 *total_vertices = calloc(NUM_VERTICES, sizeof(vec4));
+    vec4* total_vertices = calloc(NUM_VERTICES, sizeof(vec4));
+    vec4* total_colors = calloc(NUM_VERTICES, sizeof(vec4));
 
-    for (int i = 0; i < NUM_VERTICES-36; i++) {
+    for (int i = 0; i < SPHERE_VERTS; i++) {
         total_vertices[i] = sphere_verts[i];
     }
 
     for (int i = 0; i < 36; i++) {
-        total_vertices[(NUM_VERTICES-36)+i] = cube_verts[i];
+        total_vertices[SPHERE_VERTS+i] = cube_verts[i];
     }
 
-    vec4 *circle_colors = genRandomTriangleColors(NUM_VERTICES);
+    vec4* sphere_colors = genRandomTriangleColors(SPHERE_VERTS);
+    vec4* cube_color = cube_colors(CUBE_VERTS);
+
+    for (int i = 0; i < SPHERE_VERTS; i++) {
+        total_colors[i] = sphere_colors[i];
+    }
+
+    for (int i = 0; i < 36; i++) {
+        total_colors[SPHERE_VERTS+i] = cube_color[i];
+    }
 
     int f = 1;
     projection = *frustum(-f, f, f, -f, -f, f);
@@ -127,7 +171,7 @@ void init(void)
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vec4) * 2 * NUM_VERTICES, NULL, GL_STATIC_DRAW);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vec4) * NUM_VERTICES, total_vertices);
-    glBufferSubData(GL_ARRAY_BUFFER, sizeof(vec4) * NUM_VERTICES, sizeof(vec4) * NUM_VERTICES, circle_colors);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(vec4) * NUM_VERTICES, sizeof(vec4) * NUM_VERTICES, total_colors);
 
     GLuint vPosition = glGetAttribLocation(program, "vPosition");
     glEnableVertexAttribArray(vPosition);
