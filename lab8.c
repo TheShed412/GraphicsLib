@@ -196,7 +196,7 @@ void init(void)
     GLuint program = initShader("shaders/vshader_lab8.glsl", "shaders/fshader_lab8.glsl");
     glUseProgram(program);
     vec4* cube_verts = cube();
-    cube_verts = translate_vertices(cube_verts, CUBE_VERTS, 0.5, 0.25, 0);
+    cube_verts = translate_vertices(cube_verts, CUBE_VERTS, 0.5, 0.5, 0);
     vec4* sphere_verts = uv_sphere(0.5, 32, 32);
     sphere_verts = translate_vertices(sphere_verts, SPHERE_VERTS, -0.5, 0.25, 0);
 
