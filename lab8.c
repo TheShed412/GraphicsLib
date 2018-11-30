@@ -37,8 +37,12 @@ mat4 scale_ctm =             {1, 0, 0, 0,
 
 vec4 origin = {0, 0, 0, 0};
 
-vec4 eyes = {0, 3, -3.5, 1};// starting point {-10, 11, -10, 1}
-vec4 look_at_pos = {0, 0, 0, 1};// starting point {0, 11, -10, 1}
+GLfloat eyex, eyey, eyez;
+GLfloat atx, aty, atz;
+GLfloat lightx, lighty, lightz;
+
+vec4 eyes = {0, 3, -3.5, 1};
+vec4 look_at_pos = {0, 0, 0, 1};
 vec4 up_vec = {0, 1, 0, 1};
 
 vec4* genRandomTriangleColors(int num_vertices);
@@ -47,9 +51,20 @@ void display(void);
 void idle(int);
 void keyboard(unsigned char key, int mousex, int mousey);
 
-
 int main(int argc, char **argv) 
 {
+    printf("Enter eye point: ");
+    scanf("%f,%f,%f", &eyex, &eyey, &eyez);
+    printf("Enter at point: ");
+    scanf("%f,%f,%f", &atx, &aty, &atz);
+    printf("Enter light point: ");
+    scanf("%f,%f,%f", &lightx, &lighty, &lightz);
+    eyes.vec[X] = eyex;
+    eyes.vec[Y] = eyey;
+    eyes.vec[Z] = eyez;
+    look_at_pos.vec[X] = atx;
+    look_at_pos.vec[Y] = aty;
+    look_at_pos.vec[Z] = atz;
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
     glutInitWindowSize(WIDTH, HEIGHT);
@@ -127,6 +142,55 @@ vec4* cube_colors(int num_vertices)
     return colors;
 }
 
+vec4* vert_shadow(vec4* cube_verts, const vec4* light_pos, int size) {
+    vec4* shadow = calloc(size, sizeof(vec4));
+
+    GLfloat zs;
+    GLfloat xs;
+
+    GLfloat xl = light_pos->vec[X];
+    GLfloat yl = light_pos->vec[Y];
+    GLfloat zl = light_pos->vec[Z];
+
+    GLfloat x;
+    GLfloat y;
+    GLfloat z;
+
+    for (int i = 0; i < size; i++) {
+        x = cube_verts[i].vec[X];
+        y = cube_verts[i].vec[Y];
+        z = cube_verts[i].vec[Z];
+
+        xs = xl - (yl * ((xl-x)/(yl-y)));
+        zs = zl - (yl * ((zl-z)/(yl-y)));
+        shadow[i].vec[X] = xs;
+        shadow[i].vec[Z] = zs;
+        shadow[i].vec[W] = 1;
+    }
+    return shadow;
+}
+
+vec4* shadow_colors(int num_vertices)
+{
+    GLfloat r, g, b;
+    int index = 0, i;
+
+    vec4 *colors = (vec4 *) malloc(sizeof(vec4) * num_vertices);
+
+    for(i = 0; i < num_vertices / 3; i++)
+    {
+        r = 0;
+        g = 0;
+        b = 0;
+
+        colors[index + 0] = (vec4){r, g, b, 1.0};
+        colors[index + 1] = (vec4){r, g, b, 1.0};
+        colors[index + 2] = (vec4){r, g, b, 1.0};
+        index += 3;
+    }
+
+    return colors;
+}
 void init(void)
 {
     GLuint program = initShader("shaders/vshader_lab8.glsl", "shaders/fshader_lab8.glsl");
@@ -136,8 +200,8 @@ void init(void)
     vec4* sphere_verts = uv_sphere(0.5, 32, 32);
     sphere_verts = translate_vertices(sphere_verts, SPHERE_VERTS, -0.5, 0.25, 0);
 
-    vec4* total_vertices = calloc(NUM_VERTICES, sizeof(vec4));
-    vec4* total_colors = calloc(NUM_VERTICES, sizeof(vec4));
+    vec4* total_vertices = calloc(NUM_VERTICES*2, sizeof(vec4));
+    vec4* total_colors = calloc(NUM_VERTICES*2, sizeof(vec4));
 
     for (int i = 0; i < SPHERE_VERTS; i++) {
         total_vertices[i] = sphere_verts[i];
@@ -161,6 +225,24 @@ void init(void)
     int f = 1;
     projection = *frustum(-f, f, f, -f, -f, f);
     model_view = *look_at(&eyes, &look_at_pos, &up_vec);
+
+    vec4 light_vec = {lightx, lighty, lightz, 1};
+
+    vec4* cube_shadow = vert_shadow(cube_verts, &light_vec, CUBE_VERTS);
+    vec4* sphere_shadow = vert_shadow(sphere_verts, &light_vec, SPHERE_VERTS);
+    vec4* shadow_color = shadow_colors(NUM_VERTICES);
+
+    for(int i = 0; i < NUM_VERTICES; i++) {
+        total_colors[NUM_VERTICES+i] = shadow_color[i];
+    }
+
+    for (int i = 0; i < SPHERE_VERTS; i++) {
+        total_vertices[NUM_VERTICES+i] = sphere_shadow[i];
+    }
+
+    for (int i = 0; i < CUBE_VERTS; i++) {
+        total_vertices[NUM_VERTICES + SPHERE_VERTS + i] = cube_shadow[i];
+    }
     
     GLuint vao;
     glGenVertexArrays(1, &vao);
@@ -169,9 +251,9 @@ void init(void)
     GLuint buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vec4) * 2 * NUM_VERTICES, NULL, GL_STATIC_DRAW);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vec4) * NUM_VERTICES, total_vertices);
-    glBufferSubData(GL_ARRAY_BUFFER, sizeof(vec4) * NUM_VERTICES, sizeof(vec4) * NUM_VERTICES, total_colors);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vec4) * 2 * NUM_VERTICES*2, NULL, GL_STATIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vec4) * NUM_VERTICES*2, total_vertices);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(vec4) * NUM_VERTICES*2, sizeof(vec4) * NUM_VERTICES*2, total_colors);
 
     GLuint vPosition = glGetAttribLocation(program, "vPosition");
     glEnableVertexAttribArray(vPosition);
@@ -179,7 +261,7 @@ void init(void)
 
     GLuint vColor = glGetAttribLocation(program, "vColor");
     glEnableVertexAttribArray(vColor);
-    glVertexAttribPointer(vColor, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid *) (sizeof(vec4) * NUM_VERTICES));
+    glVertexAttribPointer(vColor, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid *) (sizeof(vec4) * NUM_VERTICES*2));
 
     ctm_location = glGetUniformLocation(program, "ctm");
     scale_ctm_location =  glGetUniformLocation(program, "scale_ctm");
@@ -188,7 +270,7 @@ void init(void)
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_DEPTH_CLAMP);
-    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClearColor(1.0, 1.0, 1.0, 1.0);
     glDepthRange(1,0);
 }
 
@@ -208,7 +290,7 @@ void display(void)
     glUniformMatrix4fv(perspective_shift, 1, GL_FALSE, (GLfloat *) &projection);
     glUniformMatrix4fv(cam_shit, 1, GL_FALSE, (GLfloat *) &model_view);
 
-    glDrawArrays(GL_TRIANGLES, 0, NUM_VERTICES);
+    glDrawArrays(GL_TRIANGLES, 0, NUM_VERTICES*2);
 
     glutSwapBuffers();
 }
