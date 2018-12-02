@@ -13,6 +13,8 @@
 #include "headers/view.h"
 
 #define NUM_VERTICES 6144
+#define SPHERE_VERTS 6144
+#define CUBE_VERTS 36
 #define TIMER 1
 #define WIDTH 1024
 #define HEIGHT 1024
@@ -35,7 +37,9 @@ mat4 scale_ctm =             {1, 0, 0, 0,
 
 vec4 origin = {0, 0, 0, 0};
 
-vec4 eyes = {0, 2, -2, 1};// starting point {-10, 11, -10, 1}
+int num_vertices = 0;
+
+vec4 eyes = {0, 4, 4, 1};// starting point {-10, 11, -10, 1}
 vec4 look_at_pos = {0, 0, 0, 1};// starting point {0, 11, -10, 1}
 vec4 up_vec = {0, 1, 0, 1};
 
@@ -94,18 +98,85 @@ vec4* genRandomTriangleColors(int num_vertices)
     return colors;
 }
 
+vec4* colored_verts(int num_vertices, GLfloat r, GLfloat g, GLfloat b) {
+    int index = 0, i;
+    vec4 *colors = (vec4 *) malloc(sizeof(vec4) * num_vertices);
+
+    for(i = 0; i < num_vertices / 3; i++)
+    {
+        colors[index] = (vec4){r, g, b, 1.0};
+        colors[index + 1] = (vec4){r, g, b, 1.0};
+        colors[index + 2] = (vec4){r, g, b, 1.0};
+        index += 3;
+    }
+
+    return colors;
+}
+
+int add_to_scene(vec4* scene_verts, vec4* shape_verts, int shape_size, int offset) {
+    int size = 0;
+
+    for (int i=0; i < shape_size; i++) {
+        scene_verts[offset + i] = shape_verts[i];
+    }
+
+    return shape_size;
+}
+
 void init(void)
 {
+    num_vertices = SPHERE_VERTS*5 + CUBE_VERTS;
     GLuint program = initShader("shaders/vshader_proj3.glsl", "shaders/fshader_proj3.glsl");
     glUseProgram(program);
-    vec4* cube_verts = cube();
+    
     // 20X20 cube that has y=0
-    vec4* sphere_verts = uv_sphere(1.5, 32, 32);
-    // cube_verts = scale_vertices(cube_verts, NUM_VERTICES, 40, 40, 40);
-    // cube_verts = translate_vertices(cube_verts, NUM_VERTICES, 0.0, -20, 0.0);
+    vec4* ball1 = uv_sphere(0.5, 32, 32);
+    ball1 = translate_vertices(ball1, SPHERE_VERTS, 0, 0.5, 0);
+    //vec4* ball1_color = colored_verts(SPHERE_VERTS, 0.4, 0, 0);
+    vec4* ball1_color = genRandomTriangleColors(SPHERE_VERTS);
 
-    vec4 *circle_vertices = sphere_verts;
-    vec4 *circle_colors = genRandomTriangleColors(NUM_VERTICES);
+    vec4* ball2 = uv_sphere(0.5, 32, 32);
+    ball2 = translate_vertices(ball2, SPHERE_VERTS, 1, 0.5, 0);
+    //vec4* ball1_color = colored_verts(SPHERE_VERTS, 0.4, 0, 0);
+    vec4* ball2_color = genRandomTriangleColors(SPHERE_VERTS);
+
+    vec4* ball3 = uv_sphere(0.5, 32, 32);
+    ball3 = translate_vertices(ball3, SPHERE_VERTS, 2, 0.5, 0);
+    //vec4* ball1_color = colored_verts(SPHERE_VERTS, 0.4, 0, 0);
+    vec4* ball3_color = genRandomTriangleColors(SPHERE_VERTS);
+
+    vec4* ball4 = uv_sphere(0.5, 32, 32);
+    ball4 = translate_vertices(ball4, SPHERE_VERTS, 3, 0.5, 0);
+    //vec4* ball1_color = colored_verts(SPHERE_VERTS, 0.4, 0, 0);
+    vec4* ball4_color = genRandomTriangleColors(SPHERE_VERTS);
+
+    vec4* ball5 = uv_sphere(0.5, 32, 32);
+    ball5 = translate_vertices(ball5, SPHERE_VERTS, 4, 0.5, 0);
+    //vec4* ball1_color = colored_verts(SPHERE_VERTS, 0.4, 0, 0);
+    vec4* ball5_color = genRandomTriangleColors(SPHERE_VERTS);
+
+    /* table cube */
+    vec4* cube_verts = cube();
+    cube_verts = scale_vertices(cube_verts, CUBE_VERTS, 40, 40, 40);
+    cube_verts = translate_vertices(cube_verts, CUBE_VERTS, 0.0, -20, 0.0);
+    vec4* cube_colors = colored_verts(CUBE_VERTS, 0, 0.4, 0);
+
+    vec4* scene_verts = calloc(num_vertices, sizeof(vec4));
+    vec4* scene_colors = calloc(num_vertices, sizeof(vec4));
+
+    int curr_vert_size = add_to_scene(scene_verts, cube_verts, CUBE_VERTS, 0);
+    curr_vert_size += add_to_scene(scene_verts, ball1, SPHERE_VERTS, curr_vert_size);
+    curr_vert_size += add_to_scene(scene_verts, ball2, SPHERE_VERTS, curr_vert_size);
+    curr_vert_size += add_to_scene(scene_verts, ball3, SPHERE_VERTS, curr_vert_size);
+    curr_vert_size += add_to_scene(scene_verts, ball4, SPHERE_VERTS, curr_vert_size);
+    curr_vert_size += add_to_scene(scene_verts, ball5, SPHERE_VERTS, curr_vert_size);
+
+    int curr_col_size = add_to_scene(scene_colors, cube_colors, CUBE_VERTS, 0);
+    curr_col_size += add_to_scene(scene_colors, ball1_color, SPHERE_VERTS, curr_col_size);
+    curr_col_size += add_to_scene(scene_colors, ball2_color, SPHERE_VERTS, curr_col_size);
+    curr_col_size += add_to_scene(scene_colors, ball3_color, SPHERE_VERTS, curr_col_size);
+    curr_col_size += add_to_scene(scene_colors, ball4_color, SPHERE_VERTS, curr_col_size);
+    curr_col_size += add_to_scene(scene_colors, ball5_color, SPHERE_VERTS, curr_col_size);
 
     int f = 1;
     projection = *frustum(-f, f, f, -f, -f, f);
@@ -118,9 +189,9 @@ void init(void)
     GLuint buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vec4) * 2 * NUM_VERTICES, NULL, GL_STATIC_DRAW);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vec4) * NUM_VERTICES, circle_vertices);
-    glBufferSubData(GL_ARRAY_BUFFER, sizeof(vec4) * NUM_VERTICES, sizeof(vec4) * NUM_VERTICES, circle_colors);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vec4) * 2 * num_vertices, NULL, GL_STATIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vec4) * num_vertices, scene_verts);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(vec4) * num_vertices, sizeof(vec4) * num_vertices, scene_colors);
 
     GLuint vPosition = glGetAttribLocation(program, "vPosition");
     glEnableVertexAttribArray(vPosition);
@@ -128,7 +199,7 @@ void init(void)
 
     GLuint vColor = glGetAttribLocation(program, "vColor");
     glEnableVertexAttribArray(vColor);
-    glVertexAttribPointer(vColor, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid *) (sizeof(vec4) * NUM_VERTICES));
+    glVertexAttribPointer(vColor, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid *) (sizeof(vec4) * num_vertices));
 
     ctm_location = glGetUniformLocation(program, "ctm");
     scale_ctm_location =  glGetUniformLocation(program, "scale_ctm");
@@ -157,7 +228,7 @@ void display(void)
     glUniformMatrix4fv(perspective_shift, 1, GL_FALSE, (GLfloat *) &projection);
     glUniformMatrix4fv(cam_shit, 1, GL_FALSE, (GLfloat *) &model_view);
 
-    glDrawArrays(GL_TRIANGLES, 0, NUM_VERTICES);
+    glDrawArrays(GL_TRIANGLES, 0, num_vertices);
 
     glutSwapBuffers();
 }
@@ -167,9 +238,9 @@ GLfloat spin = 0.0;
 void idle(int value) 
 {   
     glutTimerFunc(TIMER, idle, 0);
-    mat4* rotation_matrix = get_rotation_matrix(spin, Y);
-    ctm = *rotation_matrix;
-    spin += 0.01;
+    // mat4* rotation_matrix = get_rotation_matrix(spin, Y);
+    // ctm = *rotation_matrix;
+    // spin += 0.01;
     glutPostRedisplay();
 }
 

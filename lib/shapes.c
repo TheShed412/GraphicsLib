@@ -168,29 +168,6 @@ vec4* cube(){
     return cube;
 }
 
-vec4* sphere(vec4 origin, float radius) {
-    vec4* sphere_verts = calloc(VERTS_IN_SPHERE, VERTS_IN_SPHERE*sizeof(vec4));
-
-    int vert_index = 0;
-    for(float phi = 0; phi < 2*M_PI; phi += M_PI/10) {
-        for (float theta = 0; theta < M_PI; theta += M_PI/10) {
-
-            float x = radius * cos(phi) * sin(theta) + origin.vec[X];
-            float y = radius * sin(phi) * sin(theta) + origin.vec[Y];
-            float z = radius * cos(theta) + origin.vec[Z];
-
-            sphere_verts[vert_index].vec[X] = x;
-            sphere_verts[vert_index].vec[Y] = y;
-            sphere_verts[vert_index].vec[Z] = z;
-            sphere_verts[vert_index].vec[W] = 1;
-
-            vert_index++;
-        }
-    }
-
-    return sphere_verts;
-}
-
 vec4* uv_sphere(float radius, int stacks, int slices) {
     int num_verts = stacks * (slices+1) * 2 * 3;
     vec4* sphere_verts = calloc(num_verts, num_verts*sizeof(vec4));
