@@ -11,6 +11,7 @@
 #include "headers/transformations.h"
 #include "headers/shapes.h"
 #include "headers/view.h"
+#include "headers/lighting.h"
 
 #define NUM_VERTICES 6144
 #define SPHERE_VERTS 6144
