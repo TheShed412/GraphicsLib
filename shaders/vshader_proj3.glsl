@@ -2,7 +2,13 @@
 
 attribute vec4 vPosition;
 attribute vec4 vColor;
+attribute vec4 vNormal;
+
 varying vec4 color;
+varying vec4 N;
+varying vec4 L;
+varying vec4 E;
+varying float dist;
 
 uniform vec4 light_point;
 uniform mat4 ctm;

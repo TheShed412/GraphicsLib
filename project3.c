@@ -25,6 +25,17 @@ GLuint perspective_shift;
 GLuint cam_shit;
 GLuint is_shadow_location;
 GLuint light_point_location;
+
+GLuint ap_location;
+GLuint dp_location;
+GLuint sp_location;
+
+GLuint ac_location;
+GLuint al_location;
+GLuint aq_location;
+
+GLuint shininess_location;
+
 mat4 projection;
 mat4 model_view;
 mat4 ctm =             {1, 0, 0, 0,
@@ -75,6 +86,8 @@ vec4 up_vec = {0, 1, 0, 1};
 vec4 light_diffuse = {1.0, 1.0, 1.0, 1.0};
 vec4 light_specular = {1.0, 1.0, 1.0, 1.0};
 vec4 light_ambient = {0.2, 0.2, 0.2, 1.0};
+
+GLfloat shininess = 0.2;
 
 material ball_materials[5] = {
     {{1.0, 0.0, 0.0, 1.0}, {1.0, 0.0, 0.0, 1.0}, {1.0, 1.0, 1.0, 1.0}, 10},
