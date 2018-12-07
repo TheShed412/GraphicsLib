@@ -414,7 +414,7 @@ void idle(int value)
 
     mat4* ball_rotation_matrix5 = get_rotation_matrix(ball5_spin, Y);
     ball5_ctm = *ball_rotation_matrix5;
-    ball1_spin += 0.01;
+    ball1_spin += 0.00;
     ball2_spin += 0.0125;
     ball3_spin += 0.015;
     ball4_spin += 0.02;
