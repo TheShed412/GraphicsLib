@@ -26,11 +26,12 @@ void main()
 
 	if(isShadow == 1) {
 		color = shadow_color;
-		float x = light_point.x - (light_point.y * ((light_point.x-vPosition.x)/(light_point.y-vPosition.y)));
+		vec4 shadow_pos = ctm * vPosition;
+		float x = light_point.x - (light_point.y * ((light_point.x-shadow_pos.x)/(light_point.y-shadow_pos.y)));
 		float y = 0.001;
-		float z = light_point.z - (light_point.y * ((light_point.z-vPosition.z)/(light_point.y-vPosition.y)));
+		float z = light_point.z - (light_point.y * ((light_point.z-shadow_pos.z)/(light_point.y-shadow_pos.y)));
 
-		gl_Position = (projection * model_view * ctm * vec4(x, y, z, 1.0));
+		gl_Position = (projection * model_view * vec4(x, y, z, 1.0));
 	} else {
 		ambient = AmbientProduct;
 		vec4 N = normalize(model_view * ctm * vNormal);

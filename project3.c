@@ -69,6 +69,11 @@ mat4 ball5_ctm =       {1, 0, 0, 0,
                         0, 0, 1, 0,
                         0, 0, 0, 1};
 
+mat4 light_ctm =       {1, 0, 0, 0,
+                        0, 1, 0, 0,
+                        0, 0, 1, 0,
+                        0, 0, 0, 1};
+
 GLuint scale_ctm_location;
 mat4 scale_ctm =       {1, 0, 0, 0,
                         0, 1, 0, 0,
@@ -115,7 +120,8 @@ void display(void);
 void idle(int);
 void keyboard(unsigned char key, int mousex, int mousey);
 void handle_key_up(unsigned char key, int x, int y) ;
-
+void special_keyboard(int key, int mousex, int mousey);
+void handle_special_key_up(int key, int x, int y);
 
 int main(int argc, char **argv) 
 {
@@ -129,6 +135,8 @@ int main(int argc, char **argv)
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
     glutKeyboardUpFunc(handle_key_up);
+    glutSpecialFunc(special_keyboard);
+    glutSpecialUpFunc(handle_special_key_up);
     glutTimerFunc(TIMER, idle, 0);
     glutMainLoop();
 
@@ -538,7 +546,7 @@ void display(void)
     glUniform1fv(ac_location, 1, &ac);
     glUniform1fv(al_location, 1, &al);
     glUniform1fv(aq_location, 1, &aq);
-    glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ctm);
+    glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &light_ctm);
     glDrawArrays(GL_TRIANGLES, 36 + SPHERE_VERTS*5, SPHERE_VERTS);
 
     glUniform1i(is_shadow_location, 1);
@@ -573,6 +581,10 @@ GLfloat ball5_spin = 0.0;
 GLboolean y_spin = GL_FALSE;
 GLboolean other_spin = GL_FALSE;
 int spin_dir = Y;
+
+GLfloat light_move_hor = 0.0;
+GLfloat light_move_vert = 0.0;
+GLfloat light_move_height = 0.0;
 
 void idle(int value) 
 {   
@@ -641,11 +653,53 @@ void keyboard(unsigned char key, int mousex, int mousey)
     glutPostRedisplay();
 }
 
+void special_keyboard(int key, int mousex, int mousey)
+{
+    
+    switch(key) {
+        case GLUT_KEY_RIGHT:
+           light_move_hor += 0.15;
+        break;
+        case GLUT_KEY_LEFT:
+            light_move_hor -= 0.15;
+        break;
+        case GLUT_KEY_UP:
+            light_move_vert -= 0.15;
+        break;
+        case GLUT_KEY_DOWN:
+            light_move_vert += 0.15;
+        break;
+        case GLUT_KEY_CTRL_R:
+            light_move_height += 0.15; 
+        break;
+        case GLUT_KEY_ALT_R:
+            light_move_height -= 0.15; 
+        break;
+    }
+
+    mat4* temp = get_translation_matrix(light_move_hor, light_move_height, light_move_vert);
+    light_ctm = *mat4_mult(temp, &light_ctm);
+    light_point = *mat_mult_vec(&light_ctm, &light_point);
+
+    glutPostRedisplay();
+}
+
 void handle_key_up(unsigned char key, int x, int y) {
     switch(key) {
         default:
         other_spin = GL_FALSE;
         spin = 0.0;
+        break;
+    }
+    glutPostRedisplay();
+}
+
+void handle_special_key_up(int key, int x, int y) {
+    switch(key) {
+        default:
+        light_move_hor = 0.0;
+        light_move_vert = 0.0;
+        light_move_height = 0.0;
         break;
     }
     glutPostRedisplay();
