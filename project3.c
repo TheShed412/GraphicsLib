@@ -30,7 +30,27 @@ mat4 ctm =             {1, 0, 0, 0,
                         0, 0, 1, 0,
                         0, 0, 0, 1};
 
-mat4 ball_ctm =        {1, 0, 0, 0,
+mat4 ball1_ctm =       {1, 0, 0, 0,
+                        0, 1, 0, 0,
+                        0, 0, 1, 0,
+                        0, 0, 0, 1};
+
+mat4 ball2_ctm =       {1, 0, 0, 0,
+                        0, 1, 0, 0,
+                        0, 0, 1, 0,
+                        0, 0, 0, 1};
+
+mat4 ball3_ctm =       {1, 0, 0, 0,
+                        0, 1, 0, 0,
+                        0, 0, 1, 0,
+                        0, 0, 0, 1};
+
+mat4 ball4_ctm =       {1, 0, 0, 0,
+                        0, 1, 0, 0,
+                        0, 0, 1, 0,
+                        0, 0, 0, 1};
+
+mat4 ball5_ctm =       {1, 0, 0, 0,
                         0, 1, 0, 0,
                         0, 0, 1, 0,
                         0, 0, 0, 1};
@@ -277,7 +297,6 @@ void init(void)
     glVertexAttribPointer(vColor, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid *) (sizeof(vec4) * num_vertices));
 
     ctm_location = glGetUniformLocation(program, "ctm");
-    ball_ctm_location = glGetUniformLocation(program, "ball_ctm");
     scale_ctm_location =  glGetUniformLocation(program, "scale_ctm");
     perspective_shift = glGetUniformLocation(program, "projection");
     cam_shit = glGetUniformLocation(program, "model_view");
@@ -295,19 +314,40 @@ void display(void)
     glPolygonMode(GL_FRONT, GL_FILL);
     glPolygonMode(GL_BACK, GL_LINE);
 
-    glUniformMatrix4fv(ball_ctm_location, 1, GL_FALSE, (GLfloat *) &ball_ctm);
     glUniformMatrix4fv(scale_ctm_location, 1, GL_FALSE, (GLfloat *) &scale_ctm);
-    glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ctm);
     glUniformMatrix4fv(perspective_shift, 1, GL_FALSE, (GLfloat *) &projection);
     glUniformMatrix4fv(cam_shit, 1, GL_FALSE, (GLfloat *) &model_view);
 
-    glDrawArrays(GL_TRIANGLES, 0, num_vertices);
+    glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ctm);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ball1_ctm);
+    glDrawArrays(GL_TRIANGLES, 36, SPHERE_VERTS);
+
+    glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ball2_ctm);
+    glDrawArrays(GL_TRIANGLES, 36 + SPHERE_VERTS, SPHERE_VERTS);
+
+    glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ball3_ctm);
+    glDrawArrays(GL_TRIANGLES, 36 + SPHERE_VERTS*2, SPHERE_VERTS);
+
+    glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ball4_ctm);
+    glDrawArrays(GL_TRIANGLES, 36 + SPHERE_VERTS*3, SPHERE_VERTS);
+
+    glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ball5_ctm);
+    glDrawArrays(GL_TRIANGLES, 36 + SPHERE_VERTS*4, SPHERE_VERTS);
+
+    glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ctm);
+    glDrawArrays(GL_TRIANGLES, 36 + SPHERE_VERTS*5, SPHERE_VERTS);
 
     glutSwapBuffers();
 }
 
 GLfloat spin = 0.0;
-GLfloat ball_spin = 0.0;
+GLfloat ball1_spin = 0.0;
+GLfloat ball2_spin = 0.0;
+GLfloat ball3_spin = 0.0;
+GLfloat ball4_spin = 0.0;
+GLfloat ball5_spin = 0.0;
 GLboolean y_spin = GL_FALSE;
 GLboolean other_spin = GL_FALSE;
 int spin_dir = Y;
@@ -315,9 +355,25 @@ int spin_dir = Y;
 void idle(int value) 
 {   
     glutTimerFunc(TIMER, idle, 0);
-    mat4* ball_rotation_matrix = get_rotation_matrix(ball_spin, Y);
-    ball_ctm = *ball_rotation_matrix;
-    ball_spin += 0.01;
+    mat4* ball_rotation_matrix1 = get_rotation_matrix(ball1_spin, Y);
+    ball1_ctm = *ball_rotation_matrix1;
+
+    mat4* ball_rotation_matrix2 = get_rotation_matrix(ball2_spin, Y);
+    ball2_ctm = *ball_rotation_matrix2;
+
+    mat4* ball_rotation_matrix3 = get_rotation_matrix(ball3_spin, Y);
+    ball3_ctm = *ball_rotation_matrix3;
+
+    mat4* ball_rotation_matrix4 = get_rotation_matrix(ball4_spin, Y);
+    ball4_ctm = *ball_rotation_matrix4;
+
+    mat4* ball_rotation_matrix5 = get_rotation_matrix(ball5_spin, Y);
+    ball5_ctm = *ball_rotation_matrix5;
+    ball1_spin += 0.01;
+    ball2_spin += 0.0125;
+    ball3_spin += 0.015;
+    ball4_spin += 0.02;
+    ball5_spin += 0.0225;
     
     mat4* rotation_matrix  =  get_rotation_matrix(spin, spin_dir);
     if(other_spin) {
