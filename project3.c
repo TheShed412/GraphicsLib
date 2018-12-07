@@ -216,7 +216,7 @@ int add_to_scene(vec4* scene_verts, vec4* shape_verts, int shape_size, int offse
 
 void init(void)
 {
-    num_vertices = SPHERE_VERTS*12 + CUBE_VERTS;
+    num_vertices = SPHERE_VERTS*11 + CUBE_VERTS;
     GLuint program = initShader("shaders/vshader_proj3.glsl", "shaders/fshader_proj3.glsl");
     glUseProgram(program);
     
@@ -268,6 +268,11 @@ void init(void)
     curr_vert_size += add_to_scene(scene_verts, ball4, SPHERE_VERTS, curr_vert_size);
     curr_vert_size += add_to_scene(scene_verts, ball5, SPHERE_VERTS, curr_vert_size);
     curr_vert_size += add_to_scene(scene_verts, light, SPHERE_VERTS, curr_vert_size);
+    curr_vert_size += add_to_scene(scene_verts, ball1, SPHERE_VERTS, curr_vert_size);
+    curr_vert_size += add_to_scene(scene_verts, ball2, SPHERE_VERTS, curr_vert_size);
+    curr_vert_size += add_to_scene(scene_verts, ball3, SPHERE_VERTS, curr_vert_size);
+    curr_vert_size += add_to_scene(scene_verts, ball4, SPHERE_VERTS, curr_vert_size);
+    curr_vert_size += add_to_scene(scene_verts, ball5, SPHERE_VERTS, curr_vert_size);
 
     int curr_col_size = add_to_scene(scene_colors, cube_colors, CUBE_VERTS, 0);
     curr_col_size += add_to_scene(scene_colors, ball1_color, SPHERE_VERTS, curr_col_size);
@@ -276,6 +281,11 @@ void init(void)
     curr_col_size += add_to_scene(scene_colors, ball4_color, SPHERE_VERTS, curr_col_size);
     curr_col_size += add_to_scene(scene_colors, ball5_color, SPHERE_VERTS, curr_col_size);
     curr_col_size += add_to_scene(scene_colors, light_color, SPHERE_VERTS, curr_col_size);
+    curr_col_size += add_to_scene(scene_colors, ball1_color, SPHERE_VERTS, curr_col_size);
+    curr_col_size += add_to_scene(scene_colors, ball2_color, SPHERE_VERTS, curr_col_size);
+    curr_col_size += add_to_scene(scene_colors, ball3_color, SPHERE_VERTS, curr_col_size);
+    curr_col_size += add_to_scene(scene_colors, ball4_color, SPHERE_VERTS, curr_col_size);
+    curr_col_size += add_to_scene(scene_colors, ball5_color, SPHERE_VERTS, curr_col_size);
 
     int f = 1;
     projection = *frustum(-f, f, f, -f, -f, f);
@@ -330,29 +340,49 @@ void display(void)
     glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ctm);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
-    glUniform1i(is_shadow_location, 1);
+    glUniform1i(is_shadow_location, 0);
     glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ball1_ctm);
     glDrawArrays(GL_TRIANGLES, 36, SPHERE_VERTS);
 
-    glUniform1i(is_shadow_location, 1);
+    glUniform1i(is_shadow_location, 0);
     glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ball2_ctm);
     glDrawArrays(GL_TRIANGLES, 36 + SPHERE_VERTS, SPHERE_VERTS);
 
-    glUniform1i(is_shadow_location, 1);
+    glUniform1i(is_shadow_location, 0);
     glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ball3_ctm);
     glDrawArrays(GL_TRIANGLES, 36 + SPHERE_VERTS*2, SPHERE_VERTS);
 
-    glUniform1i(is_shadow_location, 1);
+    glUniform1i(is_shadow_location, 0);
     glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ball4_ctm);
     glDrawArrays(GL_TRIANGLES, 36 + SPHERE_VERTS*3, SPHERE_VERTS);
 
-    glUniform1i(is_shadow_location, 1);
+    glUniform1i(is_shadow_location, 0);
     glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ball5_ctm);
     glDrawArrays(GL_TRIANGLES, 36 + SPHERE_VERTS*4, SPHERE_VERTS);
 
     glUniform1i(is_shadow_location, 0);
     glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ctm);
     glDrawArrays(GL_TRIANGLES, 36 + SPHERE_VERTS*5, SPHERE_VERTS);
+
+    glUniform1i(is_shadow_location, 1);
+    glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ball1_ctm);
+    glDrawArrays(GL_TRIANGLES, 36 + SPHERE_VERTS*6, SPHERE_VERTS);
+
+    glUniform1i(is_shadow_location, 1);
+    glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ball2_ctm);
+    glDrawArrays(GL_TRIANGLES, 36 + SPHERE_VERTS*7, SPHERE_VERTS);
+
+    glUniform1i(is_shadow_location, 1);
+    glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ball3_ctm);
+    glDrawArrays(GL_TRIANGLES, 36 + SPHERE_VERTS*8, SPHERE_VERTS);
+
+    glUniform1i(is_shadow_location, 1);
+    glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ball4_ctm);
+    glDrawArrays(GL_TRIANGLES, 36 + SPHERE_VERTS*9, SPHERE_VERTS);
+
+    glUniform1i(is_shadow_location, 1);
+    glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ball5_ctm);
+    glDrawArrays(GL_TRIANGLES, 36 + SPHERE_VERTS*10, SPHERE_VERTS);
 
     glutSwapBuffers();
 }

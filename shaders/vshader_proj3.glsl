@@ -22,7 +22,7 @@ void main()
 		float y = 0.001;
 		float z = light_point.z - (light_point.y * ((light_point.z-vPosition.z)/(light_point.y-vPosition.y)));
 
-		gl_Position = (projection * model_view * ctm * vec4(x, y, z, 1.0) / vPosition.w);
+		gl_Position = (projection * model_view * ctm * vec4(x, y, z, 1.0));
 	} else {
 		color = vColor;
 		gl_Position = projection * model_view * scale_ctm * ctm * vPosition / vPosition.w;
