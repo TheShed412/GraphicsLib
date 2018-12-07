@@ -23,6 +23,8 @@ GLuint ctm_location;
 GLuint ball_ctm_location;
 GLuint perspective_shift;
 GLuint cam_shit;
+GLuint is_shadow_location;
+GLuint light_point_location;
 mat4 projection;
 mat4 model_view;
 mat4 ctm =             {1, 0, 0, 0,
@@ -62,6 +64,7 @@ mat4 scale_ctm =       {1, 0, 0, 0,
                         0, 0, 0, 1};
 
 vec4 origin = {0, 0, 0, 0};
+vec4 light_point = {0, 3.0, 0, 1};
 
 int num_vertices = 0;
 
@@ -244,7 +247,8 @@ void init(void)
     vec4* ball5_color = genRandomTriangleColors(SPHERE_VERTS);
 
     vec4* light = uv_sphere(0.1, 32, 32);
-    light = translate_vertices(light, SPHERE_VERTS, 0, 3.0, 0);
+    light = translate_vertices(light, SPHERE_VERTS, 
+        light_point.vec[X], light_point.vec[Y], light_point.vec[Z]);
     vec4* light_color = colored_verts(SPHERE_VERTS, 1.0, 1.0, 1.0);
     //vec4* liht_color = genRandomTriangleColors(SPHERE_VERTS);
 
@@ -301,6 +305,9 @@ void init(void)
     perspective_shift = glGetUniformLocation(program, "projection");
     cam_shit = glGetUniformLocation(program, "model_view");
 
+    is_shadow_location = glGetUniformLocation(program, "isShadow");
+    light_point_location = glGetUniformLocation(program, "light_point");
+
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_DEPTH_CLAMP);
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -317,25 +324,33 @@ void display(void)
     glUniformMatrix4fv(scale_ctm_location, 1, GL_FALSE, (GLfloat *) &scale_ctm);
     glUniformMatrix4fv(perspective_shift, 1, GL_FALSE, (GLfloat *) &projection);
     glUniformMatrix4fv(cam_shit, 1, GL_FALSE, (GLfloat *) &model_view);
+    glUniform4fv(light_point_location, 1, (GLfloat *) &light_point);
 
+    glUniform1i(is_shadow_location, 0);
     glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ctm);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
+    glUniform1i(is_shadow_location, 1);
     glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ball1_ctm);
     glDrawArrays(GL_TRIANGLES, 36, SPHERE_VERTS);
 
+    glUniform1i(is_shadow_location, 1);
     glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ball2_ctm);
     glDrawArrays(GL_TRIANGLES, 36 + SPHERE_VERTS, SPHERE_VERTS);
 
+    glUniform1i(is_shadow_location, 1);
     glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ball3_ctm);
     glDrawArrays(GL_TRIANGLES, 36 + SPHERE_VERTS*2, SPHERE_VERTS);
 
+    glUniform1i(is_shadow_location, 1);
     glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ball4_ctm);
     glDrawArrays(GL_TRIANGLES, 36 + SPHERE_VERTS*3, SPHERE_VERTS);
 
+    glUniform1i(is_shadow_location, 1);
     glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ball5_ctm);
     glDrawArrays(GL_TRIANGLES, 36 + SPHERE_VERTS*4, SPHERE_VERTS);
 
+    glUniform1i(is_shadow_location, 0);
     glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ctm);
     glDrawArrays(GL_TRIANGLES, 36 + SPHERE_VERTS*5, SPHERE_VERTS);
 
