@@ -25,6 +25,7 @@ GLuint perspective_shift;
 GLuint cam_shit;
 GLuint is_shadow_location;
 GLuint light_point_location;
+GLuint eye_location;
 
 GLuint ap_location;
 GLuint dp_location;
@@ -97,6 +98,17 @@ material ball_materials[5] = {
     {{1.0, 0.5, 0.0, 1.0}, {1.0, 0.5, 0.0, 1.0}, {1.0, 1.0, 1.0, 1.0}, 10}
 };
 
+material table_material = {{1.0, 0.0, 0.0, 1.0}, {1.0, 0.0, 0.0, 1.0}, {1.0, 1.0, 1.0, 1.0}, 1};
+material light_material = {{1.0, 0.0, 0.0, 1.0}, {1.0, 0.0, 0.0, 1.0}, {1.0, 1.0, 1.0, 1.0}, 1};
+
+vec4* ball1_normals;
+vec4* ball2_normals;
+vec4* ball3_normals;
+vec4* ball4_normals;
+vec4* ball5_normals;
+vec4* light_normals;
+vec4* cube_normals;
+
 vec4* genRandomTriangleColors(int num_vertices);
 void init(void);
 void display(void);
@@ -121,6 +133,17 @@ int main(int argc, char **argv)
     glutMainLoop();
 
     return 0;
+}
+
+vec4* vec4_product(const vec4* vec1, const vec4* vec2) {
+    vec4* result = (vec4*)calloc(1, sizeof(vec4));
+
+    result->vec[X] = vec1->vec[X] * vec2->vec[X];
+    result->vec[Y] = vec1->vec[Y] * vec2->vec[Y];
+    result->vec[Z] = vec1->vec[Z] * vec2->vec[Z];
+    result->vec[W] = vec1->vec[W] * vec2->vec[W];
+
+    return result;
 }
 
 mat4* arbitrary_rotate(GLfloat z_theta, vec4* axis) {
@@ -202,15 +225,34 @@ vec4* genRandomTriangleColors(int num_vertices)
     return colors;
 }
 
+/* assuming the thing is at origin */
+vec4* normal_verts(const vec4* shape_verts, int num_vertices) {
+    int i;
+    vec4 *normals = (vec4 *) malloc(sizeof(vec4) * num_vertices);
+
+    for(i = 0; i < num_vertices; i++)
+    {
+        vec4 vert1 = shape_verts[i];
+
+        vec4* vector1 = vec_sub(&vert1, &origin);
+        vector1->vec[W] = 0;
+    }
+
+    return normals;
+}
+
 vec4* colored_verts(int num_vertices, GLfloat r, GLfloat g, GLfloat b) {
     int index = 0, i;
     vec4 *colors = (vec4 *) malloc(sizeof(vec4) * num_vertices);
 
     for(i = 0; i < num_vertices / 3; i++)
     {
-        colors[index] = (vec4){r, g, b, 1.0};
-        colors[index + 1] = (vec4){r, g, b, 1.0};
-        colors[index + 2] = (vec4){r, g, b, 1.0};
+        // r = r*300;
+        // b = b*300;
+        // g = g*300;
+        colors[index] = (vec4){r*300, g*300, b*300, 1.0};
+        colors[index + 1] = (vec4){r*300, g*300, b*300, 1.0};
+        colors[index + 2] = (vec4){r*300, g*300, b*300, 1.0};
         index += 3;
     }
 
@@ -235,31 +277,42 @@ void init(void)
     
     // 20X20 cube that has y=0
     vec4* ball1 = uv_sphere(0.5, 32, 32);
+    ball1_normals = normal_verts(ball1, SPHERE_VERTS);
     ball1 = translate_vertices(ball1, SPHERE_VERTS, 0, 0.5, 0);
-    //vec4* ball1_color = colored_verts(SPHERE_VERTS, 0.4, 0, 0);
-    vec4* ball1_color = genRandomTriangleColors(SPHERE_VERTS);
+    ball1_normals = translate_vertices(ball1_normals, SPHERE_VERTS, 0, 0.5, 0);
+    vec4* ball1_color = colored_verts(SPHERE_VERTS, 1, 0, 0);
+    //vec4* ball1_color = genRandomTriangleColors(SPHERE_VERTS);
 
     vec4* ball2 = uv_sphere(0.5, 32, 32);
+    ball2_normals = normal_verts(ball2, SPHERE_VERTS);
     ball2 = translate_vertices(ball2, SPHERE_VERTS, 1, 0.5, 0);
-    //vec4* ball1_color = colored_verts(SPHERE_VERTS, 0.4, 0, 0);
-    vec4* ball2_color = genRandomTriangleColors(SPHERE_VERTS);
+    ball2_normals = translate_vertices(ball2_normals, SPHERE_VERTS, 1, 0.5, 0);
+    vec4* ball2_color = colored_verts(SPHERE_VERTS, 0, 1, 0);
+    //vec4* ball2_color = genRandomTriangleColors(SPHERE_VERTS);
 
     vec4* ball3 = uv_sphere(0.5, 32, 32);
+    ball3_normals = normal_verts(ball1, SPHERE_VERTS);
     ball3 = translate_vertices(ball3, SPHERE_VERTS, 2, 0.5, 0);
-    //vec4* ball1_color = colored_verts(SPHERE_VERTS, 0.4, 0, 0);
-    vec4* ball3_color = genRandomTriangleColors(SPHERE_VERTS);
+    ball3_normals = translate_vertices(ball3_normals, SPHERE_VERTS, 2, 0.5, 0);
+    vec4* ball3_color = colored_verts(SPHERE_VERTS, 0, 0, 1);
+    //vec4* ball3_color = genRandomTriangleColors(SPHERE_VERTS);
 
     vec4* ball4 = uv_sphere(0.5, 32, 32);
+    ball4_normals = normal_verts(ball4, SPHERE_VERTS);
     ball4 = translate_vertices(ball4, SPHERE_VERTS, 3, 0.5, 0);
-    //vec4* ball1_color = colored_verts(SPHERE_VERTS, 0.4, 0, 0);
-    vec4* ball4_color = genRandomTriangleColors(SPHERE_VERTS);
+    ball4_normals = translate_vertices(ball4_normals, SPHERE_VERTS, 3, 0.5, 0);
+    vec4* ball4_color = colored_verts(SPHERE_VERTS, 1, 1, 0);
+    //vec4* ball4_color = genRandomTriangleColors(SPHERE_VERTS);
 
     vec4* ball5 = uv_sphere(0.5, 32, 32);
+    ball5_normals = normal_verts(ball5, SPHERE_VERTS);
     ball5 = translate_vertices(ball5, SPHERE_VERTS, 4, 0.5, 0);
-    //vec4* ball1_color = colored_verts(SPHERE_VERTS, 0.4, 0, 0);
-    vec4* ball5_color = genRandomTriangleColors(SPHERE_VERTS);
+    ball5_normals = translate_vertices(ball5_normals, SPHERE_VERTS, 4, 0.5, 0);
+    vec4* ball5_color = colored_verts(SPHERE_VERTS, 0.5, 0.2, 0);
+    //vec4* ball5_color = genRandomTriangleColors(SPHERE_VERTS);
 
     vec4* light = uv_sphere(0.1, 32, 32);
+    light_normals = normal_verts(light, SPHERE_VERTS);
     light = translate_vertices(light, SPHERE_VERTS, 
         light_point.vec[X], light_point.vec[Y], light_point.vec[Z]);
     vec4* light_color = colored_verts(SPHERE_VERTS, 1.0, 1.0, 1.0);
@@ -267,12 +320,18 @@ void init(void)
 
     /* table cube */
     vec4* cube_verts = cube();
+    cube_normals = normal_verts(cube_verts, 36);
     cube_verts = scale_vertices(cube_verts, CUBE_VERTS, 80, 40, 80);
     cube_verts = translate_vertices(cube_verts, CUBE_VERTS, 0.0, -20, 0.0);
+    cube_normals = scale_vertices(cube_normals, CUBE_VERTS, 80, 40, 80);
+    cube_normals = translate_vertices(cube_normals, CUBE_VERTS, 0.0, -20, 0.0);
     vec4* cube_colors = colored_verts(CUBE_VERTS, 0, 0.4, 0);
 
     vec4* scene_verts = calloc(num_vertices, sizeof(vec4));
     vec4* scene_colors = calloc(num_vertices, sizeof(vec4));
+    vec4* scene_normals = calloc(SPHERE_VERTS*6 + CUBE_VERTS, sizeof(vec4));
+    int normal_num = SPHERE_VERTS*6 + CUBE_VERTS;
+
 
     int curr_vert_size = add_to_scene(scene_verts, cube_verts, CUBE_VERTS, 0);
     curr_vert_size += add_to_scene(scene_verts, ball1, SPHERE_VERTS, curr_vert_size);
@@ -300,6 +359,14 @@ void init(void)
     curr_col_size += add_to_scene(scene_colors, ball4_color, SPHERE_VERTS, curr_col_size);
     curr_col_size += add_to_scene(scene_colors, ball5_color, SPHERE_VERTS, curr_col_size);
 
+    int curr_norm_size = add_to_scene(scene_normals, cube_normals, CUBE_VERTS, 0);
+    curr_norm_size += add_to_scene(scene_normals, ball1_normals, SPHERE_VERTS, curr_norm_size);
+    curr_norm_size += add_to_scene(scene_normals, ball2_normals, SPHERE_VERTS, curr_norm_size);
+    curr_norm_size += add_to_scene(scene_normals, ball3_normals, SPHERE_VERTS, curr_norm_size);
+    curr_norm_size += add_to_scene(scene_normals, ball4_normals, SPHERE_VERTS, curr_norm_size);
+    curr_norm_size += add_to_scene(scene_normals, ball5_normals, SPHERE_VERTS, curr_norm_size);
+    curr_norm_size += add_to_scene(scene_normals, light_normals, SPHERE_VERTS, curr_norm_size);
+
     int f = 1;
     projection = *frustum(-f, f, f, -f, -f, f);
     model_view = *look_at(&eyes, &look_at_pos, &up_vec);
@@ -311,9 +378,10 @@ void init(void)
     GLuint buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vec4) * 2 * num_vertices, NULL, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vec4) * (2 * num_vertices + curr_norm_size), NULL, GL_STATIC_DRAW);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vec4) * num_vertices, scene_verts);
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(vec4) * num_vertices, sizeof(vec4) * num_vertices, scene_colors);
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(vec4) * num_vertices * 2, sizeof(vec4) * curr_norm_size, scene_normals);
 
     GLuint vPosition = glGetAttribLocation(program, "vPosition");
     glEnableVertexAttribArray(vPosition);
@@ -323,13 +391,24 @@ void init(void)
     glEnableVertexAttribArray(vColor);
     glVertexAttribPointer(vColor, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid *) (sizeof(vec4) * num_vertices));
 
+    GLuint vNormal = glGetAttribLocation(program, "vNormal");
+    glEnableVertexAttribArray(vNormal);
+    glVertexAttribPointer(vNormal, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid *) (sizeof(vec4) * num_vertices * 2));
+
     ctm_location = glGetUniformLocation(program, "ctm");
     scale_ctm_location =  glGetUniformLocation(program, "scale_ctm");
     perspective_shift = glGetUniformLocation(program, "projection");
     cam_shit = glGetUniformLocation(program, "model_view");
-
+    eye_location = glGetUniformLocation(program, "EyePoint");
     is_shadow_location = glGetUniformLocation(program, "isShadow");
     light_point_location = glGetUniformLocation(program, "light_point");
+    ap_location = glGetUniformLocation(program, "AmbientProduct");
+    sp_location = glGetUniformLocation(program, "SpecularProduct");
+    dp_location = glGetUniformLocation(program, "DiffuseProduct");
+    ac_location = glGetUniformLocation(program, "attenuation_constant");
+    al_location = glGetUniformLocation(program, "attenuation_linear");
+    aq_location = glGetUniformLocation(program, "attenuation_quadratic");
+    shininess_location = glGetUniformLocation(program, "shininess");
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_DEPTH_CLAMP);
@@ -344,36 +423,119 @@ void display(void)
     glPolygonMode(GL_FRONT, GL_FILL);
     glPolygonMode(GL_BACK, GL_LINE);
 
+    GLfloat ac = 1;
+    GLfloat al = 0.1;
+    GLfloat aq = 0.1;
+
     glUniformMatrix4fv(scale_ctm_location, 1, GL_FALSE, (GLfloat *) &scale_ctm);
     glUniformMatrix4fv(perspective_shift, 1, GL_FALSE, (GLfloat *) &projection);
     glUniformMatrix4fv(cam_shit, 1, GL_FALSE, (GLfloat *) &model_view);
     glUniform4fv(light_point_location, 1, (GLfloat *) &light_point);
+    
+    // vec4 light_diffuse = {1.0, 1.0, 1.0, 1.0};
+    // vec4 light_specular = {1.0, 1.0, 1.0, 1.0};
+    // vec4 light_ambient = {0.2, 0.2, 0.2, 1.0};
 
+    // GLfloat shininess = 0.2;
+
+    glUniform4fv(eye_location, 1, (GLfloat *) &eyes);
+
+    //table
     glUniform1i(is_shadow_location, 0);
+    vec4* AmbientProductT = vec4_product(&table_material.reflect_ambient, &light_ambient);
+    vec4* DiffuseProductT = vec4_product(&table_material.reflect_diffuse, &light_diffuse);
+    vec4* SpecularProductT = vec4_product(&table_material.reflect_specular, &light_specular);
+    glUniform4fv(ap_location, 1, (GLfloat *) &AmbientProductT);
+    glUniform4fv(dp_location, 1, (GLfloat *) &DiffuseProductT);
+    glUniform4fv(sp_location, 1, (GLfloat *) &SpecularProductT);
+    glUniform1fv(shininess_location, 1, &table_material.shine);
+    glUniform1fv(ac_location, 1, &ac);
+    glUniform1fv(al_location, 1, &al);
+    glUniform1fv(aq_location, 1, &aq);
     glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ctm);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
     glUniform1i(is_shadow_location, 0);
+    vec4* AmbientProduct1 = vec4_product(&ball_materials[0].reflect_ambient, &light_ambient);
+    vec4* DiffuseProduct1 = vec4_product(&ball_materials[0].reflect_diffuse, &light_diffuse);
+    vec4* SpecularProduct1 = vec4_product(&ball_materials[0].reflect_specular, &light_specular);
+    glUniform4fv(ap_location, 1, (GLfloat *) &AmbientProduct1);
+    glUniform4fv(dp_location, 1, (GLfloat *) &DiffuseProduct1);
+    glUniform4fv(sp_location, 1, (GLfloat *) &SpecularProduct1);
+    glUniform1fv(shininess_location, 1, &ball_materials[0].shine);
+    glUniform1fv(ac_location, 1, &ac);
+    glUniform1fv(al_location, 1, &al);
+    glUniform1fv(aq_location, 1, &aq);
     glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ball1_ctm);
     glDrawArrays(GL_TRIANGLES, 36, SPHERE_VERTS);
 
     glUniform1i(is_shadow_location, 0);
+    vec4* AmbientProduct2 = vec4_product(&ball_materials[1].reflect_ambient, &light_ambient);
+    vec4* DiffuseProduct2 = vec4_product(&ball_materials[1].reflect_diffuse, &light_diffuse);
+    vec4* SpecularProduct2 = vec4_product(&ball_materials[1].reflect_specular, &light_specular);
+    glUniform4fv(ap_location, 1, (GLfloat *) &AmbientProduct2);
+    glUniform4fv(dp_location, 1, (GLfloat *) &DiffuseProduct2);
+    glUniform4fv(sp_location, 1, (GLfloat *) &SpecularProduct2);
+    glUniform1fv(shininess_location, 1, &ball_materials[1].shine);
+    glUniform1fv(ac_location, 1, &ac);
+    glUniform1fv(al_location, 1, &al);
+    glUniform1fv(aq_location, 1, &aq);
     glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ball2_ctm);
     glDrawArrays(GL_TRIANGLES, 36 + SPHERE_VERTS, SPHERE_VERTS);
 
     glUniform1i(is_shadow_location, 0);
+    vec4* AmbientProduct3 = vec4_product(&ball_materials[2].reflect_ambient, &light_ambient);
+    vec4* DiffuseProduct3 = vec4_product(&ball_materials[2].reflect_diffuse, &light_diffuse);
+    vec4* SpecularProduct3 = vec4_product(&ball_materials[2].reflect_specular, &light_specular);
+    glUniform4fv(ap_location, 1, (GLfloat *) &AmbientProduct3);
+    glUniform4fv(dp_location, 1, (GLfloat *) &DiffuseProduct3);
+    glUniform4fv(sp_location, 1, (GLfloat *) &SpecularProduct3);
+    glUniform1fv(shininess_location, 1, &ball_materials[2].shine);
+    glUniform1fv(ac_location, 1, &ac);
+    glUniform1fv(al_location, 1, &al);
+    glUniform1fv(aq_location, 1, &aq);
     glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ball3_ctm);
     glDrawArrays(GL_TRIANGLES, 36 + SPHERE_VERTS*2, SPHERE_VERTS);
 
     glUniform1i(is_shadow_location, 0);
+    vec4* AmbientProduct4 = vec4_product(&ball_materials[3].reflect_ambient, &light_ambient);
+    vec4* DiffuseProduct4 = vec4_product(&ball_materials[3].reflect_diffuse, &light_diffuse);
+    vec4* SpecularProduct4 = vec4_product(&ball_materials[3].reflect_specular, &light_specular);
+    glUniform4fv(ap_location, 1, (GLfloat *) &AmbientProduct4);
+    glUniform4fv(dp_location, 1, (GLfloat *) &DiffuseProduct4);
+    glUniform4fv(sp_location, 1, (GLfloat *) &SpecularProduct4);
+    glUniform1fv(shininess_location, 1, &ball_materials[3].shine);
+    glUniform1fv(ac_location, 1, &ac);
+    glUniform1fv(al_location, 1, &al);
+    glUniform1fv(aq_location, 1, &aq);
     glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ball4_ctm);
     glDrawArrays(GL_TRIANGLES, 36 + SPHERE_VERTS*3, SPHERE_VERTS);
 
     glUniform1i(is_shadow_location, 0);
+    vec4* AmbientProduct5 = vec4_product(&ball_materials[4].reflect_ambient, &light_ambient);
+    vec4* DiffuseProduct5 = vec4_product(&ball_materials[4].reflect_diffuse, &light_diffuse);
+    vec4* SpecularProduct5 = vec4_product(&ball_materials[4].reflect_specular, &light_specular);
+    glUniform4fv(ap_location, 1, (GLfloat *) &AmbientProduct5);
+    glUniform4fv(dp_location, 1, (GLfloat *) &DiffuseProduct5);
+    glUniform4fv(sp_location, 1, (GLfloat *) &SpecularProduct5);
+    glUniform1fv(shininess_location, 1, &ball_materials[4].shine);
+    glUniform1fv(ac_location, 1, &ac);
+    glUniform1fv(al_location, 1, &al);
+    glUniform1fv(aq_location, 1, &aq);
     glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ball5_ctm);
     glDrawArrays(GL_TRIANGLES, 36 + SPHERE_VERTS*4, SPHERE_VERTS);
 
     glUniform1i(is_shadow_location, 0);
+    vec4* AmbientProductL = vec4_product(&light_material.reflect_ambient, &light_ambient);
+    vec4* DiffuseProductL = vec4_product(&light_material.reflect_diffuse, &light_diffuse);
+    vec4* SpecularProductL = vec4_product(&light_material.reflect_specular, &light_specular);
+    glUniform4fv(ap_location, 1, (GLfloat *) &AmbientProductL);
+    glUniform4fv(dp_location, 1, (GLfloat *) &DiffuseProductL);
+    glUniform4fv(sp_location, 1, (GLfloat *) &SpecularProductL);
+    glUniform1fv(shininess_location, 1, &light_material.shine);
+    glUniform1fv(ac_location, 1, &ac);
+    glUniform1fv(al_location, 1, &al);
+    glUniform1fv(aq_location, 1, &aq);
     glUniformMatrix4fv(ctm_location, 1, GL_FALSE, (GLfloat *) &ctm);
     glDrawArrays(GL_TRIANGLES, 36 + SPHERE_VERTS*5, SPHERE_VERTS);
 
