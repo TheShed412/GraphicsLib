@@ -216,7 +216,7 @@ int add_to_scene(vec4* scene_verts, vec4* shape_verts, int shape_size, int offse
 
 void init(void)
 {
-    num_vertices = SPHERE_VERTS*6 + CUBE_VERTS;
+    num_vertices = SPHERE_VERTS*12 + CUBE_VERTS;
     GLuint program = initShader("shaders/vshader_proj3.glsl", "shaders/fshader_proj3.glsl");
     glUseProgram(program);
     
