@@ -98,8 +98,8 @@ material ball_materials[5] = {
     {{1.0, 0.5, 0.0, 1.0}, {1.0, 0.5, 0.0, 1.0}, {1.0, 1.0, 1.0, 1.0}, 10}
 };
 
-material table_material = {{1.0, 0.0, 0.0, 1.0}, {1.0, 0.0, 0.0, 1.0}, {1.0, 1.0, 1.0, 1.0}, 1};
-material light_material = {{1.0, 0.0, 0.0, 1.0}, {1.0, 0.0, 0.0, 1.0}, {1.0, 1.0, 1.0, 1.0}, 1};
+material table_material = {{0.0, 1.0, 0.0, 1.0}, {0.0, 1.0, 0.0, 1.0}, {1.0, 1.0, 1.0, 1.0}, 1};
+material light_material = {{1.0, 1.0, 1.0, 1.0}, {1.0, 1.0, 1.0, 1.0}, {1.0, 1.0, 1.0, 1.0}, 1};
 
 vec4* ball1_normals;
 vec4* ball2_normals;
@@ -123,7 +123,7 @@ int main(int argc, char **argv)
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
     glutInitWindowSize(WIDTH, HEIGHT);
     glutInitWindowPosition(100,100);
-    glutCreateWindow("Peoject 1");
+    glutCreateWindow("Peoject 3");
     glewInit();
     init();
     glutDisplayFunc(display);
@@ -236,6 +236,8 @@ vec4* normal_verts(const vec4* shape_verts, int num_vertices) {
 
         vec4* vector1 = vec_sub(&vert1, &origin);
         vector1->vec[W] = 0;
+        
+        normals[i] = *vector1;
     }
 
     return normals;
@@ -445,9 +447,9 @@ void display(void)
     vec4* AmbientProductT = vec4_product(&table_material.reflect_ambient, &light_ambient);
     vec4* DiffuseProductT = vec4_product(&table_material.reflect_diffuse, &light_diffuse);
     vec4* SpecularProductT = vec4_product(&table_material.reflect_specular, &light_specular);
-    glUniform4fv(ap_location, 1, (GLfloat *) &AmbientProductT);
-    glUniform4fv(dp_location, 1, (GLfloat *) &DiffuseProductT);
-    glUniform4fv(sp_location, 1, (GLfloat *) &SpecularProductT);
+    glUniform4fv(ap_location, 1, (GLfloat *) AmbientProductT);
+    glUniform4fv(dp_location, 1, (GLfloat *) DiffuseProductT);
+    glUniform4fv(sp_location, 1, (GLfloat *) SpecularProductT);
     glUniform1fv(shininess_location, 1, &table_material.shine);
     glUniform1fv(ac_location, 1, &ac);
     glUniform1fv(al_location, 1, &al);
@@ -459,9 +461,9 @@ void display(void)
     vec4* AmbientProduct1 = vec4_product(&ball_materials[0].reflect_ambient, &light_ambient);
     vec4* DiffuseProduct1 = vec4_product(&ball_materials[0].reflect_diffuse, &light_diffuse);
     vec4* SpecularProduct1 = vec4_product(&ball_materials[0].reflect_specular, &light_specular);
-    glUniform4fv(ap_location, 1, (GLfloat *) &AmbientProduct1);
-    glUniform4fv(dp_location, 1, (GLfloat *) &DiffuseProduct1);
-    glUniform4fv(sp_location, 1, (GLfloat *) &SpecularProduct1);
+    glUniform4fv(ap_location, 1, (GLfloat *) AmbientProduct1);
+    glUniform4fv(dp_location, 1, (GLfloat *) DiffuseProduct1);
+    glUniform4fv(sp_location, 1, (GLfloat *) SpecularProduct1);
     glUniform1fv(shininess_location, 1, &ball_materials[0].shine);
     glUniform1fv(ac_location, 1, &ac);
     glUniform1fv(al_location, 1, &al);
@@ -473,9 +475,9 @@ void display(void)
     vec4* AmbientProduct2 = vec4_product(&ball_materials[1].reflect_ambient, &light_ambient);
     vec4* DiffuseProduct2 = vec4_product(&ball_materials[1].reflect_diffuse, &light_diffuse);
     vec4* SpecularProduct2 = vec4_product(&ball_materials[1].reflect_specular, &light_specular);
-    glUniform4fv(ap_location, 1, (GLfloat *) &AmbientProduct2);
-    glUniform4fv(dp_location, 1, (GLfloat *) &DiffuseProduct2);
-    glUniform4fv(sp_location, 1, (GLfloat *) &SpecularProduct2);
+    glUniform4fv(ap_location, 1, (GLfloat *) AmbientProduct2);
+    glUniform4fv(dp_location, 1, (GLfloat *) DiffuseProduct2);
+    glUniform4fv(sp_location, 1, (GLfloat *) SpecularProduct2);
     glUniform1fv(shininess_location, 1, &ball_materials[1].shine);
     glUniform1fv(ac_location, 1, &ac);
     glUniform1fv(al_location, 1, &al);
@@ -487,9 +489,9 @@ void display(void)
     vec4* AmbientProduct3 = vec4_product(&ball_materials[2].reflect_ambient, &light_ambient);
     vec4* DiffuseProduct3 = vec4_product(&ball_materials[2].reflect_diffuse, &light_diffuse);
     vec4* SpecularProduct3 = vec4_product(&ball_materials[2].reflect_specular, &light_specular);
-    glUniform4fv(ap_location, 1, (GLfloat *) &AmbientProduct3);
-    glUniform4fv(dp_location, 1, (GLfloat *) &DiffuseProduct3);
-    glUniform4fv(sp_location, 1, (GLfloat *) &SpecularProduct3);
+    glUniform4fv(ap_location, 1, (GLfloat *) AmbientProduct3);
+    glUniform4fv(dp_location, 1, (GLfloat *) DiffuseProduct3);
+    glUniform4fv(sp_location, 1, (GLfloat *) SpecularProduct3);
     glUniform1fv(shininess_location, 1, &ball_materials[2].shine);
     glUniform1fv(ac_location, 1, &ac);
     glUniform1fv(al_location, 1, &al);
@@ -501,9 +503,9 @@ void display(void)
     vec4* AmbientProduct4 = vec4_product(&ball_materials[3].reflect_ambient, &light_ambient);
     vec4* DiffuseProduct4 = vec4_product(&ball_materials[3].reflect_diffuse, &light_diffuse);
     vec4* SpecularProduct4 = vec4_product(&ball_materials[3].reflect_specular, &light_specular);
-    glUniform4fv(ap_location, 1, (GLfloat *) &AmbientProduct4);
-    glUniform4fv(dp_location, 1, (GLfloat *) &DiffuseProduct4);
-    glUniform4fv(sp_location, 1, (GLfloat *) &SpecularProduct4);
+    glUniform4fv(ap_location, 1, (GLfloat *) AmbientProduct4);
+    glUniform4fv(dp_location, 1, (GLfloat *) DiffuseProduct4);
+    glUniform4fv(sp_location, 1, (GLfloat *) SpecularProduct4);
     glUniform1fv(shininess_location, 1, &ball_materials[3].shine);
     glUniform1fv(ac_location, 1, &ac);
     glUniform1fv(al_location, 1, &al);
@@ -515,9 +517,9 @@ void display(void)
     vec4* AmbientProduct5 = vec4_product(&ball_materials[4].reflect_ambient, &light_ambient);
     vec4* DiffuseProduct5 = vec4_product(&ball_materials[4].reflect_diffuse, &light_diffuse);
     vec4* SpecularProduct5 = vec4_product(&ball_materials[4].reflect_specular, &light_specular);
-    glUniform4fv(ap_location, 1, (GLfloat *) &AmbientProduct5);
-    glUniform4fv(dp_location, 1, (GLfloat *) &DiffuseProduct5);
-    glUniform4fv(sp_location, 1, (GLfloat *) &SpecularProduct5);
+    glUniform4fv(ap_location, 1, (GLfloat *) AmbientProduct5);
+    glUniform4fv(dp_location, 1, (GLfloat *) DiffuseProduct5);
+    glUniform4fv(sp_location, 1, (GLfloat *) SpecularProduct5);
     glUniform1fv(shininess_location, 1, &ball_materials[4].shine);
     glUniform1fv(ac_location, 1, &ac);
     glUniform1fv(al_location, 1, &al);
@@ -529,9 +531,9 @@ void display(void)
     vec4* AmbientProductL = vec4_product(&light_material.reflect_ambient, &light_ambient);
     vec4* DiffuseProductL = vec4_product(&light_material.reflect_diffuse, &light_diffuse);
     vec4* SpecularProductL = vec4_product(&light_material.reflect_specular, &light_specular);
-    glUniform4fv(ap_location, 1, (GLfloat *) &AmbientProductL);
-    glUniform4fv(dp_location, 1, (GLfloat *) &DiffuseProductL);
-    glUniform4fv(sp_location, 1, (GLfloat *) &SpecularProductL);
+    glUniform4fv(ap_location, 1, (GLfloat *) AmbientProductL);
+    glUniform4fv(dp_location, 1, (GLfloat *) DiffuseProductL);
+    glUniform4fv(sp_location, 1, (GLfloat *) SpecularProductL);
     glUniform1fv(shininess_location, 1, &light_material.shine);
     glUniform1fv(ac_location, 1, &ac);
     glUniform1fv(al_location, 1, &al);
